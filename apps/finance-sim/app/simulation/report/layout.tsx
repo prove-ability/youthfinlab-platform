@@ -1,0 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "나의 재무 리포트",
+};
+
+export default function ReportLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
