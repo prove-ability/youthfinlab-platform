@@ -1,15 +1,13 @@
 "use client";
 
 import {
-  IconCamera,
+  IconCalculator,
+  IconChartLine,
   IconDashboard,
   IconFileAi,
-  IconFileDescription,
-  IconHelp,
   IconInnerShadowTop,
   IconListDetails,
-  IconSearch,
-  IconSettings,
+  IconUsers,
 } from "@tabler/icons-react";
 import { UserButton } from "@stackframe/stack";
 import { NavMain } from "@/components/nav-main";
@@ -23,132 +21,53 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "protected/dashboard",
-      icon: IconDashboard,
-    },
-    {
-      title: "고객사 관리",
-      url: "protected/clients",
-      icon: IconListDetails,
-    },
-    {
-      title: "클래스 관리",
-      url: "protected/classes",
-      icon: IconListDetails,
-    },
-    {
-      title: "주식 관리",
-      url: "protected/stock-management",
-      icon: IconInnerShadowTop,
-    },
-    {
-      title: "게임 관리",
-      url: "protected/game-management",
-      icon: IconFileAi,
-    },
-    // {
-    //   title: "Analytics",
-    //   url: "#",
-    //   icon: IconChartBar,
-    // },
-    // {
-    //   title: "Projects",
-    //   url: "#",
-    //   icon: IconFolder,
-    // },
-    // {
-    //   title: "Team",
-    //   url: "#",
-    //   icon: IconUsers,
-    // },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-  // documents: [
-  //   {
-  //     name: "Data Library",
-  //     url: "#",
-  //     icon: IconDatabase,
-  //   },
-  //   {
-  //     name: "Reports",
-  //     url: "#",
-  //     icon: IconReport,
-  //   },
-  //   {
-  //     name: "Word Assistant",
-  //     url: "#",
-  //     icon: IconFileWord,
-  //   },
-  // ],
-};
+const navGroups = [
+  {
+    label: "공통",
+    items: [
+      {
+        title: "Dashboard",
+        url: "protected/dashboard",
+        icon: IconDashboard,
+      },
+      {
+        title: "고객사 관리",
+        url: "protected/clients",
+        icon: IconListDetails,
+      },
+      {
+        title: "클래스 관리",
+        url: "protected/classes",
+        icon: IconUsers,
+      },
+    ],
+  },
+  {
+    label: "주식 투자 게임",
+    items: [
+      {
+        title: "주식 관리",
+        url: "protected/stock-management",
+        icon: IconChartLine,
+      },
+      {
+        title: "게임 관리",
+        url: "protected/game-management",
+        icon: IconFileAi,
+      },
+    ],
+  },
+  {
+    label: "재무 시뮬레이션",
+    items: [
+      {
+        title: "시뮬레이션 관리",
+        url: "protected/finance-sim",
+        icon: IconCalculator,
+      },
+    ],
+  },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -169,8 +88,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+        <NavMain groups={navGroups} />
       </SidebarContent>
       <SidebarFooter>
         <UserButton />

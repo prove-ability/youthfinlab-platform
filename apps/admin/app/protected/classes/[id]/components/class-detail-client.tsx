@@ -571,7 +571,7 @@ export function ClassDetailClient({
         setIsOpen={setIsQRModalOpen}
         classId={classId}
         className={classData.name}
-        webAppUrl={process.env.NEXT_PUBLIC_WEB_APP_URL || "http://localhost:3000"}
+        programType={classData.programType}
       />
     </div>
   );

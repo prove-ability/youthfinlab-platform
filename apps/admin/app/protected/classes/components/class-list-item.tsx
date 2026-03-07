@@ -97,12 +97,21 @@ export function ClassListItem({
   return (
     <div className="border rounded-lg shadow-sm p-6 bg-white">
       <div className="mb-4">
-        <h3
-          className="text-lg font-bold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors"
-          onClick={() => router.push(`/protected/classes/${classItem.id}`)}
-        >
-          {classItem.name}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3
+            className="text-lg font-bold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors"
+            onClick={() => router.push(`/protected/classes/${classItem.id}`)}
+          >
+            {classItem.name}
+          </h3>
+          <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+            classItem.programType === "finance_sim"
+              ? "bg-blue-100 text-blue-700"
+              : "bg-emerald-100 text-emerald-700"
+          }`}>
+            {classItem.programType === "finance_sim" ? "재무" : "주식"}
+          </span>
+        </div>
         <div className="text-sm text-gray-600 space-y-1 mt-2">
           <p>
             <span className="font-medium">클라이언트:</span>{" "}

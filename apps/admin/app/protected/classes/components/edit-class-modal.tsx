@@ -165,6 +165,10 @@ export function EditClassModal({
         <div className="text-center py-4">데이터를 불러오는 중...</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* 프로그램 유형 보존 (수정 시 기존 값 유지) */}
+          <input type="hidden" name="programType" value={classData.programType} />
+          <input type="hidden" name="loginMethod" value={classData.loginMethod} />
+
           <div>
             <label
               htmlFor="name"
