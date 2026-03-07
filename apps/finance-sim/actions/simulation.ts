@@ -153,10 +153,10 @@ export const saveSavingsInvestmentResult = withAuth(
         finalInvestmentAmount: String(data.finalInvestmentAmount),
       });
 
-      if (simulation.currentStep < 4) {
+      if (simulation.currentStep < 3) {
         await tx
           .update(financeSimulations)
-          .set({ currentStep: 4 })
+          .set({ currentStep: 3 })
           .where(eq(financeSimulations.id, simulation.id));
       }
     });
