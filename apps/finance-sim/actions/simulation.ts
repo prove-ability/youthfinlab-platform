@@ -132,9 +132,12 @@ export const saveSavingsInvestmentResult = withAuth(
         eq(financeSimulations.guestId, user.id),
         eq(financeSimulations.classId, user.classId)
       ),
+      with: { profile: true },
     });
 
     if (!simulation) throw new Error("Simulation not found");
+    if (!simulation.profile)
+      throw new Error("Profile must be completed before this step");
 
     await dbWithTransaction.transaction(async (tx) => {
       await tx
@@ -187,6 +190,8 @@ export const savePensionResult = withAuth(
     });
 
     if (!simulation) throw new Error("Simulation not found");
+    if (simulation.currentStep < 4)
+      throw new Error("Savings/investment step must be completed before this step");
 
     await dbWithTransaction.transaction(async (tx) => {
       await tx
@@ -234,6 +239,8 @@ export const saveInvestmentTendency = withAuth(
     });
 
     if (!simulation) throw new Error("Simulation not found");
+    if (simulation.currentStep < 5)
+      throw new Error("Pension step must be completed before this step");
 
     await dbWithTransaction.transaction(async (tx) => {
       await tx
