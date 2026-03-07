@@ -1,6 +1,6 @@
 "use client";
 
-import { formatMoney } from "../../utils";
+import { calculateFinancialSnapshot, formatMoney } from "@repo/utils";
 
 const STATUS_LABELS: Record<string, string> = {
   employed: "재직 중",
@@ -74,42 +74,6 @@ type Simulation = {
   } | null;
 };
 
-function calculateFinancialSnapshot(data: {
-  monthlyIncome: number;
-  monthlyFixedExpenses: number;
-  cashAssets: number;
-  investmentAssets: number;
-  hasDebt: boolean;
-  totalDebtAmount: number;
-}) {
-  const monthlySurplus = data.monthlyIncome - data.monthlyFixedExpenses;
-  const savingsRate =
-    data.monthlyIncome > 0
-      ? Math.round((monthlySurplus / data.monthlyIncome) * 100)
-      : 0;
-  const totalAssets = data.cashAssets + data.investmentAssets;
-  const netWorth = totalAssets - data.totalDebtAmount;
-
-  // 부채 부담도: finance-sim과 동일한 DTI(부채/연소득) 기준으로 산출
-  let debtBurden = "없음";
-  if (data.hasDebt && data.totalDebtAmount > 0) {
-    const debtToIncomeRatio =
-      data.monthlyIncome > 0
-        ? data.totalDebtAmount / (data.monthlyIncome * 12)
-        : Infinity;
-    if (debtToIncomeRatio < 1) debtBurden = "낮음";
-    else if (debtToIncomeRatio < 3) debtBurden = "보통";
-    else debtBurden = "높음";
-  }
-
-  return {
-    monthlySurplus,
-    savingsRate,
-    totalAssets,
-    netWorth,
-    debtBurden,
-  };
-}
 
 export function StudentReportView({ simulation }: { simulation: Simulation }) {
   const profile = simulation.profile;
@@ -196,10 +160,16 @@ export function StudentReportView({ simulation }: { simulation: Simulation }) {
           <div className="text-center p-3 bg-gray-50 rounded-lg">
             <p className="text-xs text-muted-foreground">순자산</p>
             <p className="text-lg font-bold text-blue-600">
-              {snapshot.netWorth.toLocaleString()}만원
+              {snapshot.netAssets.toLocaleString()}만원
             </p>
           </div>
         </div>
+
+        {snapshot.comment && (
+          <p className="mt-4 text-sm text-muted-foreground bg-blue-50 rounded-lg px-4 py-3 border border-blue-100">
+            {snapshot.comment}
+          </p>
+        )}
       </section>
 
       {/* 2. 저축 vs 투자 시뮬레이션 결과 */}
