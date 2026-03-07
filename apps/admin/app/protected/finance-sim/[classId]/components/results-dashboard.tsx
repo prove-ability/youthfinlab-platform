@@ -126,18 +126,16 @@ export function ResultsDashboard({
       {/* 재무 프로필 요약 */}
       {summary.profileStats && (
         <section className="rounded-xl border bg-card p-5">
-          <h2 className="text-lg font-semibold mb-4">재무 프로필 요약</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
+          <SectionBadge num={1} title="재무 프로필 요약" />
+          <div className="grid gap-3 md:grid-cols-3 mt-4">
+            <div className="text-center p-3 bg-blue-50 border border-blue-100 rounded-lg">
               <p className="text-xs text-muted-foreground">평균 월 소득</p>
               <p className="text-xl font-bold text-blue-600">
                 {summary.profileStats.avgIncome.toLocaleString()}만원
               </p>
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-muted-foreground">
-                평균 저축 가능 비율
-              </p>
+            <div className="text-center p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
+              <p className="text-xs text-muted-foreground">평균 저축 가능 비율</p>
               <p className="text-xl font-bold text-emerald-600">
                 {summary.profileStats.avgIncome > 0
                   ? Math.round(
@@ -146,11 +144,10 @@ export function ResultsDashboard({
                         summary.profileStats.avgIncome) *
                         100
                     )
-                  : 0}
-                %
+                  : 0}%
               </p>
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-red-50 border border-red-100 rounded-lg">
               <p className="text-xs text-muted-foreground">부채 보유 비율</p>
               <p className="text-xl font-bold text-red-600">
                 {summary.profileStats.debtRate}%
@@ -163,21 +160,17 @@ export function ResultsDashboard({
       {/* 저축/투자 시뮬레이션 결과 */}
       {summary.investmentStats && (
         <section className="rounded-xl border bg-card p-5">
-          <h2 className="text-lg font-semibold mb-4">
-            저축/투자 시뮬레이션 분포
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2 mb-4">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-muted-foreground">
-                평균 저축 비율
-              </p>
-              <p className="text-xl font-bold">
+          <SectionBadge num={2} title="저축/투자 시뮬레이션 분포" />
+          <div className="grid gap-3 md:grid-cols-2 mb-4 mt-4">
+            <div className="text-center p-3 bg-blue-50 border border-blue-100 rounded-lg">
+              <p className="text-xs text-muted-foreground">평균 저축 비율</p>
+              <p className="text-xl font-bold text-blue-600">
                 {summary.investmentStats.avgSavingsRatio}%
               </p>
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-gray-50 border border-gray-100 rounded-lg">
               <p className="text-xs text-muted-foreground">평균 선택 기간</p>
-              <p className="text-xl font-bold">
+              <p className="text-xl font-bold text-gray-700">
                 {summary.investmentStats.avgPeriod}년
               </p>
             </div>
@@ -269,68 +262,77 @@ export function ResultsDashboard({
       {/* 투자 성향 분포 */}
       {summary.tendencyDistribution.length > 0 && (
         <section className="rounded-xl border bg-card p-5">
-          <h2 className="text-lg font-semibold mb-4">투자 성향 분포</h2>
-          <div className="flex gap-2 flex-wrap">
-            {summary.tendencyDistribution.map((item) => (
-              <div
-                key={item.tendencyType}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                style={{
-                  backgroundColor:
-                    (TENDENCY_COLORS[item.tendencyType] || "#6b7280") + "15",
-                }}
-              >
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{
-                    backgroundColor:
-                      TENDENCY_COLORS[item.tendencyType] || "#6b7280",
-                  }}
-                />
-                <span className="text-sm font-medium">{item.tendencyType}</span>
-                <span className="text-sm text-muted-foreground">
-                  {item.count}명
-                </span>
-              </div>
-            ))}
+          <SectionBadge num={3} title="투자 성향 분포" />
+          <div className="mt-4 space-y-2">
+            {(() => {
+              const total = summary.tendencyDistribution.reduce(
+                (acc, item) => acc + item.count,
+                0
+              );
+              return summary.tendencyDistribution.map((item) => {
+                const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+                const color = TENDENCY_COLORS[item.tendencyType] || "#6b7280";
+                return (
+                  <div key={item.tendencyType} className="flex items-center gap-3">
+                    <span className="text-sm font-medium w-20 shrink-0 text-right">
+                      {item.tendencyType}
+                    </span>
+                    <div className="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${pct}%`, backgroundColor: color }}
+                      />
+                    </div>
+                    <span className="text-sm text-muted-foreground w-16 shrink-0">
+                      {item.count}명 ({pct}%)
+                    </span>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </section>
       )}
 
       {/* 개별 학생 결과 테이블 */}
       <section className="rounded-xl border bg-card p-5">
-        <h2 className="text-lg font-semibold mb-4">개별 학생 결과</h2>
+        <SectionBadge num={4} title="개별 학생 결과" />
         {details.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">
             아직 시뮬레이션을 시작한 학생이 없습니다.
           </p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto mt-4">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="pb-2 font-medium">이름</th>
-                  <th className="pb-2 font-medium">진행</th>
-                  <th className="pb-2 font-medium">나이</th>
-                  <th className="pb-2 font-medium">상태</th>
-                  <th className="pb-2 font-medium">소득</th>
-                  <th className="pb-2 font-medium">저축/투자</th>
-                  <th className="pb-2 font-medium">연금</th>
-                  <th className="pb-2 font-medium">투자 성향</th>
+                <tr className="border-b text-left text-muted-foreground bg-gray-50">
+                  <th className="pb-2 pt-1 px-2 font-medium rounded-tl">이름</th>
+                  <th className="pb-2 pt-1 px-2 font-medium">진행</th>
+                  <th className="pb-2 pt-1 px-2 font-medium">나이</th>
+                  <th className="pb-2 pt-1 px-2 font-medium">상태</th>
+                  <th className="pb-2 pt-1 px-2 font-medium">소득</th>
+                  <th className="pb-2 pt-1 px-2 font-medium">저축/투자</th>
+                  <th className="pb-2 pt-1 px-2 font-medium">연금</th>
+                  <th className="pb-2 pt-1 px-2 font-medium rounded-tr">투자 성향</th>
                 </tr>
               </thead>
               <tbody>
                 {details.map((sim) => (
-                  <tr key={sim.id} className="border-b last:border-0">
-                    <td className="py-2 font-medium">
+                  <tr
+                    key={sim.id}
+                    className="border-b last:border-0 hover:bg-blue-50/40 transition-colors cursor-pointer"
+                    onClick={() => window.location.href = `/protected/finance-sim/${classId}/${sim.id}`}
+                  >
+                    <td className="py-2 px-2 font-medium">
                       <Link
                         href={`/protected/finance-sim/${classId}/${sim.id}`}
                         className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {sim.guest?.name || "-"}
                       </Link>
                     </td>
-                    <td className="py-2">
+                    <td className="py-2 px-2">
                       <span
                         className={`text-xs px-1.5 py-0.5 rounded ${
                           sim.completedAt
@@ -343,28 +345,28 @@ export function ResultsDashboard({
                           : `${sim.currentStep}/6단계`}
                       </span>
                     </td>
-                    <td className="py-2">{sim.profile?.age || "-"}</td>
-                    <td className="py-2">
+                    <td className="py-2 px-2">{sim.profile?.age || "-"}</td>
+                    <td className="py-2 px-2">
                       {sim.profile
                         ? STATUS_LABELS[sim.profile.currentStatus] || "-"
                         : "-"}
                     </td>
-                    <td className="py-2">
+                    <td className="py-2 px-2">
                       {sim.profile
                         ? `${Number(sim.profile.monthlyIncome).toLocaleString()}만`
                         : "-"}
                     </td>
-                    <td className="py-2">
+                    <td className="py-2 px-2">
                       {sim.savingsInvestmentResult
                         ? `${sim.savingsInvestmentResult.savingsRatio}:${sim.savingsInvestmentResult.investmentRatio}`
                         : "-"}
                     </td>
-                    <td className="py-2">
+                    <td className="py-2 px-2">
                       {sim.pensionResult
                         ? `${formatMoney(Number(sim.pensionResult.estimatedMonthlyPension))}원/월`
                         : "-"}
                     </td>
-                    <td className="py-2">
+                    <td className="py-2 px-2">
                       {sim.investmentTendency ? (
                         <span
                           className="text-xs px-1.5 py-0.5 rounded"
@@ -396,6 +398,17 @@ export function ResultsDashboard({
   );
 }
 
+function SectionBadge({ num, title }: { num: number; title: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shrink-0">
+        {num}
+      </span>
+      <h2 className="text-base font-semibold">{title}</h2>
+    </div>
+  );
+}
+
 function StatCard({
   label,
   value,
@@ -406,15 +419,15 @@ function StatCard({
   color: "blue" | "green" | "purple" | "amber";
 }) {
   const colorMap = {
-    blue: "bg-blue-50 text-blue-700",
-    green: "bg-green-50 text-green-700",
-    purple: "bg-purple-50 text-purple-700",
-    amber: "bg-amber-50 text-amber-700",
+    blue: "bg-blue-50 border-blue-200 text-blue-700",
+    green: "bg-green-50 border-green-200 text-green-700",
+    purple: "bg-purple-50 border-purple-200 text-purple-700",
+    amber: "bg-amber-50 border-amber-200 text-amber-700",
   };
 
   return (
-    <div className={`rounded-xl p-4 ${colorMap[color]}`}>
-      <p className="text-xs opacity-80 mb-1">{label}</p>
+    <div className={`rounded-xl border p-4 ${colorMap[color]}`}>
+      <p className="text-xs opacity-70 mb-1">{label}</p>
       <p className="text-2xl font-bold">{value}</p>
     </div>
   );

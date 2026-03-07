@@ -94,123 +94,125 @@ export function ClassListItem({
     }
   };
 
+  const statusConfig = {
+    ended: { label: "종료", className: "bg-gray-100 text-gray-700" },
+    active: { label: "진행 중", className: "bg-green-100 text-green-700" },
+    setting: { label: "설정 중", className: "bg-yellow-100 text-yellow-700" },
+  };
+  const status = statusConfig[classItem.status as keyof typeof statusConfig] ?? statusConfig.setting;
+
   return (
-    <div className="border rounded-lg shadow-sm p-6 bg-white">
-      <div className="mb-4">
-        <div className="flex items-center gap-2">
-          <h3
-            className="text-lg font-bold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors"
-            onClick={() => router.push(`/protected/classes/${classItem.id}`)}
-          >
+    <div className="border rounded-xl bg-white hover:shadow-md transition-shadow overflow-hidden">
+      {/* 카드 헤더 */}
+      <div
+        className="px-5 pt-5 pb-4 cursor-pointer"
+        onClick={() => router.push(`/protected/classes/${classItem.id}`)}
+      >
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <h3 className="text-base font-semibold text-gray-900 leading-snug hover:text-blue-600 transition-colors">
             {classItem.name}
           </h3>
-          <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
-            classItem.programType === "finance_sim"
-              ? "bg-blue-100 text-blue-700"
-              : "bg-emerald-100 text-emerald-700"
-          }`}>
-            {classItem.programType === "finance_sim" ? "재무" : "주식"}
-          </span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+              classItem.programType === "finance_sim"
+                ? "bg-blue-100 text-blue-700"
+                : "bg-emerald-100 text-emerald-700"
+            }`}>
+              {classItem.programType === "finance_sim" ? "재무" : "주식"}
+            </span>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${status.className}`}>
+              {status.label}
+            </span>
+          </div>
         </div>
-        <div className="text-sm text-gray-600 space-y-1 mt-2">
-          <p>
-            <span className="font-medium">클라이언트:</span>{" "}
-            {classItem.client?.name || "데이터 없음"}
-          </p>
-          <p>
-            <span className="font-medium">담당 매니저:</span>{" "}
-            {classItem.manager?.name || "데이터 없음"}
-          </p>
-          <p>
-            <span className="font-medium">생성일:</span>{" "}
-            {new Date(classItem.createdAt).toLocaleDateString("ko-KR")}
-          </p>
-          {classItem.updatedAt && (
-            <p>
-              <span className="font-medium">수정일:</span>{" "}
-              {new Date(classItem.updatedAt).toLocaleDateString("ko-KR")}
+
+        {/* 정보 그리드 */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-gray-500">
+          <div>
+            <span className="text-gray-400">고객사</span>
+            <p className="font-medium text-gray-700 mt-0.5">
+              {classItem.client?.name || "—"}
             </p>
-          )}
-          <p>
-            <span className="font-medium">현재 Day:</span>{" "}
-            <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-              Day {classItem.currentDay || 1}
+          </div>
+          <div>
+            <span className="text-gray-400">담당 매니저</span>
+            <p className="font-medium text-gray-700 mt-0.5">
+              {classItem.manager?.name || "—"}
+            </p>
+          </div>
+          <div>
+            <span className="text-gray-400">생성일</span>
+            <p className="font-medium text-gray-700 mt-0.5">
+              {new Date(classItem.createdAt).toLocaleDateString("ko-KR")}
+            </p>
+          </div>
+          <div>
+            <span className="text-gray-400">현재 Day</span>
+            <p className="font-medium text-gray-700 mt-0.5">
+              {classItem.currentDay || 1}
               {'totalDays' in classItem && classItem.totalDays > 0 && (
-                <span className="opacity-60 ml-1">/ {classItem.totalDays}</span>
+                <span className="text-gray-400"> / {classItem.totalDays}</span>
               )}
-            </span>
-          </p>
-          <p>
-            <span className="font-medium">상태:</span>{" "}
-            <span
-              className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-                classItem.status === "ended"
-                  ? "bg-gray-100 text-gray-800"
-                  : classItem.status === "active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-yellow-100 text-yellow-800"
-              }`}
-            >
-              {classItem.status === "ended"
-                ? "종료"
-                : classItem.status === "active"
-                  ? "진행 중"
-                  : "설정 중"}
-            </span>
-          </p>
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-1 justify-end">
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/protected/classes/${classItem.id}`)}
-          className="text-xs text-blue-500 hover:bg-blue-50 px-2 py-1"
-        >
-          👁️ 상세
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => setIsStudentModalOpen(true)}
-          className="text-xs text-green-500 hover:bg-green-50 px-2 py-1"
-        >
-          + 학생
-        </Button>
-        {classItem.status !== "ended" && (
+      {/* 액션 버튼 영역 */}
+      <div className="border-t bg-gray-50 px-4 py-2.5 flex items-center justify-between gap-1">
+        <div className="flex items-center gap-1">
           <Button
-            onClick={handleStatusChange}
-            disabled={isUpdatingStatus}
-            className={`text-xs px-2 py-1 ${
-              classItem.status === "setting"
-                ? "text-green-600 hover:bg-green-50"
-                : "text-orange-600 hover:bg-orange-50"
-            }`}
+            variant="ghost"
+            onClick={() => router.push(`/protected/classes/${classItem.id}`)}
+            className="text-xs text-blue-600 hover:bg-blue-50 h-7 px-2.5"
+          >
+            상세 보기
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setIsStudentModalOpen(true)}
+            className="text-xs text-emerald-600 hover:bg-emerald-50 h-7 px-2.5"
+          >
+            학생 추가
+          </Button>
+        </div>
+        <div className="flex items-center gap-1">
+          {classItem.status !== "ended" && (
+            <Button
+              onClick={handleStatusChange}
+              disabled={isUpdatingStatus}
+              className={`text-xs h-7 px-2.5 ${
+                classItem.status === "setting"
+                  ? "text-green-600 hover:bg-green-50"
+                  : "text-orange-600 hover:bg-orange-50"
+              }`}
+              variant="ghost"
+            >
+              {isUpdatingStatus
+                ? "변경중..."
+                : classItem.status === "setting"
+                  ? "진행 시작"
+                  : "수업 종료"}
+            </Button>
+          )}
+          <Button
+            onClick={() => onEditClass(classItem)}
+            className="text-xs text-gray-500 hover:bg-gray-100 h-7 px-2.5"
             variant="ghost"
           >
-            {isUpdatingStatus
-              ? "변경중..."
-              : classItem.status === "setting"
-                ? "▶️ 진행"
-                : "⏹️ 종료"}
+            수정
           </Button>
-        )}
-        <Button
-          onClick={() => onEditClass(classItem)}
-          className="text-xs text-blue-500 hover:bg-blue-50 px-2 py-1"
-          variant="ghost"
-        >
-          수정
-        </Button>
-        <Button
-          onClick={() =>
-            handleDeleteClass(classItem.id, classItem.name || "수업")
-          }
-          disabled={isDeleting}
-          className="text-xs text-red-500 hover:bg-red-50 px-2 py-1"
-          variant="ghost"
-        >
-          {isDeleting ? "삭제중" : "삭제"}
-        </Button>
+          <Button
+            onClick={() =>
+              handleDeleteClass(classItem.id, classItem.name || "수업")
+            }
+            disabled={isDeleting}
+            className="text-xs text-red-500 hover:bg-red-50 h-7 px-2.5"
+            variant="ghost"
+          >
+            {isDeleting ? "삭제중..." : "삭제"}
+          </Button>
+        </div>
       </div>
 
       <CreateUserModal

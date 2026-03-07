@@ -29,6 +29,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Edit, Trash2, TrendingUp } from "lucide-react";
+
+const MARKET_FLAGS: Record<string, string> = {
+  KR: "🇰🇷",
+  US: "🇺🇸",
+  JP: "🇯🇵",
+  CN: "🇨🇳",
+};
 import {
   createStockPrice,
   updateStockPrice,
@@ -223,50 +230,40 @@ export default function PriceManagement({
           </CardHeader>
           <CardContent>
             {newsLoading ? (
-              <div className="text-center py-4">
-                <div className="text-muted-foreground">
-                  뉴스를 불러오는 중...
-                </div>
+              <div className="flex items-center justify-center py-8">
+                <span className="animate-spin inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full" />
               </div>
             ) : previousDayNews.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {previousDayNews.map((news, index) => (
-                  <div
-                    key={news.id}
-                    className="border rounded-lg p-4 bg-muted/30"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-sm">
-                        뉴스 {index + 1}: {news.title}
+                  <div key={news.id} className="rounded-lg border border-gray-100 bg-gray-50/60 p-3">
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <h4 className="font-semibold text-sm text-gray-900">
+                        <span className="text-gray-400 font-normal mr-1">#{index + 1}</span>
+                        {news.title}
                       </h4>
-                      {news.relatedStockIds &&
-                        news.relatedStockIds.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {news.relatedStockIds.map((stockId) => {
-                              const stock = stocks.find(
-                                (s) => s.id === stockId
-                              );
-                              return stock ? (
-                                <span
-                                  key={stockId}
-                                  className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
-                                >
-                                  {stock.name}
-                                </span>
-                              ) : null;
-                            })}
-                          </div>
-                        )}
+                      {news.relatedStockIds && news.relatedStockIds.length > 0 && (
+                        <div className="flex flex-wrap gap-1 shrink-0">
+                          {news.relatedStockIds.map((stockId) => {
+                            const stock = stocks.find((s) => s.id === stockId);
+                            return stock ? (
+                              <span key={stockId} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                {stock.name}
+                              </span>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">
                       {news.content}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-4 border-2 border-dashed border-gray-200 rounded-lg">
-                <p className="text-muted-foreground">
+              <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-xl">
+                <p className="text-sm text-muted-foreground">
                   Day {selectedDay - 1}에 작성된 뉴스가 없습니다.
                 </p>
               </div>
@@ -298,71 +295,63 @@ export default function PriceManagement({
                   가격 추가
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                  <DialogTitle>새 주식 가격 추가</DialogTitle>
+                  <DialogTitle>가격 추가</DialogTitle>
                   <DialogDescription>
-                    Day {selectedDay}의 새로운 주식 가격을 설정하세요
+                    Day {selectedDay} 주식 가격을 설정하세요
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="stock">주식 선택 *</Label>
+                <div className="space-y-3 py-1">
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="stock" className="text-sm font-medium">
+                      종목 <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       value={formData.stockId ?? undefined}
                       onValueChange={(value) =>
                         setFormData({ ...formData, stockId: value })
                       }
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="주식을 선택하세요" />
+                      <SelectTrigger id="stock">
+                        <SelectValue placeholder="종목을 선택하세요" />
                       </SelectTrigger>
                       <SelectContent>
                         {availableStocks.map((stock) => (
                           <SelectItem key={stock.id} value={stock.id}>
-                            {stock.name} ({stock.marketCountryCode})
+                            {MARKET_FLAGS[stock.marketCountryCode] ?? "🌐"} {stock.name} ({stock.marketCountryCode})
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label htmlFor="price">가격 *</Label>
-                    <div className="flex items-center space-x-2">
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="price" className="text-sm font-medium">
+                      가격 <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="flex items-center gap-2">
                       <Input
                         id="price"
                         type="number"
                         value={Number(formData.price)}
                         onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            price: e.target.value,
-                          })
+                          setFormData({ ...formData, price: e.target.value })
                         }
-                        placeholder="가격을 입력하세요"
+                        placeholder="10000"
                         min="0"
                         step="100"
                       />
-                      <span className="text-sm text-muted-foreground">원</span>
+                      <span className="text-sm text-muted-foreground shrink-0">원</span>
                     </div>
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsCreateDialogOpen(false)}
-                  >
-                    취소
-                  </Button>
+                  <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>취소</Button>
                   <Button
                     onClick={handleCreate}
-                    disabled={
-                      loading ||
-                      !formData.stockId ||
-                      Number(formData.price) <= 0
-                    }
+                    disabled={loading || !formData.stockId || Number(formData.price) <= 0}
                   >
-                    {loading ? "생성 중..." : "생성"}
+                    {loading ? "추가 중..." : "가격 추가"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -387,48 +376,42 @@ export default function PriceManagement({
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {prices.map((price) => (
-                  <Card
+                  <div
                     key={price.id}
-                    className="border-l-4 border-l-green-500"
+                    className="rounded-xl border border-gray-200 bg-white overflow-hidden hover:shadow-sm transition-shadow"
                   >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-lg">
-                            {getStockName(price.stockId || "")}
-                          </CardTitle>
-                          <CardDescription>Day {price.day}</CardDescription>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openEditDialog(price)}
-                          >
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDelete(price)}
-                            disabled={loading}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
+                    <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/80">
+                      <div>
+                        <p className="font-semibold text-sm text-gray-900">{getStockName(price.stockId || "")}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">Day {price.day}</p>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-green-600">
-                        {formatPrice(Number(price.price))}원
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditDialog(price)}
+                          className="h-7 px-2.5 text-xs text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                        >
+                          <Edit className="h-3 w-3 mr-1" />수정
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(price)}
+                          disabled={loading}
+                          className="h-7 px-2.5 text-xs text-gray-500 hover:text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />삭제
+                        </Button>
                       </div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {new Date(price.createdAt).toLocaleDateString()}
-                      </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-2xl font-bold text-green-600">{formatPrice(Number(price.price))}<span className="text-sm font-normal ml-0.5">원</span></p>
+                      <p className="text-xs text-muted-foreground mt-1">{new Date(price.createdAt).toLocaleDateString("ko-KR")}</p>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -442,69 +425,63 @@ export default function PriceManagement({
 
           {/* 수정 다이얼로그 */}
           <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-sm">
               <DialogHeader>
-                <DialogTitle>주식 가격 수정</DialogTitle>
+                <DialogTitle>가격 수정</DialogTitle>
                 <DialogDescription>
-                  주식 가격 정보를 수정하세요
+                  {editingPrice && `${getStockName(editingPrice.stockId || "")} Day ${editingPrice.day} 가격을 수정하세요`}
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="edit-stock">주식 선택 *</Label>
+              <div className="space-y-3 py-1">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="edit-stock" className="text-sm font-medium">
+                    종목 <span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     value={formData.stockId ?? undefined}
                     onValueChange={(value) =>
                       setFormData({ ...formData, stockId: value })
                     }
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="주식을 선택하세요" />
+                    <SelectTrigger id="edit-stock">
+                      <SelectValue placeholder="종목을 선택하세요" />
                     </SelectTrigger>
                     <SelectContent>
                       {stocks.map((stock) => (
                         <SelectItem key={stock.id} value={stock.id}>
-                          {stock.name} ({stock.marketCountryCode})
+                          {MARKET_FLAGS[stock.marketCountryCode] ?? "🌐"} {stock.name} ({stock.marketCountryCode})
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="edit-price">가격 *</Label>
-                  <div className="flex items-center space-x-2">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="edit-price" className="text-sm font-medium">
+                    가격 <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="flex items-center gap-2">
                     <Input
                       id="edit-price"
                       type="number"
                       value={Number(formData.price)}
                       onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          price: e.target.value,
-                        })
+                        setFormData({ ...formData, price: e.target.value })
                       }
-                      placeholder="가격을 입력하세요"
+                      placeholder="10000"
                       min="0"
                       step="100"
                     />
-                    <span className="text-sm text-muted-foreground">원</span>
+                    <span className="text-sm text-muted-foreground shrink-0">원</span>
                   </div>
                 </div>
               </div>
               <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
-                >
-                  취소
-                </Button>
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>취소</Button>
                 <Button
                   onClick={handleEdit}
-                  disabled={
-                    loading || !formData.stockId || Number(formData.price) <= 0
-                  }
+                  disabled={loading || !formData.stockId || Number(formData.price) <= 0}
                 >
-                  {loading ? "수정 중..." : "수정"}
+                  {loading ? "수정 중..." : "수정 완료"}
                 </Button>
               </DialogFooter>
             </DialogContent>

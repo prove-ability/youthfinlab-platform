@@ -43,24 +43,26 @@ export default function StockManagementPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg">데이터를 불러오는 중...</div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground">종목 데이터를 불러오는 중...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">주식 관리</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold">주식 관리</h1>
+          <p className="text-sm text-muted-foreground">
             게임에서 사용할 주식 종목을 관리합니다 (모든 클래스 공통)
           </p>
         </div>
-        <Button onClick={loadStocks}>새로고침</Button>
+        <Button onClick={loadStocks} variant="outline" size="sm">새로고침</Button>
       </div>
 
-      {/* 주식 관리 컴포넌트 */}
       <StockManagement
         stocks={stocks}
         onStockCreated={handleStockCreated}

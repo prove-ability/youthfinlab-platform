@@ -450,14 +450,14 @@ function MetricCard({
 
 function StepNotCompleted({ step, title }: { step: number; title: string }) {
   return (
-    <section className="rounded-xl border bg-card p-5 opacity-50">
-      <h2 className="text-lg font-semibold flex items-center gap-2">
-        <span className="w-7 h-7 rounded-full bg-gray-300 text-white text-xs flex items-center justify-center">
+    <section className="rounded-xl border border-dashed bg-gray-50 p-5">
+      <h2 className="text-base font-semibold flex items-center gap-2 text-gray-400">
+        <span className="w-7 h-7 rounded-full bg-gray-200 text-gray-400 text-xs flex items-center justify-center">
           {step}
         </span>
         {title}
       </h2>
-      <p className="text-sm text-muted-foreground mt-2">
+      <p className="text-sm text-gray-400 mt-2">
         아직 이 단계를 완료하지 않았습니다.
       </p>
     </section>
