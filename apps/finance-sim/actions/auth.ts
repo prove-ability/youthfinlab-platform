@@ -23,6 +23,8 @@ export async function login(formData: FormData) {
         return { error: "아직 시작되지 않은 수업입니다." };
       case "invalid_credentials":
         return { error: "아이디 또는 비밀번호가 올바르지 않습니다." };
+      default:
+        return { error: "로그인에 실패했습니다. 다시 시도해주세요." };
     }
   }
 
