@@ -2,13 +2,8 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 
-const MARKET_FLAGS: Record<string, string> = {
-  KR: "🇰🇷",
-  US: "🇺🇸",
-  JP: "🇯🇵",
-  CN: "🇨🇳",
-};
 import { Button } from "@/components/ui/button";
+import { MARKET_FLAGS } from "@/lib/market-constants";
 import {
   Card,
   CardContent,

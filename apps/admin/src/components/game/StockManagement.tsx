@@ -29,13 +29,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Edit, Trash2, TrendingUp } from "lucide-react";
-
-const MARKET_LABELS: Record<string, { label: string; flag: string }> = {
-  KR: { label: "한국", flag: "🇰🇷" },
-  US: { label: "미국", flag: "🇺🇸" },
-  JP: { label: "일본", flag: "🇯🇵" },
-  CN: { label: "중국", flag: "🇨🇳" },
-};
+import { MARKET_LABELS } from "@/lib/market-constants";
 import {
   createStock,
   updateStock,
