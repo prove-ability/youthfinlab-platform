@@ -97,16 +97,17 @@ function calculateFinancialSnapshot(data: {
       : 0;
   const totalAssets = data.cashAssets + data.investmentAssets;
   const netWorth = totalAssets - data.totalDebtAmount;
-  const debtToAssetRatio =
-    totalAssets > 0
-      ? Math.round((data.totalDebtAmount / totalAssets) * 100)
-      : 0;
 
+  // 부채 부담도: finance-sim과 동일한 DTI(부채/연소득) 기준으로 산출
   let debtBurden = "없음";
-  if (data.hasDebt) {
-    if (debtToAssetRatio > 50) debtBurden = "높음";
-    else if (debtToAssetRatio > 20) debtBurden = "보통";
-    else debtBurden = "낮음";
+  if (data.hasDebt && data.totalDebtAmount > 0) {
+    const debtToIncomeRatio =
+      data.monthlyIncome > 0
+        ? data.totalDebtAmount / (data.monthlyIncome * 12)
+        : Infinity;
+    if (debtToIncomeRatio < 1) debtBurden = "낮음";
+    else if (debtToIncomeRatio < 3) debtBurden = "보통";
+    else debtBurden = "높음";
   }
 
   return {
@@ -114,7 +115,6 @@ function calculateFinancialSnapshot(data: {
     savingsRate,
     totalAssets,
     netWorth,
-    debtToAssetRatio,
     debtBurden,
   };
 }
