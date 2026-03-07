@@ -11,7 +11,19 @@ interface QRDisplayModalProps {
   setIsOpen: (open: boolean) => void;
   classId: string;
   className: string;
-  webAppUrl: string;
+  programType: "stock_game" | "finance_sim";
+}
+
+function getAppUrl(programType: "stock_game" | "finance_sim"): string {
+  if (programType === "finance_sim") {
+    return (
+      process.env.NEXT_PUBLIC_FINANCE_SIM_APP_URL ||
+      "http://localhost:3200"
+    );
+  }
+  return (
+    process.env.NEXT_PUBLIC_WEB_APP_URL || "http://localhost:3000"
+  );
 }
 
 export function QRDisplayModal({
@@ -19,7 +31,7 @@ export function QRDisplayModal({
   setIsOpen,
   classId,
   className,
-  webAppUrl,
+  programType,
 }: QRDisplayModalProps) {
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
@@ -74,8 +86,9 @@ export function QRDisplayModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  const appUrl = getAppUrl(programType);
   const qrUrl = qrToken
-    ? `${webAppUrl}/qr-login?token=${qrToken}&classId=${classId}`
+    ? `${appUrl}/qr-login?token=${qrToken}&classId=${classId}`
     : "";
 
   const formatExpiryTime = (isoString: string) => {

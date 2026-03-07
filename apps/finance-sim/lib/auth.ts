@@ -10,7 +10,10 @@ export interface User {
 
 export type VerifyResult =
   | { success: true; user: User }
-  | { success: false; reason: "invalid_credentials" | "class_not_active" | "invalid_class_code" };
+  | {
+      success: false;
+      reason: "invalid_credentials" | "class_not_active" | "invalid_class_code";
+    };
 
 export async function verifyCredentials(
   loginId: string,
@@ -18,31 +21,27 @@ export async function verifyCredentials(
   classCode: string
 ): Promise<VerifyResult> {
   try {
-    // 1. 클래스 코드로 클래스 찾기
     const classData = await db.query.classes.findFirst({
-      where: eq(classes.code, classCode.toUpperCase()),
+      where: and(
+        eq(classes.code, classCode.toUpperCase()),
+        eq(classes.programType, "finance_sim")
+      ),
     });
 
     if (!classData) {
       return { success: false, reason: "invalid_class_code" };
     }
 
-    // 2. 클래스가 진행 중(active)이 아닌 경우 로그인 불가
     if (classData.status !== "active") {
-      console.log("Login blocked: Class is not active", classData.status);
       return { success: false, reason: "class_not_active" };
     }
 
-    // 3. 해당 클래스 내에서 loginId와 password로 사용자 찾기
     const user = await db.query.guests.findFirst({
       where: and(
         eq(guests.classId, classData.id),
         eq(guests.loginId, loginId),
         eq(guests.password, password)
       ),
-      with: {
-        class: true,
-      },
     });
 
     if (!user) {

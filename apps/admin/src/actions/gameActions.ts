@@ -283,9 +283,12 @@ export async function getGameManagementData(params?: {
     const userId = user.id;
     const { selectedClassId, selectedDay } = params || {};
 
-    // 1. 사용자의 클래스 목록 조회
+    // 1. 사용자의 주식 게임 클래스 목록 조회 (finance_sim 제외)
     const userClasses = await db.query.classes.findMany({
-      where: eq(classes.createdBy, userId),
+      where: and(
+        eq(classes.createdBy, userId),
+        eq(classes.programType, "stock_game")
+      ),
       with: {
         client: {
           columns: { id: true, name: true },

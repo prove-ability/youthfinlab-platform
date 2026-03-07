@@ -128,13 +128,25 @@ export function DashboardClient() {
     );
   };
 
+  if (!loading && !payload) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh] text-center">
+        <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+          <Activity className="w-6 h-6 text-red-400" />
+        </div>
+        <p className="text-gray-600 font-medium">데이터를 불러오지 못했습니다</p>
+        <p className="text-sm text-gray-400 mt-1">잠시 후 페이지를 새로고침해 주세요.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* 헤더 */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">관리자 대시보드</h1>
-        <p className="text-gray-500 mt-2">
-          주식 게임 시스템 전체 현황을 한눈에 확인하세요
+        <h1 className="text-2xl font-bold text-gray-900">관리자 대시보드</h1>
+        <p className="text-gray-500 mt-1 text-sm">
+          주식 게임 및 재무 시뮬레이션 전체 현황을 한눈에 확인하세요
         </p>
       </div>
 
@@ -181,22 +193,25 @@ export function DashboardClient() {
           </Link>
 
           {/* 총 학생 수 */}
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-500 rounded-lg">
-                <GraduationCap className="w-6 h-6 text-white" />
+          <Link href="/protected/classes">
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-purple-500 rounded-lg">
+                  <GraduationCap className="w-6 h-6 text-white" />
+                </div>
+                <ArrowRight className="w-5 h-5 text-purple-600" />
               </div>
+              <h3 className="text-sm font-medium text-purple-900 mb-1">
+                총 학생 수
+              </h3>
+              <p className="text-3xl font-bold text-purple-600">
+                {payload.stats.totalGuests}
+              </p>
+              <p className="text-xs text-purple-700 mt-2">
+                거래 {payload.stats.totalTransactions.toLocaleString()}건
+              </p>
             </div>
-            <h3 className="text-sm font-medium text-purple-900 mb-1">
-              총 학생 수
-            </h3>
-            <p className="text-3xl font-bold text-purple-600">
-              {payload.stats.totalGuests}
-            </p>
-            <p className="text-xs text-purple-700 mt-2">
-              거래 {payload.stats.totalTransactions.toLocaleString()}건
-            </p>
-          </div>
+          </Link>
 
           {/* 활성 게임 */}
           <Link href="/protected/game-management">
@@ -230,14 +245,14 @@ export function DashboardClient() {
               </h2>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
                 <div>
                   <p className="text-sm text-gray-600">총 응답 수</p>
                   <p className="text-2xl font-bold text-gray-900">
                     {payload.stats.totalSurveys}
                   </p>
                 </div>
-                <MessageSquare className="w-12 h-12 text-yellow-500" />
+                <MessageSquare className="w-12 h-12 text-blue-300" />
               </div>
               <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
                 <div>
@@ -249,7 +264,7 @@ export function DashboardClient() {
                     <span className="text-sm text-gray-600">/ 10.0</span>
                   </div>
                 </div>
-                <Star className="w-12 h-12 text-yellow-500" />
+                <Star className="w-12 h-12 text-yellow-400" />
               </div>
               <section
                 className="p-4 bg-green-50 rounded-lg"
@@ -394,11 +409,19 @@ export function DashboardClient() {
         {/* 최근 등록된 학생 */}
         {payload && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Users className="w-6 h-6 text-purple-500" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                최근 등록 학생
-              </h2>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Users className="w-6 h-6 text-purple-500" />
+                <h2 className="text-xl font-semibold text-gray-900">
+                  최근 등록 학생
+                </h2>
+              </div>
+              <Link
+                href="/protected/classes"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                전체 보기 →
+              </Link>
             </div>
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
               {payload.recentGuests.map((guest: RecentGuest) => (

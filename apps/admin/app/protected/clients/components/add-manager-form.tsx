@@ -54,35 +54,60 @@ export function AddManagerForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 mt-4">
-      <input
-        className="border p-1 rounded"
-        placeholder="이름"
-        name="name"
-        id="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
-      <input
-        className="border p-1 rounded"
-        placeholder="휴대폰 번호"
-        id="phone"
-        name="phone"
-        value={mobile}
-        onChange={(e) => setMobile(e.target.value)}
-      />
-      <input
-        className="border p-1 rounded"
-        placeholder="이메일"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <Button type="submit" disabled={loading}>
-        {loading ? "저장 중..." : "매니저 저장"}
-      </Button>
-      {msg && <div className="text-green-600 text-sm mt-1">{msg}</div>}
-      {error && <div className="text-red-600 text-sm mt-1">{error}</div>}
+    <form onSubmit={handleSubmit} className="mt-2 rounded-lg border border-dashed border-gray-200 bg-white p-4">
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        매니저 추가
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="name" className="text-xs text-gray-500 font-medium">
+            이름 <span className="text-red-400">*</span>
+          </label>
+          <input
+            className="border border-gray-200 bg-white px-3 py-1.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="홍길동"
+            name="name"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="phone" className="text-xs text-gray-500 font-medium">
+            휴대폰 번호
+          </label>
+          <input
+            className="border border-gray-200 bg-white px-3 py-1.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="010-0000-0000"
+            id="phone"
+            name="phone"
+            value={mobile}
+            onChange={(e) => setMobile(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="email" className="text-xs text-gray-500 font-medium">
+            이메일
+          </label>
+          <input
+            className="border border-gray-200 bg-white px-3 py-1.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="example@email.com"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <div>
+          {msg && <p className="text-green-600 text-xs">{msg}</p>}
+          {error && <p className="text-red-500 text-xs">{error}</p>}
+        </div>
+        <Button type="submit" disabled={loading} className="h-8 px-4 text-xs">
+          {loading ? "저장 중..." : "매니저 저장"}
+        </Button>
+      </div>
     </form>
   );
 }

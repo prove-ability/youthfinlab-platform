@@ -149,8 +149,8 @@ export const buyStock = withAuth(
           .where(eq(wallets.id, userWallet.id));
 
         // 7. 캐시 무효화 (랭킹 데이터)
-        revalidateTag(`ranking-${user.classId}`);
-        revalidateTag(`ranking-${user.classId}-day-${currentDay}`);
+        revalidateTag(`ranking-${user.classId}`, "max");
+        revalidateTag(`ranking-${user.classId}-day-${currentDay}`, "max");
 
         return {
           success: true,
@@ -284,8 +284,8 @@ export const sellStock = withAuth(
           .where(eq(wallets.id, userWallet.id));
 
         // 7. 캐시 무효화 (랭킹 데이터)
-        revalidateTag(`ranking-${user.classId}`);
-        revalidateTag(`ranking-${user.classId}-day-${currentDay}`);
+        revalidateTag(`ranking-${user.classId}`, "max");
+        revalidateTag(`ranking-${user.classId}-day-${currentDay}`, "max");
 
         return {
           success: true,

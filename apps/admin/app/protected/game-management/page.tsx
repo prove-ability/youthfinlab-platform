@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
+
 import { Button } from "@/components/ui/button";
+import { MARKET_FLAGS } from "@/lib/market-constants";
 import {
   Card,
   CardContent,
@@ -172,7 +174,7 @@ export default function GameManagementPage() {
   );
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
       <Card>
         <CardHeader>
           <CardTitle>게임 관리</CardTitle>
@@ -182,17 +184,14 @@ export default function GameManagementPage() {
         </CardHeader>
         <CardContent>
           {/* 클래스 선택 */}
-          <div className="mb-6 space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                고객사 선택
-              </label>
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">고객사 선택</label>
               <select
                 value={selectedClientId}
                 onChange={(e) => {
                   const newClientId = e.target.value;
                   setSelectedClientId(newClientId);
-                  // 고객사 변경 시 해당 고객사의 첫 클래스 자동 선택
                   if (newClientId) {
                     const classesOfClient = classes.filter(
                       (c: any) => c.client?.id === newClientId
@@ -206,7 +205,7 @@ export default function GameManagementPage() {
                     setSelectedClass("");
                   }
                 }}
-                className="w-full p-2 border rounded"
+                className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="">고객사를 선택하세요</option>
                 {uniqueClients.map((client: any) => (
@@ -218,15 +217,13 @@ export default function GameManagementPage() {
             </div>
 
             {selectedClientId && (
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  클래스 선택
-                </label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium">클래스 선택</label>
                 <div className="relative">
                   <select
                     value={selectedClass}
                     onChange={(e) => setSelectedClass(e.target.value)}
-                    className="w-full p-2 border rounded"
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isDayOperationLoading}
                   >
                     <option value="">클래스를 선택하세요</option>
@@ -237,52 +234,14 @@ export default function GameManagementPage() {
                     ))}
                   </select>
                   {isDayOperationLoading && (
-                    <div className="absolute right-10 top-1/2 -translate-y-1/2">
-                      <svg
-                        className="animate-spin h-5 w-5 text-blue-500"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <span className="animate-spin inline-block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full" />
                     </div>
                   )}
                 </div>
                 {isDayOperationLoading && (
-                  <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
-                    <svg
-                      className="animate-spin h-3 w-3"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
+                  <p className="text-xs text-blue-600 flex items-center gap-1">
+                    <span className="animate-spin inline-block w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full" />
                     Day 업데이트 중... 잠시만 기다려주세요
                   </p>
                 )}
@@ -292,111 +251,69 @@ export default function GameManagementPage() {
 
           {/* 게임 진행 상황 */}
           {selectedClass && gameProgress && (
-            <Card
-              className={`mb-6 bg-blue-50 relative ${isDayOperationLoading ? "opacity-60" : ""}`}
-            >
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  게임 진행 상황
-                  {isDayOperationLoading && (
-                    <svg
-                      className="animate-spin h-5 w-5 text-blue-500"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">최대 Day</p>
-                    <p className="text-2xl font-bold">{gameProgress.maxDay}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">총 뉴스</p>
-                    <p className="text-2xl font-bold">
-                      {gameProgress.totalNews}개
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">총 가격 데이터</p>
-                    <p className="text-2xl font-bold">
-                      {gameProgress.totalPrices}개
-                    </p>
-                  </div>
-                </div>
+            <div className={`mb-6 rounded-xl border bg-blue-50 border-blue-200 p-4 transition-opacity ${isDayOperationLoading ? "opacity-60" : ""}`}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-blue-800">게임 진행 상황</p>
                 {isDayOperationLoading && (
-                  <div className="mt-3 pt-3 border-t border-blue-200">
-                    <p className="text-xs text-blue-600 flex items-center gap-1">
-                      <svg
-                        className="animate-spin h-3 w-3"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
-                      데이터 업데이트 중입니다...
-                    </p>
-                  </div>
+                  <span className="text-xs text-blue-600 flex items-center gap-1.5">
+                    <span className="animate-spin inline-block w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full" />
+                    업데이트 중...
+                  </span>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                  <p className="text-xs text-gray-500 mb-1">최대 Day</p>
+                  <p className="text-2xl font-bold text-blue-600">{gameProgress.maxDay}</p>
+                </div>
+                <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                  <p className="text-xs text-gray-500 mb-1">총 뉴스</p>
+                  <p className="text-2xl font-bold text-blue-600">{gameProgress.totalNews}<span className="text-sm font-normal ml-0.5">개</span></p>
+                </div>
+                <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                  <p className="text-xs text-gray-500 mb-1">가격 데이터</p>
+                  <p className="text-2xl font-bold text-blue-600">{gameProgress.totalPrices}<span className="text-sm font-normal ml-0.5">개</span></p>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Day 조정 버튼 */}
           {selectedClass && (
-            <div className="mb-6 flex gap-2">
-              <Button
-                onClick={handleDayDecrease}
-                variant="outline"
-                isLoading={isDayOperationLoading}
-                disabled={isDayOperationLoading}
-              >
-                클래스 Day -1
-              </Button>
-              <Button
-                onClick={handleDayIncrease}
-                isLoading={isDayOperationLoading}
-                disabled={isDayOperationLoading}
-              >
-                게임 진행 (Day +1, 용돈 지급)
-              </Button>
+            <div className="mb-6 flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 border-r pr-2 mr-1">
+                <Button
+                  onClick={handleDayDecrease}
+                  variant="outline"
+                  size="sm"
+                  isLoading={isDayOperationLoading}
+                  disabled={isDayOperationLoading}
+                >
+                  Day −1
+                </Button>
+                <Button
+                  onClick={handleDayIncrease}
+                  size="sm"
+                  isLoading={isDayOperationLoading}
+                  disabled={isDayOperationLoading}
+                >
+                  Day +1 · 용돈 지급
+                </Button>
+              </div>
               <Button
                 onClick={handleDaySelection}
                 variant="secondary"
+                size="sm"
                 disabled={isDayOperationLoading}
               >
-                조회할 Day 선택
+                조회 Day 선택
               </Button>
+              {isDayOperationLoading && (
+                <span className="text-xs text-blue-600 flex items-center gap-1.5 ml-1">
+                  <span className="animate-spin inline-block w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full" />
+                  처리 중...
+                </span>
+              )}
             </div>
           )}
 
@@ -404,38 +321,41 @@ export default function GameManagementPage() {
           {selectedClass && (
             <Tabs defaultValue="stock-management" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="stock-management">주식 관리</TabsTrigger>
-                <TabsTrigger value="game-day-management">
-                  게임 Day 관리
-                </TabsTrigger>
+                <TabsTrigger value="stock-management">종목 목록</TabsTrigger>
+                <TabsTrigger value="game-day-management">Day 뉴스 관리</TabsTrigger>
                 <TabsTrigger value="price-management">가격 관리</TabsTrigger>
               </TabsList>
 
               <TabsContent value="stock-management">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>주식 종목 관리</CardTitle>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">이 게임에 사용 중인 종목</CardTitle>
                     <CardDescription>
-                      게임에 사용할 주식 종목을 관리합니다.
+                      종목 추가·수정은 주식 관리 메뉴에서 할 수 있습니다.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
                       {stocks.length === 0 ? (
-                        <p className="text-center text-muted-foreground py-4">
+                        <p className="text-center text-muted-foreground py-8 text-sm">
                           등록된 주식 종목이 없습니다.
                         </p>
                       ) : (
                         stocks.map((stock: Stock) => (
                           <div
                             key={stock.id}
-                            className="p-3 border rounded flex justify-between items-center"
+                            className="flex items-center gap-3 px-4 py-3 border rounded-xl bg-gray-50/60"
                           >
+                            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                              <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                              </svg>
+                            </div>
                             <div>
-                              <p className="font-medium">{stock.name}</p>
-                              <p className="text-sm text-gray-500">
-                                {stock.industrySector} ·{" "}
-                                {stock.marketCountryCode}
+                              <p className="font-medium text-sm text-gray-900">{stock.name}</p>
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                {stock.industrySector && <span className="mr-2">{stock.industrySector}</span>}
+                                <span>{MARKET_FLAGS[stock.marketCountryCode] ?? "🌐"} {stock.marketCountryCode}</span>
                               </p>
                             </div>
                           </div>

@@ -29,13 +29,13 @@ export function EditClassModal({
   const [clients, setClients] = useState<Partial<Client>[]>([]);
   const [managers, setManagers] = useState<Partial<Manager>[]>([]);
   const [selectedClientId, setSelectedClientId] = useState(
-    classData.clientId || ""
+    classData.clientId || "",
   );
   const [selectedManagerId, setSelectedManagerId] = useState(
-    classData.managerId || ""
+    classData.managerId || "",
   );
   const [filteredManagers, setFilteredManagers] = useState<Partial<Manager>[]>(
-    []
+    [],
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,7 +56,7 @@ export function EditClassModal({
   useEffect(() => {
     if (selectedClientId) {
       const filtered = managers.filter(
-        (manager) => manager.clientId === selectedClientId
+        (manager) => manager.clientId === selectedClientId,
       );
       setFilteredManagers(filtered);
 
@@ -84,7 +84,7 @@ export function EditClassModal({
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value, type } = e.target;
     const isNumber = type === "number";
@@ -98,13 +98,13 @@ export function EditClassModal({
     setIsLoading(true);
     try {
       const data = await getClientsAndManagers();
-      
+
       // withAuth의 ActionState 타입 처리
       if ("success" in data && !data.success) {
         alert(`데이터 로드 실패: ${data.message}`);
         return;
       }
-      
+
       // 성공 시 데이터 설정
       if ("clients" in data && "managers" in data) {
         setClients(data.clients);
@@ -152,8 +152,6 @@ export function EditClassModal({
       setIsSubmitting(false);
     }
   };
-  console.log(classData);
-
   return (
     <Modal
       isOpen={isOpen}
@@ -165,6 +163,18 @@ export function EditClassModal({
         <div className="text-center py-4">데이터를 불러오는 중...</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* 프로그램 유형 보존 (수정 시 기존 값 유지) */}
+          <input
+            type="hidden"
+            name="programType"
+            value={classData.programType}
+          />
+          <input
+            type="hidden"
+            name="loginMethod"
+            value={classData.loginMethod}
+          />
+
           <div>
             <label
               htmlFor="name"
@@ -184,27 +194,31 @@ export function EditClassModal({
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="totalDays"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              총 게임 일수 *
-            </label>
-            <input
-              type="number"
-              id="totalDays"
-              name="totalDays"
-              required
-              min="1"
-              value={formData.totalDays}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              게임이 진행될 총 일수를 입력하세요 (예: 8일)
-            </p>
-          </div>
+          {classData.programType === "stock_game" ? (
+            <div>
+              <label
+                htmlFor="totalDays"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                총 게임 일수 *
+              </label>
+              <input
+                type="number"
+                id="totalDays"
+                name="totalDays"
+                required
+                min="1"
+                value={formData.totalDays}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                게임이 진행될 총 일수를 입력하세요 (예: 8일)
+              </p>
+            </div>
+          ) : (
+            <input type="hidden" name="totalDays" value="1" />
+          )}
 
           {/* <div className="mb-4">
               <label

@@ -19,9 +19,12 @@ export async function verifyQRToken(
   classId: string
 ): Promise<QRVerifyResult> {
   try {
-    // 1. 클래스 조회
+    // 1. 클래스 조회 (주식 게임 전용)
     const classData = await db.query.classes.findFirst({
-      where: eq(classes.id, classId),
+      where: and(
+        eq(classes.id, classId),
+        eq(classes.programType, "stock_game")
+      ),
     });
 
     if (!classData) {
@@ -67,9 +70,12 @@ export async function createQRGuestSession(
   nickname: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // 1. 클래스 확인
+    // 1. 클래스 확인 (주식 게임 전용)
     const classData = await db.query.classes.findFirst({
-      where: eq(classes.id, classId),
+      where: and(
+        eq(classes.id, classId),
+        eq(classes.programType, "stock_game")
+      ),
     });
 
     if (!classData) {
