@@ -11,9 +11,10 @@ import {
   investmentTendencies,
 } from "@repo/db";
 import { eq, and, count, avg, sql } from "drizzle-orm";
+import { withAuth } from "@/lib/safe-action";
 
 // 재무 시뮬레이션 수업 목록
-export async function getFinanceSimClasses() {
+export const getFinanceSimClasses = withAuth(async (_user) => {
   const result = await db.query.classes.findMany({
     where: eq(classes.programType, "finance_sim"),
     with: {
@@ -50,10 +51,10 @@ export async function getFinanceSimClasses() {
   );
 
   return classesWithStats;
-}
+});
 
 // 수업별 결과 요약 집계
-export async function getClassSimulationSummary(classId: string) {
+export const getClassSimulationSummary = withAuth(async (_user, classId: string) => {
   // 기본 수업 정보
   const classData = await db.query.classes.findFirst({
     where: eq(classes.id, classId),
@@ -238,10 +239,10 @@ export async function getClassSimulationSummary(classId: string) {
     pensionStats,
     tendencyDistribution,
   };
-}
+});
 
 // 개별 학생 결과 목록
-export async function getClassSimulationDetails(classId: string) {
+export const getClassSimulationDetails = withAuth(async (_user, classId: string) => {
   const simulations = await db.query.financeSimulations.findMany({
     where: eq(financeSimulations.classId, classId),
     with: {
@@ -255,10 +256,10 @@ export async function getClassSimulationDetails(classId: string) {
   });
 
   return simulations;
-}
+});
 
 // 학생 개별 시뮬레이션 상세 조회
-export async function getStudentSimulation(simulationId: string) {
+export const getStudentSimulation = withAuth(async (_user, simulationId: string) => {
   const simulation = await db.query.financeSimulations.findFirst({
     where: eq(financeSimulations.id, simulationId),
     with: {
@@ -272,4 +273,4 @@ export async function getStudentSimulation(simulationId: string) {
   });
 
   return simulation ?? null;
-}
+});

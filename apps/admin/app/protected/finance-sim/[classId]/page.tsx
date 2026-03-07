@@ -3,6 +3,7 @@ import {
   getClassSimulationDetails,
 } from "@/actions/financeSimActions";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ResultsDashboard } from "./components/results-dashboard";
 
 interface PageProps {
@@ -11,8 +12,17 @@ interface PageProps {
 
 export default async function FinanceSimClassDetailPage({ params }: PageProps) {
   const { classId } = await params;
-  const summary = await getClassSimulationSummary(classId);
-  const details = await getClassSimulationDetails(classId);
+  const [summaryResult, detailsResult] = await Promise.all([
+    getClassSimulationSummary(classId),
+    getClassSimulationDetails(classId),
+  ]);
+
+  if ("success" in summaryResult || "success" in detailsResult) {
+    redirect("/login");
+  }
+
+  const summary = summaryResult;
+  const details = detailsResult;
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

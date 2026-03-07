@@ -1,8 +1,15 @@
 import { getFinanceSimClasses } from "@/actions/financeSimActions";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function FinanceSimPage() {
-  const classes = await getFinanceSimClasses();
+  const result = await getFinanceSimClasses();
+
+  if ("success" in result) {
+    redirect("/login");
+  }
+
+  const classes = result;
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

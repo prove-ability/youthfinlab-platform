@@ -1,6 +1,6 @@
 import { getStudentSimulation } from "@/actions/financeSimActions";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { StudentReportView } from "./components/student-report-view";
 
 interface PageProps {
@@ -9,7 +9,13 @@ interface PageProps {
 
 export default async function StudentSimulationPage({ params }: PageProps) {
   const { classId, simulationId } = await params;
-  const simulation = await getStudentSimulation(simulationId);
+  const result = await getStudentSimulation(simulationId);
+
+  if (result !== null && "success" in result) {
+    redirect("/login");
+  }
+
+  const simulation = result;
 
   if (!simulation || simulation.classId !== classId) {
     notFound();
