@@ -256,12 +256,10 @@ export function StudentReportView({ simulation }: { simulation: Simulation }) {
                 <div
                   className="h-full bg-blue-500 rounded-full"
                   style={{
-                    width: `${Math.round(
-                      (Number(investResult.finalSavingsAmount) /
-                        (Number(investResult.finalSavingsAmount) +
-                          Number(investResult.finalInvestmentAmount))) *
-                        100
-                    )}%`,
+                    width: (() => {
+                      const total = Number(investResult.finalSavingsAmount) + Number(investResult.finalInvestmentAmount);
+                      return total === 0 ? "0%" : `${Math.round((Number(investResult.finalSavingsAmount) / total) * 100)}%`;
+                    })(),
                   }}
                 />
               </div>
@@ -279,12 +277,10 @@ export function StudentReportView({ simulation }: { simulation: Simulation }) {
                 <div
                   className="h-full bg-emerald-500 rounded-full"
                   style={{
-                    width: `${Math.round(
-                      (Number(investResult.finalInvestmentAmount) /
-                        (Number(investResult.finalSavingsAmount) +
-                          Number(investResult.finalInvestmentAmount))) *
-                        100
-                    )}%`,
+                    width: (() => {
+                      const total = Number(investResult.finalSavingsAmount) + Number(investResult.finalInvestmentAmount);
+                      return total === 0 ? "0%" : `${Math.round((Number(investResult.finalInvestmentAmount) / total) * 100)}%`;
+                    })(),
                   }}
                 />
               </div>
