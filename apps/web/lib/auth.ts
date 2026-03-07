@@ -18,9 +18,12 @@ export async function verifyCredentials(
   classCode: string
 ): Promise<VerifyResult> {
   try {
-    // 1. 클래스 코드로 클래스 찾기
+    // 1. 클래스 코드로 클래스 찾기 (주식 게임 전용)
     const classData = await db.query.classes.findFirst({
-      where: eq(classes.code, classCode.toUpperCase()),
+      where: and(
+        eq(classes.code, classCode.toUpperCase()),
+        eq(classes.programType, "stock_game")
+      ),
     });
 
     if (!classData) {
