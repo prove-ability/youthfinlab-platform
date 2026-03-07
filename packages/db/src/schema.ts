@@ -7,6 +7,7 @@ import {
   jsonb,
   numeric,
   pgEnum,
+  boolean,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
@@ -30,6 +31,10 @@ export const classStatusEnum = pgEnum("class_status", [
 export const loginMethodEnum = pgEnum("login_method", [
   "account", // 계정 기반 로그인
   "qr", // QR 코드 로그인
+]);
+export const programTypeEnum = pgEnum("program_type", [
+  "stock_game", // 주식 투자 게임
+  "finance_sim", // 재무 시뮬레이션
 ]);
 
 export const guests = pgTable("guests", {
@@ -66,6 +71,7 @@ export const classes = pgTable("classes", {
   currentDay: integer("current_day").notNull().default(1),
   status: classStatusEnum("status").default("setting").notNull(),
   loginMethod: loginMethodEnum("login_method").default("account").notNull(),
+  programType: programTypeEnum("program_type").default("stock_game").notNull(),
   qrToken: text("qr_token"),
   qrExpiresAt: timestamp("qr_expires_at", { withTimezone: true }),
   createdBy: uuid("created_by").notNull(),
@@ -271,3 +277,173 @@ export const surveysRelations = relations(surveys, ({ one }) => ({
     references: [classes.id],
   }),
 }));
+
+// ================================
+// 재무 시뮬레이션 테이블
+// ================================
+
+export const financeSimulations = pgTable("finance_simulations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  guestId: uuid("guest_id")
+    .references((): AnyPgColumn => guests.id, { onDelete: "cascade" })
+    .notNull(),
+  classId: uuid("class_id")
+    .references((): AnyPgColumn => classes.id, { onDelete: "cascade" })
+    .notNull(),
+  currentStep: integer("current_step").notNull().default(1),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const financeProfiles = pgTable("finance_profiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  simulationId: uuid("simulation_id")
+    .references((): AnyPgColumn => financeSimulations.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  age: integer("age").notNull(),
+  currentStatus: text("current_status").notNull(), // employed, freelancer, job_seeker, on_leave
+  monthlyIncome: numeric("monthly_income").notNull(),
+  monthlyFixedExpenses: numeric("monthly_fixed_expenses").notNull(),
+  cashAssets: numeric("cash_assets").notNull(),
+  investmentAssets: numeric("investment_assets"),
+  hasDebt: boolean("has_debt").notNull().default(false),
+  totalDebtAmount: numeric("total_debt_amount"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const savingsInvestmentResults = pgTable("savings_investment_results", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  simulationId: uuid("simulation_id")
+    .references((): AnyPgColumn => financeSimulations.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  monthlyAmount: numeric("monthly_amount").notNull(),
+  periodYears: integer("period_years").notNull(),
+  savingsRatio: integer("savings_ratio").notNull(),
+  investmentRatio: integer("investment_ratio").notNull(),
+  investmentReturnRate: numeric("investment_return_rate").notNull(),
+  totalDeposited: numeric("total_deposited").notNull(),
+  finalSavingsAmount: numeric("final_savings_amount").notNull(),
+  finalInvestmentAmount: numeric("final_investment_amount").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export const pensionResults = pgTable("pension_results", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  simulationId: uuid("simulation_id")
+    .references((): AnyPgColumn => financeSimulations.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  currentAge: integer("current_age").notNull(),
+  startTiming: text("start_timing").notNull(), // now, 5years, 10years
+  monthlyContribution: numeric("monthly_contribution").notNull(),
+  retirementAge: integer("retirement_age").notNull(),
+  totalContributed: numeric("total_contributed").notNull(),
+  estimatedAssetAtRetirement: numeric("estimated_asset_at_retirement").notNull(),
+  estimatedMonthlyPension: numeric("estimated_monthly_pension").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export const investmentTendencies = pgTable("investment_tendencies", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  simulationId: uuid("simulation_id")
+    .references((): AnyPgColumn => financeSimulations.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  answers: jsonb("answers").$type<Record<string, number>>().notNull(),
+  totalScore: integer("total_score").notNull(),
+  tendencyType: text("tendency_type").notNull(), // 안정형, 안정추구형, 위험중립형, 적극투자형, 공격투자형
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+// 재무 시뮬레이션 Relations
+export const financeSimulationsRelations = relations(
+  financeSimulations,
+  ({ one }) => ({
+    guest: one(guests, {
+      fields: [financeSimulations.guestId],
+      references: [guests.id],
+    }),
+    class: one(classes, {
+      fields: [financeSimulations.classId],
+      references: [classes.id],
+    }),
+    profile: one(financeProfiles, {
+      fields: [financeSimulations.id],
+      references: [financeProfiles.simulationId],
+    }),
+    savingsInvestmentResult: one(savingsInvestmentResults, {
+      fields: [financeSimulations.id],
+      references: [savingsInvestmentResults.simulationId],
+    }),
+    pensionResult: one(pensionResults, {
+      fields: [financeSimulations.id],
+      references: [pensionResults.simulationId],
+    }),
+    investmentTendency: one(investmentTendencies, {
+      fields: [financeSimulations.id],
+      references: [investmentTendencies.simulationId],
+    }),
+  })
+);
+
+export const financeProfilesRelations = relations(
+  financeProfiles,
+  ({ one }) => ({
+    simulation: one(financeSimulations, {
+      fields: [financeProfiles.simulationId],
+      references: [financeSimulations.id],
+    }),
+  })
+);
+
+export const savingsInvestmentResultsRelations = relations(
+  savingsInvestmentResults,
+  ({ one }) => ({
+    simulation: one(financeSimulations, {
+      fields: [savingsInvestmentResults.simulationId],
+      references: [financeSimulations.id],
+    }),
+  })
+);
+
+export const pensionResultsRelations = relations(
+  pensionResults,
+  ({ one }) => ({
+    simulation: one(financeSimulations, {
+      fields: [pensionResults.simulationId],
+      references: [financeSimulations.id],
+    }),
+  })
+);
+
+export const investmentTendenciesRelations = relations(
+  investmentTendencies,
+  ({ one }) => ({
+    simulation: one(financeSimulations, {
+      fields: [investmentTendencies.simulationId],
+      references: [financeSimulations.id],
+    }),
+  })
+);

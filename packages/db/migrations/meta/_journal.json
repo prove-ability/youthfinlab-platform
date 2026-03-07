@@ -232,6 +232,13 @@
       "when": 1761461856058,
       "tag": "0032_stale_puff_adder",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1771161402895,
+      "tag": "0033_harsh_wallflower",
+      "breakpoints": true
     }
   ]
 }
