@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatMoney } from "../utils";
 
 type Summary = {
   classData: any;
@@ -74,16 +75,6 @@ const TIMING_LABELS: Record<string, string> = {
   "5years": "5년 뒤",
   "10years": "10년 뒤",
 };
-
-function formatMoney(amount: number): string {
-  if (Math.abs(amount) >= 100_000_000) {
-    return `${(amount / 100_000_000).toFixed(1)}억`;
-  }
-  if (Math.abs(amount) >= 10_000) {
-    return `${Math.round(amount / 10_000).toLocaleString()}만`;
-  }
-  return amount.toLocaleString();
-}
 
 export function ResultsDashboard({
   summary,

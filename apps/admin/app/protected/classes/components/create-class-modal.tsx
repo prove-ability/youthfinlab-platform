@@ -210,7 +210,8 @@ export function CreateClassModal({
     if (isOpen) {
       loadClientsAndManagers();
       loadStocks();
-      // 🆕 모달 열릴 때 상태 초기화
+      // 모달 열릴 때 상태 초기화
+      setProgramType("stock_game");
       setGenerationError(null);
       setIsCancelled(false);
     }

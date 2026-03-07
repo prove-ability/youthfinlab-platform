@@ -1,5 +1,7 @@
 "use client";
 
+import { formatMoney } from "../../utils";
+
 const STATUS_LABELS: Record<string, string> = {
   employed: "재직 중",
   freelancer: "프리랜서",
@@ -71,16 +73,6 @@ type Simulation = {
     tendencyType: string;
   } | null;
 };
-
-function formatMoney(amount: number): string {
-  if (Math.abs(amount) >= 100_000_000) {
-    return `${(amount / 100_000_000).toFixed(1)}억`;
-  }
-  if (Math.abs(amount) >= 10_000) {
-    return `${Math.round(amount / 10_000).toLocaleString()}만`;
-  }
-  return amount.toLocaleString();
-}
 
 function calculateFinancialSnapshot(data: {
   monthlyIncome: number;
