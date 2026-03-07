@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 type ToastType = "success" | "error" | "info";
 
@@ -32,10 +32,10 @@ function Toast({
         ? "bg-red-500"
         : "bg-blue-500";
 
-  useState(() => {
+  useEffect(() => {
     const timer = setTimeout(onClose, 3000);
     return () => clearTimeout(timer);
-  });
+  }, [onClose]);
 
   return (
     <div

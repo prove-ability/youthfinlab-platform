@@ -149,7 +149,10 @@ export default function TendencyPage() {
   const totalScore = Object.values(answers).reduce((sum, v) => sum + v, 0);
   const tendencyType = getTendencyType(totalScore);
   const tendencyInfo = tendencyDescriptions[tendencyType];
-  const maxScore = 98;
+  const maxScore = tendencyQuestions.reduce(
+    (sum, q) => sum + Math.max(...q.options.map((o) => o.score)),
+    0
+  );
 
   function handleAnswer(questionId: string, score: number) {
     setAnswers((prev) => ({ ...prev, [questionId]: score }));
