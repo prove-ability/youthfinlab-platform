@@ -53,11 +53,9 @@ export default function StockNewsSheet({
   }, [isOpen, stockId]);
 
   const loadData = async () => {
-    console.log("🔍 Loading stock history for:", stockId, stockName);
     setLoading(true);
     try {
       const result = await getStockHistory(stockId);
-      console.log("📦 Stock history result:", result ? "Success" : "Failed");
       setData(result);
     } catch (error) {
       console.error("💥 Error loading stock history:", error);
@@ -244,7 +242,7 @@ export default function StockNewsSheet({
                   {/* 뉴스 마커 */}
                   {data.relatedNews.map((news) => {
                     const pricePoint = data.priceHistory.find(
-                      (p) => p.day === news.day
+                      (p) => p.day === news.day,
                     );
                     if (!pricePoint) return null;
                     const isSelected = selectedNews === news.id;

@@ -6,23 +6,23 @@ import { Download, X } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
 export default function PWAInstaller() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   useEffect(() => {
     // Service Worker 비활성화 (호스팅 환경 호환성 문제)
     // 필요시 나중에 다시 활성화 가능
-    
+
     // 기존 Service Worker가 있다면 제거
-    if ('serviceWorker' in navigator) {
+    if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then((registrations) => {
         registrations.forEach((registration) => {
           registration.unregister();
-          console.log('🗑️ Service Worker unregistered');
         });
       });
     }
@@ -31,11 +31,12 @@ export default function PWAInstaller() {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
+
       // 이미 설치되었는지 확인
-      const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
-                          (window.navigator as { standalone?: boolean }).standalone === true;
-      
+      const isInstalled =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as { standalone?: boolean }).standalone === true;
+
       if (!isInstalled) {
         // 3초 후에 설치 프롬프트 표시
         setTimeout(() => {
@@ -44,10 +45,13 @@ export default function PWAInstaller() {
       }
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
     };
   }, []);
 
@@ -55,27 +59,26 @@ export default function PWAInstaller() {
     if (!deferredPrompt) return;
 
     deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    console.log(`User response: ${outcome}`);
-    
+    await deferredPrompt.userChoice;
+
     setDeferredPrompt(null);
     setShowInstallPrompt(false);
   };
 
   const handleDismiss = () => {
     setShowInstallPrompt(false);
-    
+
     // 7일 후에 다시 표시
     const dismissedAt = Date.now();
-    localStorage.setItem('pwa-install-dismissed', dismissedAt.toString());
+    localStorage.setItem("pwa-install-dismissed", dismissedAt.toString());
   };
 
   // 이미 설치되었거나, 최근에 거부했으면 표시 안함
   useEffect(() => {
-    const dismissedAt = localStorage.getItem('pwa-install-dismissed');
+    const dismissedAt = localStorage.getItem("pwa-install-dismissed");
     if (dismissedAt) {
-      const daysSinceDismissed = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
+      const daysSinceDismissed =
+        (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
       if (daysSinceDismissed < 7) {
         setShowInstallPrompt(false);
       }
@@ -97,7 +100,9 @@ export default function PWAInstaller() {
                 <Download className="w-6 h-6 text-blue-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-900 text-sm">앱으로 설치하기</h3>
+                <h3 className="font-bold text-gray-900 text-sm">
+                  앱으로 설치하기
+                </h3>
                 <p className="text-xs text-gray-600 mt-1">
                   홈 화면에 추가하여 더 빠르고 편리하게 이용하세요
                 </p>
