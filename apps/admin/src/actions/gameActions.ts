@@ -11,7 +11,7 @@ import {
 } from "@repo/db";
 import { eq, and, desc, count, sql, lte, inArray } from "drizzle-orm";
 import { withAuth } from "@/lib/safe-action";
-import { ClassStockPrice, ClassStockPriceInput, News } from "@/types";
+import { ClassStockPrice, ClassStockPriceInput, News, Stock, ClassWithRelations } from "@/types";
 
 export interface GameData {
   classId: string;
@@ -267,8 +267,8 @@ export async function getGameManagementData(params?: {
   selectedClassId?: string;
   selectedDay?: number;
 }): Promise<{
-  classes: any[];
-  stocks: any[];
+  classes: ClassWithRelations[];
+  stocks: Stock[];
   gameProgress: { maxDay: number; totalNews: number; totalPrices: number } | null;
   prices: ClassStockPrice[];
 }> {

@@ -20,7 +20,7 @@ import { DaySelectionModal } from "./components/DaySelectionModal";
 import { getGameManagementData } from "@/actions/gameActions";
 import GameDayManagement from "@/components/game/GameDayManagement";
 import PriceManagement from "@/components/game/PriceManagement";
-import { Stock } from "@/types";
+import { Stock, ClassWithRelations } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function GameManagementPage() {
@@ -46,7 +46,7 @@ export default function GameManagementPage() {
     staleTime: 30_000, // 30초 캐시
   });
 
-  const classes = useMemo(() => data?.classes || [], [data?.classes]);
+  const classes = useMemo(() => data?.classes || ([] as ClassWithRelations[]), [data?.classes]);
   const stocks = useMemo(() => data?.stocks || [], [data?.stocks]);
   const gameProgress = useMemo(
     () => data?.gameProgress || null,
@@ -58,11 +58,11 @@ export default function GameManagementPage() {
   useEffect(() => {
     if (classes.length > 0 && !isInitialized.current) {
       isInitialized.current = true;
-      const firstClientId = (classes[0] as any)?.client?.id;
+      const firstClientId = classes[0]?.client?.id;
       if (firstClientId) {
         setSelectedClientId(firstClientId);
         const firstClassOfClient = classes.find(
-          (c) => (c as any)?.client?.id === firstClientId
+          (c) => c.client?.id === firstClientId
         );
         setSelectedClass(firstClassOfClient?.id || classes[0]?.id || "");
       } else {
@@ -163,14 +163,14 @@ export default function GameManagementPage() {
   }
 
   const uniqueClients = Array.from(
-    new Set(classes.map((c: any) => c.client?.id).filter(Boolean))
+    new Set(classes.map((c) => c.client?.id).filter(Boolean))
   ).map((clientId) => {
-    const classWithClient = classes.find((c: any) => c.client?.id === clientId);
-    return (classWithClient as any)?.client;
-  });
+    const classWithClient = classes.find((c) => c.client?.id === clientId);
+    return classWithClient?.client;
+  }).filter((client): client is NonNullable<ClassWithRelations["client"]> => client != null);
 
   const classesOfSelectedClient = classes.filter(
-    (c: any) => c.client?.id === selectedClientId
+    (c) => c.client?.id === selectedClientId
   );
 
   return (
@@ -194,10 +194,11 @@ export default function GameManagementPage() {
                   setSelectedClientId(newClientId);
                   if (newClientId) {
                     const classesOfClient = classes.filter(
-                      (c: any) => c.client?.id === newClientId
+                      (c) => c.client?.id === newClientId
                     );
-                    if (classesOfClient.length > 0) {
-                      setSelectedClass(classesOfClient[0].id);
+                    const firstClass = classesOfClient[0];
+                    if (firstClass) {
+                      setSelectedClass(firstClass.id);
                     } else {
                       setSelectedClass("");
                     }
@@ -208,7 +209,7 @@ export default function GameManagementPage() {
                 className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="">고객사를 선택하세요</option>
-                {uniqueClients.map((client: any) => (
+                {uniqueClients.map((client) => (
                   <option key={client.id} value={client.id}>
                     {client.name}
                   </option>
@@ -227,7 +228,7 @@ export default function GameManagementPage() {
                     disabled={isDayOperationLoading}
                   >
                     <option value="">클래스를 선택하세요</option>
-                    {classesOfSelectedClient.map((cls: any) => (
+                    {classesOfSelectedClient.map((cls) => (
                       <option key={cls.id} value={cls.id}>
                         {cls.name} (현재 Day: {cls.currentDay})
                       </option>

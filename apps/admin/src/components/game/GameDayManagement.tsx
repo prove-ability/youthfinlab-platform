@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,14 +52,11 @@ export default function GameDayManagement({
   ]);
   const [existingNews, setExistingNews] = useState<News[]>([]);
 
-  // 클래스나 Day가 변경될 때마다 상태 초기화 및 기존 뉴스 로드
-  useEffect(() => {
-    resetForm();
-    loadExistingNews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClass, selectedDay]);
+  const resetForm = useCallback(() => {
+    setNewsItems([{ title: "", content: "", relatedStockIds: [] }]);
+  }, []);
 
-  const loadExistingNews = async () => {
+  const loadExistingNews = useCallback(async () => {
     if (!selectedClass) {
       setExistingNews([]);
       return;
@@ -68,7 +65,6 @@ export default function GameDayManagement({
     setNewsLoading(true);
     try {
       const allNews = await getNews();
-      // 현재 클래스와 Day에 해당하는 뉴스만 필터링
       const filteredNews = allNews.filter(
         (news) => news.classId === selectedClass && news.day === selectedDay,
       );
@@ -79,7 +75,13 @@ export default function GameDayManagement({
     } finally {
       setNewsLoading(false);
     }
-  };
+  }, [selectedClass, selectedDay]);
+
+  // 클래스나 Day가 변경될 때마다 상태 초기화 및 기존 뉴스 로드
+  useEffect(() => {
+    resetForm();
+    loadExistingNews();
+  }, [selectedClass, selectedDay, resetForm, loadExistingNews]);
 
   const addNewsItem = () => {
     setNewsItems([
@@ -97,7 +99,7 @@ export default function GameDayManagement({
   const updateNewsItem = (
     index: number,
     field: keyof NewsInput,
-    value: any,
+    value: NewsInput[keyof NewsInput],
   ) => {
     const updated = [...newsItems];
     const currentItem = updated[index];
@@ -133,10 +135,6 @@ export default function GameDayManagement({
 
       setNewsItems(updated);
     }
-  };
-
-  const resetForm = () => {
-    setNewsItems([{ title: "", content: "", relatedStockIds: [] }]);
   };
 
   const handleDeleteNews = async (newsId: string) => {

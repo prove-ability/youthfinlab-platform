@@ -197,7 +197,7 @@ export function ClassSurveyView({ classId }: ClassSurveyViewProps) {
         </div>
         <div className="p-6">
           <div className="space-y-4">
-            {surveys.map((survey: any) => (
+            {surveys.map((survey) => (
               <div
                 key={survey.id}
                 className="border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-colors bg-white"
