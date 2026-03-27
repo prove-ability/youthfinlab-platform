@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { formatMoney } from "../utils";
+import type { ClassWithRelations } from "@/types";
 
 type Summary = {
-  classData: any;
+  classData: ClassWithRelations;
   studentCount: number;
   simCount: number;
   completedCount: number;

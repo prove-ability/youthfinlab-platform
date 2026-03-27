@@ -32,6 +32,12 @@ export function CreateUserModal({
   onUserCreated,
   onCreatedWithStudent,
 }: CreateUserModalProps) {
+  type CreatedGuest = NonNullable<CreateUserModalProps["onCreatedWithStudent"]> extends (
+    student: infer T
+  ) => void
+    ? T
+    : never;
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
@@ -65,8 +71,9 @@ export function CreateUserModal({
       } else if ("message" in result && result.message) {
         // 생성된 계정 정보를 표시
         alert(result.message);
-        if ((result as any).createdGuest) {
-          onCreatedWithStudent?.((result as any).createdGuest);
+        const createdGuest = (result as { createdGuest?: CreatedGuest }).createdGuest;
+        if (createdGuest) {
+          onCreatedWithStudent?.(createdGuest);
         }
         setIsOpen(false);
         onUserCreated();

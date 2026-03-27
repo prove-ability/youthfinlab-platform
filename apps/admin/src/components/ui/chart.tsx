@@ -4,7 +4,6 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@repo/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const THEMES = { light: "" } as const;
 
 export type ChartConfig = {
@@ -123,11 +122,11 @@ function ChartTooltipContent({
   active?: boolean;
   payload?: TooltipItem[];
   label?: unknown;
-  labelFormatter?: (value: any, payload?: TooltipItem[]) => React.ReactNode;
+  labelFormatter?: (value: string | number, payload?: TooltipItem[]) => React.ReactNode;
   labelClassName?: string;
   formatter?: (
-    value: any,
-    name: any,
+    value: unknown,
+    name: unknown,
     item: TooltipItem,
     index: number,
     payload?: TooltipItem["payload"]
@@ -152,11 +151,15 @@ function ChartTooltipContent({
       !labelKey && typeof label === "string"
         ? config[label as keyof typeof config]?.label || label
         : itemConfig?.label;
+    const formattedValue =
+      typeof value === "string" || typeof value === "number"
+        ? value
+        : key;
 
     if (labelFormatter) {
       return (
         <div className={cn("font-medium", labelClassName)}>
-          {labelFormatter(value, payload)}
+          {labelFormatter(formattedValue, payload)}
         </div>
       );
     }
