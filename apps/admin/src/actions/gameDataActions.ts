@@ -27,39 +27,96 @@ interface GeneratedGameData {
 }
 
 /**
- * Gemini API를 사용하여 게임 데이터 생성
+ * 난이도별 AI 프롬프트 생성
  */
-export const generateGameData = withAuth(
-  async (
-    user,
-    params: {
-      classId: string;
-      totalDays: number;
-      stocks: StockInfo[];
+function buildPrompt(
+  difficulty: "normal" | "easy",
+  totalDays: number,
+  stocks: StockInfo[]
+): string {
+  const stockList = stocks
+    .map((s) => `- "${s.id}" → ${s.name} (${s.marketCountryCode}/${s.industrySector})`)
+    .join("\n");
+
+  const commonJson = `
+**응답 형식 (JSON):**
+{
+  "days": [
+    {
+      "day": 1,
+      "news": [
+        {
+          "title": "뉴스 제목",
+          "content": "뉴스 내용",
+          "relatedStockIds": ["⚠️ 위 '사용 가능한 주식 ID 목록'에서 복사한 정확한 UUID만 사용!"]
+        }
+      ],
+      "prices": [
+        {
+          "stockId": "⚠️ 위 '사용 가능한 주식 ID 목록'에서 복사한 정확한 UUID만 사용!",
+          "price": 가격숫자
+        }
+      ]
     }
-  ): Promise<{ success: boolean; message: string; data?: GeneratedGameData }> => {
-    try {
-      const { classId, totalDays, stocks } = params;
+  ]
+}
 
-      if (!process.env.GEMINI_API_KEY) {
-        throw new Error("GEMINI_API_KEY가 설정되지 않았습니다.");
-      }
+**🚨 절대 규칙:**
+1. stockId와 relatedStockIds에는 반드시 위 '사용 가능한 주식 ID 목록'의 정확한 UUID를 복사해서 사용하세요.
+2. 절대로 임의의 UUID를 생성하지 마세요!
+3. 주식 이름이나 심볼이 아닌, 위에 나열된 UUID 문자열을 그대로 사용하세요.
+4. 반드시 유효한 JSON 형식으로만 응답하고, 다른 텍스트는 포함하지 마세요.
+`;
 
-      // Gemini API 클라이언트 초기화
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  if (difficulty === "easy") {
+    return `
+당신은 초등학교 4학년(10살) 어린이를 위한 주식 투자 교육 게임 데이터를 만드는 선생님입니다.
+아래 주식 정보를 바탕으로 ${totalDays}일간의 게임 데이터를 만들어 주세요.
 
-      // Gemini 모델 가져오기 (최신 안정 버전)
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+**⚠️ 매우 중요: 주식 ID는 아래 목록의 정확한 UUID만 사용하세요!**
 
-      // 프롬프트 생성
-      const prompt = `
+**사용 가능한 주식 ID 목록 (이 ID들만 사용! 절대로 다른 주식은 포함하지 마세요!):**
+${stockList}
+
+**🚨 절대 금지:**
+- 위 목록에 없는 주식 ID를 절대로 사용하지 마세요!
+- 위 목록에 있는 주식만 가격 정보를 생성하세요!
+- 위 목록에 있는 주식만 뉴스의 relatedStockIds에 포함하세요!
+
+**[쉬움 난이도 요구사항]**
+1. 각 날짜마다 6개의 뉴스를 만들되, 마지막 날(${totalDays}일)은 뉴스가 없어야 합니다.
+2. 각 뉴스는 다음날 주식 가격에 영향을 줘야 합니다.
+3. 뉴스 작성 규칙:
+   - 초등학교 4학년이 이해할 수 있는 쉬운 말을 쓰세요. 어려운 경제 용어는 쓰지 마세요.
+   - 뉴스 제목은 15자 이내의 짧은 문장으로 만드세요.
+   - 뉴스 내용은 50~80자로 짧고 명확하게 쓰세요.
+   - 주가가 오르는 이유를 직접적으로 설명하세요. 예: "○○ 회사 아이스크림이 여름에 많이 팔려서 돈을 많이 벌었어요."
+   - 일상에서 친숙한 소재(아이스크림, 게임, 문구, 음식, 장난감 등)를 사용하세요.
+   - 반말 없이 친근한 설명체를 써주세요. (예: "~했어요", "~랍니다")
+   - 뉴스 제목이 느낌표(!)로 끝나지 않아야 합니다.
+   - 각 뉴스는 관련 주식을 1개만 지정하세요.
+4. 주식 가격 규칙:
+   - 첫날 가격은 실제 주가와 비슷하게 설정하세요.
+   - 가격 변동폭은 작게 유지하세요:
+     - 한국 주식: 하루에 최대 ±10% 이내
+     - 미국·해외 주식: 하루에 최대 ±20% 이내
+   - 가격은 천원 단위로 맞춰주세요. (예: 5,000원, 12,000원)
+   - 해외 주식은 환율을 적용해 원화로 변환 후 천원 단위로 저장하세요.
+   - 뉴스가 좋으면 다음날 가격이 오르고, 뉴스가 나쁘면 다음날 가격이 내려가도록 명확하게 연결해 주세요.
+5. 가격 변동과 뉴스의 관계가 어린이도 쉽게 이해할 수 있도록 명확해야 합니다.
+6. 위 목록에 있는 주식만 매일 가격 정보를 생성하세요.
+${commonJson}`;
+  }
+
+  // 보통(normal) 난이도 — 기존 프롬프트
+  return `
 당신은 투자 교육 게임을 위한 데이터를 생성하는 전문가입니다.
 아래 주식 정보를 바탕으로 ${totalDays}일간의 현실적인 게임 데이터를 생성해주세요.
 
 **⚠️ 매우 중요: 주식 ID는 아래 목록의 정확한 UUID만 사용하세요!**
 
 **사용 가능한 주식 ID 목록 (이 ID들만 사용! 절대로 다른 주식은 포함하지 마세요!):**
-${stocks.map((s) => `- "${s.id}" → ${s.name} (${s.marketCountryCode}/${s.industrySector})`).join("\n")}
+${stockList}
 
 **🚨 절대 금지:**
 - 위 목록에 없는 주식 ID를 절대로 사용하지 마세요!
@@ -85,35 +142,37 @@ ${stocks.map((s) => `- "${s.id}" → ${s.name} (${s.marketCountryCode}/${s.indus
    - 해외 주식의 경우 환율을 고려해서 원화로 수정한 뒤 값을 저장해줘, 이떄 최소 단위는 천원 단위로 부탁해
 6. 뉴스의 영향력이 다음날 가격에 명확히 반영되어야 합니다.
 7. 위 목록에 있는 주식만 매일 가격 정보를 생성하세요. 목록에 없는 주식은 절대 포함하지 마세요.
-
-**응답 형식 (JSON):**
-{
-  "days": [
-    {
-      "day": 1,
-      "news": [
-        {
-          "title": "뉴스 제목",
-          "content": "뉴스 내용 (100-200자)",
-          "relatedStockIds": ["⚠️ 위 '사용 가능한 주식 ID 목록'에서 복사한 정확한 UUID만 사용!"]
-        }
-      ],
-      "prices": [
-        {
-          "stockId": "⚠️ 위 '사용 가능한 주식 ID 목록'에서 복사한 정확한 UUID만 사용!",
-          "price": 가격숫자
-        }
-      ]
-    }
-  ]
+${commonJson}`;
 }
 
-**🚨 절대 규칙:**
-1. stockId와 relatedStockIds에는 반드시 위 '사용 가능한 주식 ID 목록'의 정확한 UUID를 복사해서 사용하세요.
-2. 절대로 임의의 UUID를 생성하지 마세요!
-3. 주식 이름이나 심볼이 아닌, 위에 나열된 UUID 문자열을 그대로 사용하세요.
-4. 반드시 유효한 JSON 형식으로만 응답하고, 다른 텍스트는 포함하지 마세요.
-`;
+/**
+ * Gemini API를 사용하여 게임 데이터 생성
+ */
+export const generateGameData = withAuth(
+  async (
+    user,
+    params: {
+      classId: string;
+      totalDays: number;
+      stocks: StockInfo[];
+      difficulty?: "normal" | "easy";
+    }
+  ): Promise<{ success: boolean; message: string; data?: GeneratedGameData }> => {
+    try {
+      const { classId, totalDays, stocks, difficulty = "normal" } = params;
+
+      if (!process.env.GEMINI_API_KEY) {
+        throw new Error("GEMINI_API_KEY가 설정되지 않았습니다.");
+      }
+
+      // Gemini API 클라이언트 초기화
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+      // Gemini 모델 가져오기 (최신 안정 버전)
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+
+      // 난이도별 프롬프트 생성
+      const prompt = buildPrompt(difficulty, totalDays, stocks);
 
       // Gemini API 호출
       const result = await model.generateContent(prompt);
