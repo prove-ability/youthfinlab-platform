@@ -37,6 +37,7 @@ const classSchema = z.object({
   clientId: z.string().min(1, "클라이언트 선택은 필수입니다."),
   loginMethod: z.enum(["account", "qr"]).default("account"),
   programType: z.enum(["stock_game", "finance_sim"]).default("stock_game"),
+  difficulty: z.enum(["normal", "easy"]).default("normal"),
   currentDay: z.coerce
     .number()
     .min(1, "현재 Day는 1 이상이어야 합니다.")
@@ -93,6 +94,7 @@ export const createClass = withAuth(async (user, formData: FormData) => {
         clientId: validation.data.clientId,
         loginMethod: validation.data.loginMethod,
         programType: validation.data.programType,
+        difficulty: validation.data.difficulty,
         currentDay: validation.data.currentDay,
         createdBy: user.id,
       })
