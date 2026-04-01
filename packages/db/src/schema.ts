@@ -96,7 +96,9 @@ export const news = pgTable("news", {
     .$onUpdate(() => new Date())
     .notNull(),
   createdBy: uuid("created_by").notNull(),
-  classId: uuid("class_id").references((): AnyPgColumn => classes.id),
+  classId: uuid("class_id")
+    .references((): AnyPgColumn => classes.id)
+    .notNull(),
 });
 
 export const stocks = pgTable("stocks", {

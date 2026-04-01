@@ -101,7 +101,7 @@ export function ClassDetailClient({
     },
   });
 
-  const students = (data as StudentsLite[]) ?? [];
+  const students = useMemo(() => (data as StudentsLite[]) ?? [], [data]);
 
   useEffect(() => {
     if (Array.isArray(data)) {
@@ -118,10 +118,6 @@ export function ClassDetailClient({
   const fetchStudents = useCallback(async () => {
     await refetch();
   }, [refetch]);
-
-  useEffect(() => {
-    fetchStudents();
-  }, [classId, fetchStudents]);
 
   const filteredStudents = useMemo(() => {
     if (!searchTerm.trim()) return students;
