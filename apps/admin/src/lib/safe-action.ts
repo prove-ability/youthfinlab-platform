@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { stackServerApp } from "@/stack/server";
 import type { User } from "@stackframe/stack";
 
@@ -11,7 +10,7 @@ export interface ActionState {
 }
 
 // 인증된 사용자 정보와 함께 실행될 액션 함수의 타입을 정의합니다.
-type AuthenticatedAction<Args extends any[], T> = (
+type AuthenticatedAction<Args extends unknown[], T> = (
   user: User,
   ...args: Args
 ) => Promise<T>;
@@ -22,7 +21,7 @@ type AuthenticatedAction<Args extends any[], T> = (
  * @param action 인증된 사용자 정보가 필요한 서버 액션
  * @returns 인증 로직이 추가된 새로운 서버 액션
  */
-export function withAuth<Args extends any[], T>(
+export function withAuth<Args extends unknown[], T>(
   action: AuthenticatedAction<Args, T>
 ) {
   return async (...args: Args): Promise<T | ActionState> => {

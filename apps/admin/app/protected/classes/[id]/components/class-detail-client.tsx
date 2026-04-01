@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Button } from "@repo/ui";
 import {
   ArrowLeft,
@@ -88,12 +88,10 @@ export function ClassDetailClient({
         affiliation: s.affiliation,
         grade: s.grade,
         classId: s.classId,
-        createdAt: (s as any).createdAt
-          ? new Date((s as any).createdAt)
-          : undefined,
-        nickname: (s as any).nickname,
-        loginId: (s as any).loginId ?? (s as any).login_id,
-        password: (s as any).password ?? (s as any).pw,
+        createdAt: s.createdAt ? new Date(s.createdAt) : undefined,
+        nickname: s.nickname ?? undefined,
+        loginId: s.loginId,
+        password: s.password,
       }));
       // 최신 생성일 순으로 정렬 (최근 생성이 상단)
       mapped.sort(
@@ -103,7 +101,7 @@ export function ClassDetailClient({
     },
   });
 
-  const students = (data as StudentsLite[]) ?? [];
+  const students = useMemo(() => (data as StudentsLite[]) ?? [], [data]);
 
   useEffect(() => {
     if (Array.isArray(data)) {
@@ -117,14 +115,9 @@ export function ClassDetailClient({
     }
   }, [queryError]);
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     await refetch();
-  };
-
-  useEffect(() => {
-    fetchStudents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [classId]);
+  }, [refetch]);
 
   const filteredStudents = useMemo(() => {
     if (!searchTerm.trim()) return students;

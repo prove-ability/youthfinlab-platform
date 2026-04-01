@@ -193,11 +193,11 @@ export function StudentBulkUpload({
           successCount: res.successCount,
           failureCount: res.failureCount,
         });
-        if ("createdGuests" in res && Array.isArray((res as any).createdGuests)) {
+        if ("createdGuests" in res && Array.isArray(res.createdGuests)) {
           onCompletedWithStudents?.({
             successCount: res.successCount,
             failureCount: res.failureCount,
-            createdGuests: (res as any).createdGuests,
+            createdGuests: res.createdGuests,
           });
         }
         // 성공 시 모달 닫기

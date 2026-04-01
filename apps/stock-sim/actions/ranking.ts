@@ -25,11 +25,15 @@ export interface RankingEntry {
   isCurrentUser: boolean;
 }
 
+// isCurrentUser 필드를 제외한 캐싱용 타입
+type RankingEntryWithoutCurrentUser = Omit<RankingEntry, "isCurrentUser">;
+
 /**
  * 랭킹 데이터 계산 함수 (캐싱 대상)
- * classId와 currentDay를 기준으로 캐싱
+ * isCurrentUser는 사용자마다 다르므로 캐시에서 제외하고,
+ * getCachedRankingData 호출 후 별도로 주입한다.
  */
-const calculateRankingData = async (classId: string, currentDay: number, currentUserId: string) => {
+const calculateRankingData = async (classId: string, currentDay: number) => {
 
   // 같은 클래스의 모든 게스트 조회
   const classGuests = await db.query.guests.findMany({
@@ -117,7 +121,7 @@ const calculateRankingData = async (classId: string, currentDay: number, current
   );
 
   // 5. 각 게스트의 랭킹 데이터 계산 (메모리에서 처리)
-  const rankingData: Omit<RankingEntry, "rank">[] = classGuests.map((guest) => {
+  const rankingData: Omit<RankingEntryWithoutCurrentUser, "rank">[] = classGuests.map((guest) => {
     const wallet = walletMap.get(guest.id);
     const balance = parseFloat(wallet?.balance || "0");
 
@@ -144,7 +148,6 @@ const calculateRankingData = async (classId: string, currentDay: number, current
       initialCapital,
       profit,
       profitRate,
-      isCurrentUser: guest.id === currentUserId,
     };
   });
 
@@ -160,7 +163,7 @@ const calculateRankingData = async (classId: string, currentDay: number, current
   });
 
   // 7. 순위 부여
-  const rankedData: RankingEntry[] = sortedData.map((entry, index) => ({
+  const rankedData: RankingEntryWithoutCurrentUser[] = sortedData.map((entry, index) => ({
     ...entry,
     rank: index + 1,
   }));
@@ -171,10 +174,11 @@ const calculateRankingData = async (classId: string, currentDay: number, current
 /**
  * 캐싱된 랭킹 데이터 조회 함수
  * 5분 TTL, classId와 day를 기준으로 캐싱
+ * isCurrentUser는 캐시 키와 무관하므로 캐시에 포함하지 않는다.
  */
-const getCachedRankingData = (classId: string, currentDay: number, currentUserId: string) => {
+const getCachedRankingData = (classId: string, currentDay: number) => {
   return unstable_cache(
-    async () => calculateRankingData(classId, currentDay, currentUserId),
+    async () => calculateRankingData(classId, currentDay),
     [`ranking-${classId}-${currentDay}`],
     {
       revalidate: 300, // 5분 TTL
@@ -208,8 +212,12 @@ export const getClassRanking = withAuth(async (user) => {
 
     const currentDay = classInfo.currentDay;
 
-    // 캐싱된 랭킹 데이터 조회
-    const rankedData = await getCachedRankingData(user.classId, currentDay, user.id);
+    // 캐싱된 랭킹 데이터 조회 (isCurrentUser는 캐시 밖에서 주입)
+    const cachedData = await getCachedRankingData(user.classId, currentDay);
+    const rankedData: RankingEntry[] = cachedData.map((entry) => ({
+      ...entry,
+      isCurrentUser: entry.guestId === user.id,
+    }));
 
     return {
       rankings: rankedData,

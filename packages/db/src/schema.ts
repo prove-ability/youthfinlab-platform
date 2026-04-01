@@ -85,9 +85,9 @@ export const classes = pgTable("classes", {
 
 export const news = pgTable("news", {
   id: uuid("id").primaryKey().defaultRandom(),
-  day: integer("day"),
-  title: text("title"),
-  content: text("content"),
+  day: integer("day").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
   relatedStockIds: jsonb("related_stock_ids").$type<string[]>(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
@@ -96,7 +96,9 @@ export const news = pgTable("news", {
     .$onUpdate(() => new Date())
     .notNull(),
   createdBy: uuid("created_by").notNull(),
-  classId: uuid("class_id").references((): AnyPgColumn => classes.id),
+  classId: uuid("class_id")
+    .references((): AnyPgColumn => classes.id)
+    .notNull(),
 });
 
 export const stocks = pgTable("stocks", {
@@ -116,10 +118,14 @@ export const stocks = pgTable("stocks", {
 
 export const classStockPrices = pgTable("class_stock_prices", {
   id: uuid("id").primaryKey().defaultRandom(),
-  classId: uuid("class_id").references((): AnyPgColumn => classes.id),
-  stockId: uuid("stock_id").references((): AnyPgColumn => stocks.id),
-  day: integer("day"),
-  price: numeric("price"),
+  classId: uuid("class_id")
+    .references((): AnyPgColumn => classes.id)
+    .notNull(),
+  stockId: uuid("stock_id")
+    .references((): AnyPgColumn => stocks.id)
+    .notNull(),
+  day: integer("day").notNull(),
+  price: numeric("price").notNull(),
   newsId: uuid("news_id").references((): AnyPgColumn => news.id),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
@@ -146,7 +152,9 @@ export const wallets = pgTable("wallets", {
 
 export const transactions = pgTable("transactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  walletId: uuid("wallet_id").references((): AnyPgColumn => wallets.id),
+  walletId: uuid("wallet_id")
+    .references((): AnyPgColumn => wallets.id)
+    .notNull(),
   stockId: uuid("stock_id").references((): AnyPgColumn => stocks.id),
   type: transactionTypeEnum("type").notNull(),
   subType: transactionSubTypeEnum("sub_type").notNull(),
@@ -255,8 +263,9 @@ export const holdingsRelations = relations(holdings, ({ one }) => ({
 
 export const surveys = pgTable("surveys", {
   id: uuid("id").primaryKey().defaultRandom(),
-  guestId: uuid("guest_id")
-    .references((): AnyPgColumn => guests.id, { onDelete: "set null" }),
+  guestId: uuid("guest_id").references((): AnyPgColumn => guests.id, {
+    onDelete: "set null",
+  }),
   classId: uuid("class_id")
     .references((): AnyPgColumn => classes.id, { onDelete: "cascade" })
     .notNull(),
@@ -355,7 +364,9 @@ export const pensionResults = pgTable("pension_results", {
   monthlyContribution: numeric("monthly_contribution").notNull(),
   retirementAge: integer("retirement_age").notNull(),
   totalContributed: numeric("total_contributed").notNull(),
-  estimatedAssetAtRetirement: numeric("estimated_asset_at_retirement").notNull(),
+  estimatedAssetAtRetirement: numeric(
+    "estimated_asset_at_retirement",
+  ).notNull(),
   estimatedMonthlyPension: numeric("estimated_monthly_pension").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
@@ -405,7 +416,7 @@ export const financeSimulationsRelations = relations(
       fields: [financeSimulations.id],
       references: [investmentTendencies.simulationId],
     }),
-  })
+  }),
 );
 
 export const financeProfilesRelations = relations(
@@ -415,7 +426,7 @@ export const financeProfilesRelations = relations(
       fields: [financeProfiles.simulationId],
       references: [financeSimulations.id],
     }),
-  })
+  }),
 );
 
 export const savingsInvestmentResultsRelations = relations(
@@ -425,18 +436,15 @@ export const savingsInvestmentResultsRelations = relations(
       fields: [savingsInvestmentResults.simulationId],
       references: [financeSimulations.id],
     }),
-  })
+  }),
 );
 
-export const pensionResultsRelations = relations(
-  pensionResults,
-  ({ one }) => ({
-    simulation: one(financeSimulations, {
-      fields: [pensionResults.simulationId],
-      references: [financeSimulations.id],
-    }),
-  })
-);
+export const pensionResultsRelations = relations(pensionResults, ({ one }) => ({
+  simulation: one(financeSimulations, {
+    fields: [pensionResults.simulationId],
+    references: [financeSimulations.id],
+  }),
+}));
 
 export const investmentTendenciesRelations = relations(
   investmentTendencies,
@@ -445,5 +453,5 @@ export const investmentTendenciesRelations = relations(
       fields: [investmentTendencies.simulationId],
       references: [financeSimulations.id],
     }),
-  })
+  }),
 );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Modal } from "@/components/common/modal";
 import { Button } from "@repo/ui";
@@ -39,7 +39,7 @@ export function QRDisplayModal({
   const [error, setError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
 
-  const generateToken = async () => {
+  const generateToken = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -72,7 +72,7 @@ export function QRDisplayModal({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [classId]);
 
   useEffect(() => {
     if (isOpen) {
@@ -83,8 +83,7 @@ export function QRDisplayModal({
       setExpiresAt(null);
       setError(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, generateToken]);
 
   const appUrl = getAppUrl(programType);
   const qrUrl = qrToken

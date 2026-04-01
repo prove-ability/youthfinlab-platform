@@ -21,11 +21,18 @@ export function ClassList() {
     null
   );
 
-  const handleClassCreated = (newClass: ClassWithRelations) => {
+  const handleClassCreated = (
+    newClass: Class & { client?: Client | null; manager?: Manager | null }
+  ) => {
     // 캐시에 즉시 반영 후, 외부에서 무효화되어도 UX 동일 유지
     queryClient.setQueryData<ClassWithRelations[]>(["classes", "list"], (prev) => {
       const arr = prev ?? [];
-      return [newClass, ...arr];
+      const normalizedClass: ClassWithRelations = {
+        ...newClass,
+        client: newClass.client ?? null,
+        manager: newClass.manager ?? null,
+      };
+      return [normalizedClass, ...arr];
     });
   };
 

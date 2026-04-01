@@ -6,13 +6,25 @@ import { Button } from "@repo/ui";
 import { createClass, getClientsAndManagers } from "@/actions/classActions";
 import { getStocks } from "@/actions/stockActions";
 import { generateGameData } from "@/actions/gameDataActions";
-import { Manager, Client, Stock } from "@/types";
+import { Manager, Client, Stock, Class } from "@/types";
 import { Modal } from "@/components/common/modal";
+
+type CreatedClassWithRelations = Class & {
+  client: Client | null;
+  manager: Manager | null;
+};
+
+interface GameDataGenerationParams {
+  classId: string;
+  totalDays: number;
+  selectedStocks: Stock[];
+  resultMessage: string;
+}
 
 interface CreateClassModalProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onClassCreated: (newClass: any) => void;
+  onClassCreated: (newClass: CreatedClassWithRelations) => void;
 }
 
 export function CreateClassModal({
@@ -43,13 +55,14 @@ export function CreateClassModal({
   // 🆕 추가 기능을 위한 state
   const [isCancelled, setIsCancelled] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
-  const [lastGenerationParams, setLastGenerationParams] = useState<any>(null);
+  const [lastGenerationParams, setLastGenerationParams] = useState<GameDataGenerationParams | null>(null);
 
   // 🆕 사운드 알림 함수
   const playSuccessSound = () => {
     try {
-      const audioContext = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioContext = new AudioContextClass();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
@@ -93,13 +106,7 @@ export function CreateClassModal({
   };
 
   // 🆕 게임 데이터 생성 로직 (별도 함수로 분리)
-  const startGameDataGeneration = async (params: {
-    classId: string;
-    totalDays: number;
-    selectedStocks: Stock[];
-    createdClass: any;
-    resultMessage: string;
-  }) => {
+  const startGameDataGeneration = async (params: GameDataGenerationParams) => {
     const { classId, totalDays, selectedStocks, resultMessage } = params;
 
     // 파라미터 저장 (재시도용)
@@ -309,7 +316,17 @@ export function CreateClassModal({
         return;
       }
 
-      const createdClass = result.data;
+      const createdClass = {
+        ...(result.data as Class),
+        client:
+          "client" in result.data
+            ? ((result.data.client as Client | null | undefined) ?? null)
+            : null,
+        manager:
+          "manager" in result.data
+            ? ((result.data.manager as Manager | null | undefined) ?? null)
+            : null,
+      } satisfies CreatedClassWithRelations;
 
       // 2. 게임 데이터 자동 생성 (주식 게임일 때만)
       if (
@@ -327,7 +344,6 @@ export function CreateClassModal({
           classId: createdClass.id!,
           totalDays,
           selectedStocks,
-          createdClass,
           resultMessage: result.message,
         });
       } else {

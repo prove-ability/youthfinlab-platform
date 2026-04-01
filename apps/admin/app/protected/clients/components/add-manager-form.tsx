@@ -28,7 +28,7 @@ export function AddManagerForm({
     formData.append("name", name);
     formData.append("mobile_phone", mobile);
     formData.append("email", email);
-    const result: any = await createManager(clientId, formData);
+    const result = await createManager(clientId, formData);
     setLoading(false);
     if (
       result &&
@@ -42,12 +42,12 @@ export function AddManagerForm({
           : Object.values(result.error).flat().join(", ")
       );
     } else {
-      setMsg(result.message);
+      setMsg("message" in result && result.message ? result.message : null);
       setName("");
       setMobile("");
       setEmail("");
       // 새로 추가된 매니저를 부모 컴포넌트에 전달
-      if (result && result.data) {
+      if ("data" in result && result.data) {
         onManagerAdded(result.data);
       }
     }

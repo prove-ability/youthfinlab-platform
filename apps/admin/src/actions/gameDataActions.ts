@@ -37,7 +37,7 @@ export const generateGameData = withAuth(
       totalDays: number;
       stocks: StockInfo[];
     }
-  ): Promise<{ success: boolean; message: string; data?: any }> => {
+  ): Promise<{ success: boolean; message: string; data?: GeneratedGameData }> => {
     try {
       const { classId, totalDays, stocks } = params;
 
