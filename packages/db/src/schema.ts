@@ -36,6 +36,10 @@ export const programTypeEnum = pgEnum("program_type", [
   "stock_game", // 주식 투자 게임
   "finance_sim", // 재무 시뮬레이션
 ]);
+export const difficultyEnum = pgEnum("difficulty", [
+  "normal", // 보통 (중학생 이상)
+  "easy", // 쉬움 (초등학교 저학년)
+]);
 
 export const guests = pgTable("guests", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -72,6 +76,7 @@ export const classes = pgTable("classes", {
   status: classStatusEnum("status").default("setting").notNull(),
   loginMethod: loginMethodEnum("login_method").default("account").notNull(),
   programType: programTypeEnum("program_type").default("stock_game").notNull(),
+  difficulty: difficultyEnum("difficulty").default("normal").notNull(),
   qrToken: text("qr_token"),
   qrExpiresAt: timestamp("qr_expires_at", { withTimezone: true }),
   createdBy: uuid("created_by").notNull(),
