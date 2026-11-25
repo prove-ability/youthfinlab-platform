@@ -5,6 +5,7 @@ import { z } from "zod";
 import {
   db,
   dbWithTransaction,
+  classes,
   guests,
   wallets,
   transactions,
@@ -246,8 +247,20 @@ export const updateUser = withAuth(
 // DELETE: 사용자 삭제
 export const deleteUser = withAuth(async (user, userId: string) => {
   try {
-    await db.delete(wallets).where(eq(wallets.guestId, userId));
-    await db.delete(guests).where(eq(guests.id, userId));
+    await dbWithTransaction.transaction(async (tx) => {
+      const [guest] = await tx.select({ owner: classes.createdBy }).from(guests)
+        .innerJoin(classes, eq(classes.id, guests.classId))
+        .where(eq(guests.id, userId)).for("update", { of: guests });
+      if (!guest) return;
+      if (guest.owner !== user.id) throw new Error("권한이 없습니다.");
+
+      const guestWallet = tx.select({ id: wallets.id }).from(wallets)
+        .where(eq(wallets.guestId, userId));
+      await tx.delete(transactions).where(inArray(transactions.walletId, guestWallet));
+      await tx.delete(holdings).where(eq(holdings.guestId, userId));
+      await tx.delete(wallets).where(eq(wallets.guestId, userId));
+      await tx.delete(guests).where(eq(guests.id, userId));
+    });
     revalidatePath("/classes");
     return { success: true, message: "사용자가 성공적으로 삭제되었습니다." };
   } catch (e) {

@@ -150,6 +150,14 @@ export const createGameDay = withAuth(
     const userId = user.id;
     try {
       await dbWithTransaction.transaction(async (tx) => {
+        if (gameData.stocks.length > 0) {
+          // 같은 클래스의 일차별 가격 저장을 직렬화한다.
+          const [ownedClass] = await tx.select({ id: classes.id }).from(classes)
+            .where(and(eq(classes.id, gameData.classId), eq(classes.createdBy, userId)))
+            .for("update");
+          if (!ownedClass) throw new Error("클래스를 찾을 수 없습니다.");
+        }
+
         // 1. 뉴스 생성
         const newsToInsert = gameData.news.map((news) => ({
           day: gameData.day,
@@ -177,18 +185,17 @@ export const createGameDay = withAuth(
           newsId: createdNews[0]?.id,
         }));
 
-        if (pricesToInsert.length > 0) {
-          await tx
-            .insert(classStockPrices)
-            .values(pricesToInsert)
-            .onConflictDoUpdate({
-              target: [
-                classStockPrices.classId,
-                classStockPrices.stockId,
-                classStockPrices.day,
-              ],
-              set: { price: sql`excluded.price` },
-            });
+        for (const row of pricesToInsert) {
+          const updated = await tx.update(classStockPrices)
+            .set({ price: row.price })
+            .where(and(
+              eq(classStockPrices.classId, row.classId),
+              eq(classStockPrices.stockId, row.stockId),
+              eq(classStockPrices.day, row.day)
+            ))
+            .returning({ id: classStockPrices.id });
+          if (updated.length > 1) throw new Error("같은 일차에 중복된 주가가 있습니다.");
+          if (updated.length === 0) await tx.insert(classStockPrices).values(row);
         }
       });
 

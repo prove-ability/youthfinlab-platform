@@ -509,6 +509,7 @@ it("saves manual game day and updates a previously entered price", async () => {
     stocks: [{ stockId: stock.id, price: 100 }],
   };
   await game.createGameDay(data);
+  const [originalPrice] = await game.getClassStockPrices(classId, 1);
   await game.createGameDay({
     ...data,
     news: [],
@@ -516,7 +517,7 @@ it("saves manual game day and updates a previously entered price", async () => {
   });
   expect(await adminNews.getNewsByClassAndDay(classId, 1)).toHaveLength(1);
   expect(await game.getClassStockPrices(classId, 1)).toEqual([
-    expect.objectContaining({ price: "200" }),
+    expect.objectContaining({ id: originalPrice.id, newsId: originalPrice.newsId, price: "200" }),
   ]);
 });
 
