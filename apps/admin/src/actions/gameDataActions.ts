@@ -26,6 +26,34 @@ interface GeneratedGameData {
   }[];
 }
 
+function gameDataResponseFormat(stockIds: string[]) {
+  const stockId = { $ref: "#/$defs/stockId" };
+  const object = (properties: Record<string, unknown>) => ({
+    type: "object", properties, required: Object.keys(properties), additionalProperties: false,
+  });
+  const array = (items: unknown) => ({ type: "array", items });
+  const article = object({
+    title: { type: "string" },
+    content: { type: "string" },
+    relatedStockIds: array(stockId),
+  });
+  const day = object({
+    day: { type: "integer" },
+    news: array(article),
+    prices: array(object({ stockId, price: { type: "number" } })),
+  });
+  return {
+    type: "json_schema",
+    json_schema: {
+      name: "game_data",
+      strict: true,
+      schema: {
+        ...object({ days: array(day) }),
+        $defs: { stockId: { type: "string", enum: stockIds } },
+      },
+    },
+  };
+}
 /**
  * 난이도별 AI 프롬프트 생성
  */
@@ -169,6 +197,8 @@ export const generateGameData = withAuth(
       if (!process.env.OPENAI_API_KEY) {
         throw new Error("관리자 서버에 OPENAI_API_KEY를 설정해 주세요.");
       }
+      const validStockIds = new Set(stocks.map((stock) => stock.id));
+      if (!validStockIds.size) throw new Error("게임에 사용할 종목을 선택해 주세요.");
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -178,7 +208,7 @@ export const generateGameData = withAuth(
         body: JSON.stringify({
           model: process.env.OPENAI_GAME_MODEL || "gpt-4.1-mini",
           messages: [{ role: "user", content: buildPrompt(difficulty, totalDays, stocks) }],
-          response_format: { type: "json_object" },
+          response_format: gameDataResponseFormat([...validStockIds]),
           store: false,
         }),
       });
@@ -204,9 +234,6 @@ export const generateGameData = withAuth(
         throw new Error(`${totalDays}일치 데이터가 생성되지 않았습니다.`);
       }
 
-      // 주식 ID 목록 생성 (검증용)
-      const validStockIds = new Set(stocks.map((s) => s.id));
-      const validStockList = stocks.map((s) => `${s.name}(${s.id})`).join(", ");
 
       // stockId 검증
       for (const dayData of gameData.days) {
@@ -214,7 +241,7 @@ export const generateGameData = withAuth(
           for (const priceItem of dayData.prices) {
             if (!validStockIds.has(priceItem.stockId)) {
               throw new Error(
-                `AI가 잘못된 주식 ID를 생성했습니다: ${priceItem.stockId}\n유효한 ID 목록: ${validStockList}\n\n다시 시도해주세요.`
+                "선택한 종목과 일치하지 않는 게임 데이터입니다. 다시 시도해 주세요."
               );
             }
           }
@@ -225,7 +252,7 @@ export const generateGameData = withAuth(
               for (const stockId of newsItem.relatedStockIds) {
                 if (!validStockIds.has(stockId)) {
                   throw new Error(
-                    `AI가 뉴스에 잘못된 주식 ID를 생성했습니다: ${stockId}\n유효한 ID 목록: ${validStockList}\n\n다시 시도해주세요.`
+                    "선택한 종목과 일치하지 않는 게임 데이터입니다. 다시 시도해 주세요."
                   );
                 }
               }
