@@ -3,7 +3,8 @@
   "ui": "tui",
   "globalEnv": [
     "DATABASE_URL",
-    "GEMINI_API_KEY",
+    "OPENAI_API_KEY",
+    "OPENAI_GAME_MODEL",
     "NEXT_PUBLIC_STACK_PROJECT_ID",
     "NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY",
     "STACK_SECRET_SERVER_KEY"
@@ -15,7 +16,8 @@
       "outputs": [".next/**", "!.next/cache/**"],
       "env": [
         "DATABASE_URL",
-        "GEMINI_API_KEY",
+        "OPENAI_API_KEY",
+        "OPENAI_GAME_MODEL",
         "NEXT_PUBLIC_STACK_PROJECT_ID",
         "NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY",
         "STACK_SECRET_SERVER_KEY"
@@ -32,7 +34,8 @@
       "persistent": true,
       "env": [
         "DATABASE_URL",
-        "GEMINI_API_KEY",
+        "OPENAI_API_KEY",
+        "OPENAI_GAME_MODEL",
         "NEXT_PUBLIC_STACK_PROJECT_ID",
         "NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY",
         "STACK_SECRET_SERVER_KEY"

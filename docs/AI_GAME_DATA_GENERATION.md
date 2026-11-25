@@ -2,7 +2,7 @@
 
 ## 📋 개요
 
-Gemini AI를 활용하여 투자 게임의 뉴스와 주식 가격 데이터를 자동으로 생성하는 기능입니다.
+OpenAI AI를 활용하여 투자 게임의 뉴스와 주식 가격 데이터를 자동으로 생성하는 기능입니다.
 
 ## ✨ 주요 기능
 
@@ -15,15 +15,15 @@ Gemini AI를 활용하여 투자 게임의 뉴스와 주식 가격 데이터를 
 
 ### 1. 환경 변수 설정
 
-`apps/admin/.env.local` 파일에 Gemini API Key를 추가하세요:
+`apps/admin/.env.local` 파일에 OpenAI API Key를 추가하세요:
 
 ```bash
-GEMINI_API_KEY=your_gemini_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-**Gemini API Key 발급 방법:**
-1. [Google AI Studio](https://makersuite.google.com/app/apikey) 접속
-2. "Get API Key" 클릭
+**OpenAI API Key 발급 방법:**
+1. [OpenAI Platform](https://platform.openai.com/api-keys) 접속
+2. "Create new secret key" 클릭
 3. 생성된 API Key 복사
 
 ### 2. 클래스 생성 시 게임 데이터 자동 생성
@@ -91,7 +91,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ## ⚙️ 기술 스택
 
-- **AI 모델**: Gemini 1.5 Pro
+- **AI 모델**: gpt-4.1-mini (OPENAI_GAME_MODEL로 변경 가능)
 - **프롬프트 엔지니어링**: 교육적 시나리오 생성에 최적화
 - **데이터 검증**: 생성된 데이터의 형식 및 일관성 검증
 - **DB 저장**: PostgreSQL (Neon)
@@ -115,19 +115,19 @@ const prompt = `
 
 ## ⚠️ 주의사항
 
-1. **API 비용**: Gemini API 사용량에 따라 비용이 발생할 수 있습니다
+1. **API 비용**: OpenAI API 사용량에 따라 비용이 발생할 수 있습니다
 2. **생성 시간**: 일수와 주식 수에 따라 30초 ~ 2분 정도 소요
 3. **데이터 품질**: AI가 생성한 데이터이므로 검토 권장
 4. **에러 처리**: 생성 실패 시 클래스는 생성되지만 게임 데이터는 없음
 
 ## 🐛 트러블슈팅
 
-### "GEMINI_API_KEY가 설정되지 않았습니다"
+### "OPENAI_API_KEY가 설정되지 않았습니다"
 → `.env.local` 파일에 API Key가 제대로 설정되었는지 확인
 → 서버 재시작 필요
 
 ### "생성된 데이터를 파싱하는데 실패했습니다"
-→ Gemini API가 올바른 JSON 형식을 반환하지 못한 경우
+→ OpenAI API가 올바른 JSON 형식을 반환하지 못한 경우
 → 다시 시도하거나 주식 수를 줄여보세요
 
 ### 생성이 너무 오래 걸림

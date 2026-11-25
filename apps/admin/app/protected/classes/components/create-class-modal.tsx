@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@repo/ui";
 import { createClass, getClientsAndManagers } from "@/actions/classActions";
@@ -55,7 +55,7 @@ export function CreateClassModal({
   const [estimatedTime, setEstimatedTime] = useState(0);
 
   // 🆕 추가 기능을 위한 state
-  const [isCancelled, setIsCancelled] = useState(false);
+  const cancelled = useRef(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [lastGenerationParams, setLastGenerationParams] = useState<GameDataGenerationParams | null>(null);
 
@@ -93,7 +93,7 @@ export function CreateClassModal({
         "게임 데이터 생성을 취소하시겠습니까?\n클래스는 이미 생성되었습니다.",
       )
     ) {
-      setIsCancelled(true);
+      cancelled.current = true;
       setGenerationMessage("❌ 사용자가 취소했습니다");
     }
   };
@@ -103,7 +103,7 @@ export function CreateClassModal({
     if (!lastGenerationParams) return;
 
     setGenerationError(null);
-    setIsCancelled(false);
+    cancelled.current = false;
     await startGameDataGeneration(lastGenerationParams);
   };
 
@@ -113,7 +113,7 @@ export function CreateClassModal({
 
     // 파라미터 저장 (재시도용)
     setLastGenerationParams(params);
-    setIsCancelled(false);
+    cancelled.current = false;
     setGenerationError(null);
     setIsGeneratingGameData(true);
     setGenerationProgress(0);
@@ -124,7 +124,7 @@ export function CreateClassModal({
 
     // 프로그레스바 시뮬레이션
     const progressInterval = setInterval(() => {
-      if (isCancelled) {
+      if (cancelled.current) {
         clearInterval(progressInterval);
         return;
       }
@@ -140,13 +140,13 @@ export function CreateClassModal({
     setGenerationMessage("🤖 AI가 게임 데이터를 생성하고 있습니다...");
 
     const messageTimer1 = setTimeout(() => {
-      if (!isCancelled) {
+      if (!cancelled.current) {
         setGenerationMessage("📊 주식 가격과 뉴스를 생성하고 있습니다...");
       }
     }, estimated * 300);
 
     const messageTimer2 = setTimeout(() => {
-      if (!isCancelled) {
+      if (!cancelled.current) {
         setGenerationMessage("✅ 데이터를 검증하고 있습니다...");
       }
     }, estimated * 600);
@@ -164,56 +164,26 @@ export function CreateClassModal({
         })),
       });
 
-      // 취소되었는지 확인
-      if (isCancelled) {
-        clearInterval(progressInterval);
-        clearTimeout(messageTimer1);
-        clearTimeout(messageTimer2);
-        setIsGeneratingGameData(false);
-        setGenerationProgress(0);
-        setGenerationMessage("");
-        return;
-      }
-
-      // 완료 시 100%로 설정
-      clearInterval(progressInterval);
-      clearTimeout(messageTimer1);
-      clearTimeout(messageTimer2);
-      setGenerationProgress(100);
-      setGenerationMessage("💾 데이터 저장 완료!");
-
-      // 🆕 사운드 알림 재생
-      playSuccessSound();
-
-      setTimeout(() => {
-        setIsGeneratingGameData(false);
-        setGenerationProgress(0);
-        setGenerationMessage("");
-      }, 1000);
-
       if (!gameDataResult.success) {
-        const errorMsg =
-          gameDataResult.message || "알 수 없는 오류가 발생했습니다.";
-        setGenerationError(errorMsg);
-        alert(`클래스는 생성되었지만 게임 데이터 생성 실패: ${errorMsg}`);
-      } else {
+        throw new Error(gameDataResult.message || "알 수 없는 오류가 발생했습니다.");
+      }
+      if (!cancelled.current) {
+        setGenerationProgress(100);
+        playSuccessSound();
         alert(`${resultMessage}\n게임 데이터도 성공적으로 생성되었습니다! 🎉`);
       }
+      setIsOpen(false);
     } catch (error) {
-      console.error("Error generating game data:", error);
+      const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+      setGenerationError(message);
+      alert(`클래스는 생성되었지만 게임 데이터 생성 실패: ${message}`);
+    } finally {
       clearInterval(progressInterval);
       clearTimeout(messageTimer1);
       clearTimeout(messageTimer2);
-
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "알 수 없는 오류가 발생했습니다.";
-      setGenerationError(errorMessage);
       setIsGeneratingGameData(false);
       setGenerationProgress(0);
       setGenerationMessage("");
-      alert(`게임 데이터 생성 중 오류가 발생했습니다: ${errorMessage}`);
     }
   };
 
@@ -222,9 +192,12 @@ export function CreateClassModal({
       loadClientsAndManagers();
       loadStocks();
       // 모달 열릴 때 상태 초기화
+      setLastGenerationParams(null);
+      setSelectedClientId("");
+      setDifficulty("normal");
       setProgramType("stock_game");
       setGenerationError(null);
-      setIsCancelled(false);
+      cancelled.current = false;
     }
   }, [isOpen]);
 
@@ -276,6 +249,7 @@ export function CreateClassModal({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (lastGenerationParams || isSubmitting) return;
 
     // 게임 데이터 자동 생성이 활성화되어 있고 주식이 선택되지 않은 경우 (주식 게임만)
     if (
@@ -332,6 +306,9 @@ export function CreateClassModal({
       } satisfies CreatedClassWithRelations;
 
       // 2. 게임 데이터 자동 생성 (주식 게임일 때만)
+      onClassCreated(createdClass);
+      void queryClient.invalidateQueries({ queryKey: ["classes", "list"] });
+
       if (
         programType === "stock_game" &&
         autoGenerateData &&
@@ -352,18 +329,9 @@ export function CreateClassModal({
         });
       } else {
         alert(result.message);
+        setIsOpen(false);
       }
 
-      onClassCreated(createdClass);
-      // 캐시 무효화로 목록 최신화
-      queryClient.invalidateQueries({ queryKey: ["classes", "list"] });
-      setIsOpen(false);
-
-      // 폼 리셋
-      (e.target as HTMLFormElement).reset();
-      setSelectedClientId("");
-      setSelectedStockIds([]);
-      setDifficulty("normal");
     } catch (error) {
       console.error("Error creating class:", error);
       alert("생성 중 오류가 발생했습니다.");
@@ -375,7 +343,7 @@ export function CreateClassModal({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={() => setIsOpen(false)}
+      onClose={() => { if (!isSubmitting && !isGeneratingGameData) setIsOpen(false); }}
       title="새 수업 추가"
       size="md"
     >
@@ -383,6 +351,8 @@ export function CreateClassModal({
         <div className="text-center py-4">데이터를 불러오는 중...</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          <fieldset disabled={isSubmitting || !!lastGenerationParams} className="space-y-4">
+            <legend className="sr-only">수업 설정</legend>
           <div>
             <label
               htmlFor="name"
@@ -756,6 +726,8 @@ export function CreateClassModal({
             />
           </div>
 
+          </fieldset>
+
           {/* 게임 데이터 생성 프로그레스바 */}
           {isGeneratingGameData && (
             <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -841,7 +813,7 @@ export function CreateClassModal({
                 </Button>
                 <Button
                   type="button"
-                  onClick={() => setGenerationError(null)}
+                  onClick={() => setIsOpen(false)}
                   variant="ghost"
                   className="text-xs px-3 py-1.5"
                 >
@@ -857,13 +829,13 @@ export function CreateClassModal({
               onClick={() => setIsOpen(false)}
               variant="ghost"
               className="px-4 py-2"
-              disabled={isGeneratingGameData}
+              disabled={isSubmitting || isGeneratingGameData}
             >
               취소
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !!lastGenerationParams}
               className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
