@@ -1,6 +1,7 @@
 "use server";
 
-import { dbWithTransaction, classStockPrices, news } from "@repo/db";
+import { eq } from "drizzle-orm";
+import { db, dbWithTransaction, gameDataGenerations, classStockPrices, news } from "@repo/db";
 import { withAuth } from "@/lib/safe-action";
 
 interface StockInfo {
@@ -160,6 +161,11 @@ export const generateGameData = withAuth(
     try {
       const { classId, totalDays, stocks, difficulty = "normal" } = params;
 
+      const alreadySaved = { success: true, message: "이미 저장된 게임 데이터입니다." };
+      const [completed] = await db.select({ classId: gameDataGenerations.classId })
+        .from(gameDataGenerations).where(eq(gameDataGenerations.classId, classId));
+      if (completed) return alreadySaved;
+
       if (!process.env.OPENAI_API_KEY) {
         throw new Error("관리자 서버에 OPENAI_API_KEY를 설정해 주세요.");
       }
@@ -235,7 +241,11 @@ export const generateGameData = withAuth(
       }
 
       // DB에 저장 (선택된 주식만 필터링하여 저장)
-      await dbWithTransaction.transaction(async (tx) => {
+      const saved = await dbWithTransaction.transaction(async (tx) => {
+        const [claimed] = await tx.insert(gameDataGenerations).values({ classId })
+          .onConflictDoNothing().returning({ classId: gameDataGenerations.classId });
+        if (!claimed) return false;
+
         for (const dayData of gameData.days) {
           // 뉴스 저장 (마지막 날 제외, 선택된 주식과 관련된 뉴스만)
           if (dayData.news && dayData.news.length > 0) {
@@ -279,7 +289,9 @@ export const generateGameData = withAuth(
             }
           }
         }
+        return true;
       });
+      if (!saved) return alreadySaved;
 
       return {
         success: true,
