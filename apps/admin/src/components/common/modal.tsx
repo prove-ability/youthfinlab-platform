@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useId, useLayoutEffect, useRef, type ReactNode } from "react";
 import { Button } from "@repo/ui";
 
 interface ModalProps {
@@ -44,45 +44,34 @@ export function Modal({
   customHeader,
   maxHeight = "90vh",
 }: ModalProps) {
-  // ESC 키 입력 시 모달 닫기
-  useEffect(() => {
-    if (!isOpen || !closeOnEscape) return;
+  const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose, closeOnEscape]);
-
-  // 모달이 열릴 때 body 스크롤 방지
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
+  useLayoutEffect(() => {
+    const dialog = ref.current;
+    if (!isOpen || !dialog) return;
+    const opener = document.activeElement;
+    dialog.showModal();
     return () => {
-      document.body.style.overflow = "unset";
+      dialog.close();
+      if (opener instanceof HTMLElement && opener.isConnected) opener.focus({ preventScroll: true });
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget && closeOnBackdropClick) {
-      onClose();
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={handleBackdropClick}
+    <dialog
+      ref={ref}
+      aria-labelledby={title && !customHeader ? titleId : undefined}
+      onCancel={(event) => {
+        event.preventDefault();
+        if (closeOnEscape) onClose();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget && closeOnBackdropClick) onClose();
+      }}
+      className="fixed inset-0 m-0 h-full w-full max-h-none max-w-none overflow-auto overscroll-contain bg-transparent p-4 open:flex items-center justify-center backdrop:bg-black/50 backdrop:overflow-hidden backdrop:overscroll-contain"
     >
       <div
         className={`bg-white rounded-2xl w-full ${sizeClasses[size]} shadow-2xl flex flex-col`}
@@ -96,9 +85,9 @@ export function Modal({
           <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
             <div>
               {typeof title === "string" ? (
-                <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+                <h2 id={titleId} className="text-2xl font-bold text-gray-900">{title}</h2>
               ) : (
-                title
+                <div id={titleId}>{title}</div>
               )}
               {subtitle && (
                 <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
@@ -128,6 +117,6 @@ export function Modal({
           </div>
         )}
       </div>
-    </div>
+    </dialog>
   );
 }
