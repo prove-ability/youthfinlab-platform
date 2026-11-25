@@ -9,9 +9,13 @@
     "check-types": "turbo run check-types",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx ./packages/db/src/migrate.ts",
-    "db:debug": "tsx ./debug-env.ts"
+    "db:debug": "tsx ./debug-env.ts",
+    "test": "vitest run",
+    "test:browser": "playwright test"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.3.16",
+    "@playwright/test": "1.65.1",
     "@types/node": "^24.0.1",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
@@ -25,7 +29,9 @@
     "prettier": "^3.5.3",
     "tsx": "^4.20.5",
     "turbo": "^2.5.8",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "vite": "6.4.1",
+    "vitest": "3.2.6"
   },
   "packageManager": "pnpm@9.0.0",
   "pnpm": {
