@@ -65,16 +65,17 @@ export function ClassList() {
     await refetch();
   };
 
-  if (isLoading) {
+  if (isLoading && !isCreateModalOpen) {
     return <div>로딩 중...</div>;
   }
 
-  if (queryError instanceof Error) {
+  if (queryError instanceof Error && !isCreateModalOpen) {
     return <div className="text-red-500">오류: {queryError.message}</div>;
   }
 
   return (
     <div className="space-y-4">
+      {queryError instanceof Error && <p role="alert">목록 조회 오류: {queryError.message}</p>}
       <div className="flex justify-between items-center">
         <p className="text-gray-600">총 {classes.length}개의 수업</p>
         <Button

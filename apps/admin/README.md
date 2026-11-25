@@ -20,7 +20,7 @@
 - 고객사별 담당 매니저 관리
 
 ### 주식 게임 관리
-- 게임 데이터(종목·주가) 자동/수동 생성 (Gemini AI 활용)
+- 게임 데이터(종목·주가) 자동/수동 생성 (OpenAI AI 활용)
 - Day 진행 및 결과 조회
 
 ### 재무 시뮬레이션 결과 조회
@@ -36,7 +36,7 @@
 - **인증**: Stack Auth
 - **데이터베이스**: `@repo/db` (Drizzle ORM + Neon PostgreSQL)
 - **UI**: Tailwind CSS, Radix UI, shadcn/ui, Recharts
-- **AI**: Google Gemini API (게임 데이터 자동 생성)
+- **AI**: OpenAI API (게임 데이터 자동 생성)
 - **기타**: TanStack Query, TanStack Table, DnD Kit, QRCode.react
 
 ## 개발 서버
@@ -57,8 +57,8 @@ STACK_SECRET_SERVER_KEY=
 # Neon PostgreSQL
 DATABASE_URL=
 
-# Google Gemini (게임 데이터 자동 생성)
-GEMINI_API_KEY=
+# OpenAI (게임 데이터 자동 생성)
+OPENAI_API_KEY=
 
 # 앱 URL (QR 코드 생성에 사용)
 NEXT_PUBLIC_WEB_APP_URL=https://invest-game.youthfinlab.com

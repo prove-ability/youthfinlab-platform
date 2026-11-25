@@ -1,7 +1,7 @@
 "use server";
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { db, classStockPrices, news } from "@repo/db";
+import { eq } from "drizzle-orm";
+import { db, dbWithTransaction, gameDataGenerations, classStockPrices, news } from "@repo/db";
 import { withAuth } from "@/lib/safe-action";
 
 interface StockInfo {
@@ -146,7 +146,7 @@ ${commonJson}`;
 }
 
 /**
- * Gemini API를 사용하여 게임 데이터 생성
+ * OpenAI API를 사용하여 게임 데이터 생성
  */
 export const generateGameData = withAuth(
   async (
@@ -161,36 +161,39 @@ export const generateGameData = withAuth(
     try {
       const { classId, totalDays, stocks, difficulty = "normal" } = params;
 
-      if (!process.env.GEMINI_API_KEY) {
-        throw new Error("GEMINI_API_KEY가 설정되지 않았습니다.");
+      const alreadySaved = { success: true, message: "이미 저장된 게임 데이터입니다." };
+      const [completed] = await db.select({ classId: gameDataGenerations.classId })
+        .from(gameDataGenerations).where(eq(gameDataGenerations.classId, classId));
+      if (completed) return alreadySaved;
+
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error("관리자 서버에 OPENAI_API_KEY를 설정해 주세요.");
       }
-
-      // Gemini API 클라이언트 초기화
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-      // Gemini 모델 가져오기 (최신 안정 버전)
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
-
-      // 난이도별 프롬프트 생성
-      const prompt = buildPrompt(difficulty, totalDays, stocks);
-
-      // Gemini API 호출
-      const result = await model.generateContent(prompt);
-      const response = result.response;
-      const text = response.text();
-
-      // JSON 파싱
-      let gameData: GeneratedGameData;
-      try {
-        // JSON 블록에서 추출
-        const jsonMatch =
-          text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*\}/);
-        const jsonText = jsonMatch ? jsonMatch[1] || jsonMatch[0] : text;
-        gameData = JSON.parse(jsonText);
-      } catch (error) {
-        console.error("JSON 파싱 실패:", text, error);
-        throw new Error("생성된 데이터를 파싱하는데 실패했습니다.");
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: process.env.OPENAI_GAME_MODEL || "gpt-4.1-mini",
+          messages: [{ role: "user", content: buildPrompt(difficulty, totalDays, stocks) }],
+          response_format: { type: "json_object" },
+          store: false,
+        }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        if (body?.error?.code === "insufficient_quota") {
+          throw new Error("OpenAI API 사용 한도를 확인한 뒤 재시도해 주세요.");
+        }
+        throw new Error(`OpenAI API 요청 실패 (HTTP ${response.status}). 서버 설정과 API 상태를 확인해 주세요.`);
       }
+      const completion = (await response.json()).choices?.[0];
+      if (completion?.finish_reason !== "stop" || !completion.message?.content) {
+        throw new Error("AI 응답이 완성되지 않았습니다. 다시 시도해 주세요.");
+      }
+      const gameData: GeneratedGameData = JSON.parse(completion.message.content);
 
       // 데이터 검증
       if (!gameData.days || !Array.isArray(gameData.days)) {
@@ -238,49 +241,57 @@ export const generateGameData = withAuth(
       }
 
       // DB에 저장 (선택된 주식만 필터링하여 저장)
-      for (const dayData of gameData.days) {
-        // 뉴스 저장 (마지막 날 제외, 선택된 주식과 관련된 뉴스만)
-        if (dayData.news && dayData.news.length > 0) {
-          for (const newsItem of dayData.news) {
-            // 뉴스의 relatedStockIds가 선택된 주식 중 하나라도 포함되어 있는지 확인
-            const hasValidStock = newsItem.relatedStockIds?.some((stockId) =>
-              validStockIds.has(stockId)
-            );
+      const saved = await dbWithTransaction.transaction(async (tx) => {
+        const [claimed] = await tx.insert(gameDataGenerations).values({ classId })
+          .onConflictDoNothing().returning({ classId: gameDataGenerations.classId });
+        if (!claimed) return false;
 
-            // 선택된 주식과 관련된 뉴스만 저장
-            if (hasValidStock) {
-              // relatedStockIds를 선택된 주식만 필터링
-              const filteredRelatedStockIds = newsItem.relatedStockIds.filter(
-                (stockId) => validStockIds.has(stockId)
+        for (const dayData of gameData.days) {
+          // 뉴스 저장 (마지막 날 제외, 선택된 주식과 관련된 뉴스만)
+          if (dayData.news && dayData.news.length > 0) {
+            for (const newsItem of dayData.news) {
+              // 뉴스의 relatedStockIds가 선택된 주식 중 하나라도 포함되어 있는지 확인
+              const hasValidStock = newsItem.relatedStockIds?.some((stockId) =>
+                validStockIds.has(stockId)
               );
 
-              await db.insert(news).values({
+              // 선택된 주식과 관련된 뉴스만 저장
+              if (hasValidStock) {
+                // relatedStockIds를 선택된 주식만 필터링
+                const filteredRelatedStockIds = newsItem.relatedStockIds.filter(
+                  (stockId) => validStockIds.has(stockId)
+                );
+
+                await tx.insert(news).values({
+                  classId,
+                  day: dayData.day,
+                  title: newsItem.title,
+                  content: newsItem.content,
+                  relatedStockIds: filteredRelatedStockIds,
+                  createdBy: user.id,
+                  updatedAt: new Date(),
+                });
+              }
+            }
+          }
+
+          // 가격 정보 저장 (선택된 주식만)
+          for (const priceItem of dayData.prices) {
+            // 선택된 주식인지 확인
+            if (validStockIds.has(priceItem.stockId)) {
+              await tx.insert(classStockPrices).values({
                 classId,
+                stockId: priceItem.stockId,
                 day: dayData.day,
-                title: newsItem.title,
-                content: newsItem.content,
-                relatedStockIds: filteredRelatedStockIds,
-                createdBy: user.id,
+                price: priceItem.price.toString(),
                 updatedAt: new Date(),
               });
             }
           }
         }
-
-        // 가격 정보 저장 (선택된 주식만)
-        for (const priceItem of dayData.prices) {
-          // 선택된 주식인지 확인
-          if (validStockIds.has(priceItem.stockId)) {
-            await db.insert(classStockPrices).values({
-              classId,
-              stockId: priceItem.stockId,
-              day: dayData.day,
-              price: priceItem.price.toString(),
-              updatedAt: new Date(),
-            });
-          }
-        }
-      }
+        return true;
+      });
+      if (!saved) return alreadySaved;
 
       return {
         success: true,

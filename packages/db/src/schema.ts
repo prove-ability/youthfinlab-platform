@@ -88,6 +88,12 @@ export const classes = pgTable("classes", {
     .notNull(),
 });
 
+export const gameDataGenerations = pgTable("game_data_generations", {
+  classId: uuid("class_id")
+    .primaryKey()
+    .references(() => classes.id, { onDelete: "cascade" }),
+});
+
 export const news = pgTable("news", {
   id: uuid("id").primaryKey().defaultRandom(),
   day: integer("day").notNull(),
