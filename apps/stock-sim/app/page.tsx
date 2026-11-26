@@ -56,7 +56,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-yfl-canvas pb-20">
       {/* Pull-to-refresh 인디케이터 */}
       {isRefreshing && (
         <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4">
@@ -136,7 +136,7 @@ export default function Home() {
         {/* 내 자산 */}
         <div
           id="wallet-balance"
-          className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 mb-5"
+          className="bg-white rounded-3xl p-5 shadow-sm border border-yfl-divider mb-5"
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-bold text-gray-900">내 자산</h3>
@@ -167,7 +167,7 @@ export default function Home() {
               {dashboardData.profitRate.toFixed(2)}%)
             </p>
           )}
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-yfl-divider">
             <div>
               <p className="text-xs text-gray-600 mb-1.5">남은 현금</p>
               <div className="text-base font-bold text-gray-900">
@@ -189,7 +189,7 @@ export default function Home() {
         {/* 내 순위 */}
         {dashboardData.myRank && (
           <Link href="/ranking">
-            <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:border-gray-200 active:scale-[0.98] transition-all cursor-pointer mb-5">
+            <div className="bg-white rounded-3xl p-5 shadow-sm border border-yfl-divider hover:border-yfl-divider active:scale-[0.98] transition-all cursor-pointer mb-5">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h3 className="text-xs font-semibold text-gray-600 mb-1.5">
@@ -223,7 +223,7 @@ export default function Home() {
         )}
 
         {/* 보유 주식 */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-yfl-divider">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-bold text-gray-900">보유 주식</h3>
             <Link

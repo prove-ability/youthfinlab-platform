@@ -183,7 +183,7 @@ function ProfilePageContent() {
   }
 
   const inputClass =
-    "w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-shadow";
+    "w-full px-4 py-3 rounded-xl border border-yfl-divider bg-yfl-canvas text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-shadow";
 
   return (
     <div className="min-h-dvh flex flex-col bg-white">
@@ -203,7 +203,7 @@ function ProfilePageContent() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 기본 정보 */}
-          <section className="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
+          <section className="bg-white rounded-2xl border border-yfl-divider p-4 shadow-xs">
             <h2 className="text-sm font-semibold text-gray-800 mb-3">
               기본 정보
             </h2>
@@ -247,7 +247,7 @@ function ProfilePageContent() {
           </section>
 
           {/* 소득/지출 */}
-          <section className="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
+          <section className="bg-white rounded-2xl border border-yfl-divider p-4 shadow-xs">
             <h2 className="text-sm font-semibold text-gray-800 mb-3">
               소득 / 지출
             </h2>
@@ -288,7 +288,7 @@ function ProfilePageContent() {
           </section>
 
           {/* 자산 */}
-          <section className="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
+          <section className="bg-white rounded-2xl border border-yfl-divider p-4 shadow-xs">
             <h2 className="text-sm font-semibold text-gray-800 mb-3">자산</h2>
             <div className="space-y-3">
               <div>
@@ -326,7 +326,7 @@ function ProfilePageContent() {
           </section>
 
           {/* 부채 */}
-          <section className="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
+          <section className="bg-white rounded-2xl border border-yfl-divider p-4 shadow-xs">
             <h2 className="text-sm font-semibold text-gray-800 mb-3">부채</h2>
             <div className="flex gap-3 mb-3">
               <button

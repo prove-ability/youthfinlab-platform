@@ -34,12 +34,12 @@ export default function PageHeader({
               {icon}
             </motion.div>
           )}
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+          <h1 className="text-2xl font-bold text-[var(--yfl-forest)]">{title}</h1>
         </div>
       </div>
       {description && (
         <motion.p
-          className="text-sm text-gray-600 mt-1.5"
+          className="text-sm text-[var(--yfl-muted)] mt-1.5"
           role="doc-subtitle"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

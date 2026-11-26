@@ -16,7 +16,7 @@ export default function StepProgress({ currentStep }: { currentStep: number }) {
         <span className="text-xs font-semibold text-white/90">
           {currentStep}/6 단계
         </span>
-        <span className="text-xs text-white/60">
+        <span className="text-xs text-white/90">
           {STEPS[currentStep - 1]?.label}
         </span>
       </div>

@@ -86,3 +86,21 @@
   .yfl-entry-card button { border: 1px solid ButtonText; }
   .yfl-entry-card :is(input, button):focus-visible { outline-color: Highlight; }
 }
+/* Shared learner controls; semantic trading colors remain on their components. */
+.yfl-game { color-scheme: light; color: var(--yfl-forest); }
+.yfl-game :is(input:not([type="range"]):not([type="checkbox"]):not([type="radio"]), select, textarea) { border-color: var(--yfl-muted); border-radius: .75rem; }
+.yfl-game :is(input, select, textarea, button, a):focus-visible { outline: 3px solid var(--yfl-forest); outline-offset: 3px; }
+.yfl-game :is(input, progress) { accent-color: var(--yfl-forest); }
+.yfl-game button:disabled { cursor: not-allowed; }
+.yfl-dashboard { --yfl-ink: #19391f; --yfl-secondary: #52604a; --yfl-soft: #ebeed7; --yfl-panel: #fffefa; }
+.yfl-stat-card { height: 100%; padding: 1.5rem; border: 1px solid var(--yfl-divider); border-radius: 1.25rem; background: var(--yfl-panel); transition: border-color .15s, box-shadow .15s; }
+.yfl-stat-card:hover { border-color: var(--yfl-muted); box-shadow: 0 4px 16px #19391f0d; }
+.yfl-stat-active { background: var(--yfl-soft); }
+.yfl-stat-icon { background: var(--yfl-forest); }
+.yfl-dashboard-panel { background: var(--yfl-panel); border: 1px solid var(--yfl-divider); border-radius: 1.25rem; }
+.yfl-dashboard a:focus-visible { outline: 3px solid var(--yfl-ink); outline-offset: 4px; border-radius: 1.25rem; }
+.dark .yfl-dashboard { --yfl-ink: #fff8e9; --yfl-secondary: #cdddab; --yfl-soft: #253a2d; --yfl-panel: #19281e; --yfl-divider: #52604a; }
+@media (forced-colors: active) {
+ .yfl-dashboard, .dark .yfl-dashboard { --yfl-ink: CanvasText; --yfl-secondary: CanvasText; --yfl-soft: Canvas; --yfl-panel: Canvas; --yfl-divider: CanvasText; }
+ .yfl-game :is(input, select, textarea, button, a):focus-visible, .yfl-dashboard a:focus-visible { outline-color: Highlight; }
+}

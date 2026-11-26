@@ -136,7 +136,7 @@ export default function StockChart({ stocks }: StockChartProps) {
   return (
     <div className="space-y-4">
       {/* 범례 */}
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-5 shadow-md border border-gray-200">
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-5 shadow-md border border-yfl-divider">
         <h4 className="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
           <span className="w-1 h-6 bg-blue-600 rounded-full"></span>
           주식 목록 ({stocks.length}개)
@@ -145,7 +145,7 @@ export default function StockChart({ stocks }: StockChartProps) {
           {stocks.map((s, idx) => (
             <div
               key={s.id}
-              className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-300 transition-all"
+              className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-yfl-divider hover:shadow-md hover:border-gray-300 transition-all"
             >
               <div
                 className="w-4 h-4 rounded-full flex-shrink-0 shadow-sm"
@@ -162,7 +162,7 @@ export default function StockChart({ stocks }: StockChartProps) {
       </div>
 
       {/* 차트 */}
-      <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+      <div className="bg-white rounded-xl p-6 shadow-lg border border-yfl-divider">
         <div className="mb-6">
           <h3 className="text-xl font-bold text-gray-900">
             주식 가격 추이 (Day 1 ~ {currentDay})

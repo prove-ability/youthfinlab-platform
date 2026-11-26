@@ -79,7 +79,7 @@ export default function SnapshotPage() {
           <div
             className={`rounded-2xl p-4 border ${
               snapshot.debtBurden === "없음"
-                ? "bg-gray-50 border-gray-200"
+                ? "bg-yfl-canvas border-yfl-divider"
                 : snapshot.debtBurden === "낮음"
                   ? "bg-green-50 border-green-100"
                   : snapshot.debtBurden === "보통"
@@ -117,7 +117,7 @@ export default function SnapshotPage() {
         </div>
 
         {/* 세부 내역 - 카드 스타일 */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-5 shadow-xs">
+        <div className="bg-white rounded-2xl border border-yfl-divider p-4 mb-5 shadow-xs">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">
             월 자산 현황
           </h3>
@@ -134,7 +134,7 @@ export default function SnapshotPage() {
                 {Number(profile.monthlyFixedExpenses).toLocaleString()}만원
               </span>
             </div>
-            <hr className="border-gray-100" />
+            <hr className="border-yfl-divider" />
             <div className="flex justify-between items-center">
               <span className="text-gray-500">저축</span>
               <span className="font-bold text-forest-700 text-base">
@@ -145,7 +145,7 @@ export default function SnapshotPage() {
         </div>
 
         {/* 자산 현황 */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-5 shadow-xs">
+        <div className="bg-white rounded-2xl border border-yfl-divider p-4 mb-5 shadow-xs">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">
             보유 자산
           </h3>

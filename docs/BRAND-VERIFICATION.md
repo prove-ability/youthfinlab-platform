@@ -37,3 +37,13 @@ Modern Web Guidance의 color 가이드를 검색·조회했다. “Maintain 4.5:
 ## 검토·배포
 
 이 변경은 PR 검토까지 진행한다. 병합·운영 배포는 수행하지 않았다. 브랜드 정의와 이미지 생성 프롬프트는 [BRAND-DIRECTION.md](BRAND-DIRECTION.md)에 있다.
+
+## 공통 UI 후속 정리
+
+관리자 통계 카드는 중립 배경·포레스트 숫자로 통일하고 활성 게임만 세이지 배경으로 강조했다. 서베이·최근 활동 패널에도 같은 토큰을 적용했다. 학습 앱에는 아이보리 배경, 카드 경계, 입력창 경계·포커스, 주요 안내 버튼 및 선택된 하단 내비게이션을 적용했다. 매수·매도·손익·오류의 의미 색상과 처리 로직은 유지했다.
+
+후속 검증: Vitest 39개, WebKit 회귀 8개, 세 앱 타입 검사, 주식·재무 production build 통과. 관리자·재무 기본정보·주식 온보딩의 실제 컴포넌트 샘플을 1280px/390px에서 확인했으며 모바일 가로 넘침 및 pageerror 없음. 샘플의 저장·이동 액션은 목 처리했으므로 운영 인증·거래 검증이 아니다. 이전 커밋 ddc8fbf의 관리자 Vercel 빌드는 성공했으며 후속 커밋 결과는 PR 상태에서 확인한다.
+
+- [관리자 데스크톱](brand-evidence/admin-refined-desktop.png) / [모바일](brand-evidence/admin-refined-mobile.png)
+- [재무 기본정보 데스크톱](brand-evidence/finance-refined-desktop.png) / [모바일](brand-evidence/finance-refined-mobile.png)
+- [주식 온보딩 데스크톱](brand-evidence/stock-refined-desktop.png) / [모바일](brand-evidence/stock-refined-mobile.png)

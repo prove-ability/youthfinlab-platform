@@ -94,7 +94,7 @@ export default function PWAInstaller() {
           exit={{ y: 100, opacity: 0 }}
           className="fixed bottom-20 left-4 right-4 max-w-md mx-auto z-50"
         >
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-yfl-divider p-4">
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Download className="w-6 h-6 text-blue-600" />
@@ -109,7 +109,7 @@ export default function PWAInstaller() {
                 <div className="flex gap-2 mt-3">
                   <button
                     onClick={handleInstallClick}
-                    className="flex-1 bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex-1 bg-[var(--yfl-forest)] text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-[var(--yfl-emphasis)] transition-colors"
                   >
                     설치하기
                   </button>

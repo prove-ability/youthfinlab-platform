@@ -76,7 +76,7 @@ export default function AnalysisPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-yfl-canvas pb-20">
       <div className="max-w-4xl mx-auto p-4">
         <PageHeader
           title="투자 결과 분석"
@@ -100,7 +100,7 @@ export default function AnalysisPage() {
             .map((stock) => (
               <div
                 key={stock.stockId}
-                className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100"
+                className="bg-white rounded-3xl p-5 shadow-sm border border-yfl-divider"
               >
                 {/* 주식 정보 */}
                 <div className="flex items-start justify-between mb-4">
@@ -140,7 +140,7 @@ export default function AnalysisPage() {
                 </div>
 
                 {/* 어제 뉴스 & 피드백 */}
-                <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                <div className="bg-yfl-canvas rounded-2xl p-4 border border-yfl-divider">
                   {(newsData[stock.stockId]?.length ?? 0) > 0 ? (
                     <div className="space-y-2 mb-3">
                       {newsData[stock.stockId]?.map((news, idx) => (
@@ -175,7 +175,7 @@ export default function AnalysisPage() {
                   {/* 뉴스가 있을 때만 피드백 표시 */}
                   {(newsData[stock.stockId]?.length ?? 0) > 0 && (
                     <div
-                      className={`mt-3 pt-3 border-t border-gray-200 ${
+                      className={`mt-3 pt-3 border-t border-yfl-divider ${
                         stock.profitLoss >= 0
                           ? "bg-emerald-50 -mx-4 -mb-4 mt-3 p-4 rounded-b-2xl"
                           : "bg-amber-50 -mx-4 -mb-4 mt-3 p-4 rounded-b-2xl"

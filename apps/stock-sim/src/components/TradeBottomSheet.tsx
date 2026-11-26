@@ -202,7 +202,7 @@ export default function TradeBottomSheet({
         </div>
 
         {/* Balance/Holdings Info */}
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm">
+        <div className="mb-4 p-3 bg-yfl-canvas rounded-lg text-sm">
           {tradeType === "buy" ? (
             <div className="flex justify-between">
               <span className="text-gray-600">지금 가진 돈</span>
@@ -304,17 +304,17 @@ export default function TradeBottomSheet({
               </h3>
 
               <div className="space-y-3 mb-6">
-                <div className="flex justify-between py-2 border-b border-gray-100">
+                <div className="flex justify-between py-2 border-b border-yfl-divider">
                   <span className="text-gray-600">종목</span>
                   <span className="font-bold text-gray-900">{stock.name}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
+                <div className="flex justify-between py-2 border-b border-yfl-divider">
                   <span className="text-gray-600">가격</span>
                   <span className="font-bold text-gray-900">
                     {stock.currentPrice.toLocaleString()}원
                   </span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
+                <div className="flex justify-between py-2 border-b border-yfl-divider">
                   <span className="text-gray-600">수량</span>
                   <span className="font-bold text-gray-900">{quantity}주</span>
                 </div>

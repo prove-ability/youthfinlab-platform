@@ -59,7 +59,7 @@ export default function RankingPage() {
   const myRanking = rankings.find((r) => r.isCurrentUser);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-yfl-canvas pb-20">
       {/* Pull-to-refresh 인디케이터 */}
       {isRefreshing && (
         <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4">
@@ -127,7 +127,7 @@ export default function RankingPage() {
                   className={`rounded-2xl transition-all p-4 ${
                     isMe
                       ? "bg-emerald-50 border-2 border-emerald-300"
-                      : "bg-white border border-gray-200"
+                      : "bg-white border border-yfl-divider"
                   }`}
                 >
                   <div className="flex items-center justify-between">

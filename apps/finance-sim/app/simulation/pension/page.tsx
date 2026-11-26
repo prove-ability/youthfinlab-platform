@@ -124,7 +124,7 @@ export default function PensionPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               현재 나이
             </label>
-            <div className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700">
+            <div className="w-full px-4 py-3 rounded-xl border border-yfl-divider bg-yfl-canvas text-sm text-gray-700">
               {currentAge}세
             </div>
           </div>
@@ -172,7 +172,7 @@ export default function PensionPage() {
         </div>
 
         {/* 차트 */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-5 shadow-xs">
+        <div className="bg-white rounded-2xl border border-yfl-divider p-4 mb-5 shadow-xs">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">
             시작 시점별 자산 성장 비교
           </h3>
@@ -230,7 +230,7 @@ export default function PensionPage() {
               className={`rounded-2xl p-4 ${
                 i === 0
                   ? "bg-forest-50 border border-forest-200"
-                  : "bg-white border border-gray-100 shadow-xs"
+                  : "bg-white border border-yfl-divider shadow-xs"
               }`}
             >
               <div className="flex justify-between items-center mb-2">

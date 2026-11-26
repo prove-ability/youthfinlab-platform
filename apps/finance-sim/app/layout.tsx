@@ -12,7 +12,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1.0,
   viewportFit: "cover",
-  themeColor: "#2F4538",
+  themeColor: "#19391F",
 };
 
 export const metadata: Metadata = {
@@ -75,7 +75,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className="bg-stone-100">
+      <body className="yfl-game bg-yfl-canvas">
         <QueryProvider>
           <ToastProvider>
             <div className="mx-auto max-w-xl min-h-dvh bg-white shadow-sm">

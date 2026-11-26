@@ -36,7 +36,7 @@ export default function GameStartModal() {
           </p>
         </div>
 
-        <div className="bg-gray-50 rounded-2xl p-5 mb-6">
+        <div className="bg-yfl-canvas rounded-2xl p-5 mb-6">
           <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
             📖 게임 방법
           </h3>

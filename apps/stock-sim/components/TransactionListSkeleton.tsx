@@ -4,7 +4,7 @@ export default function TransactionListSkeleton() {
       {[1, 2, 3, 4, 5].map((i) => (
         <div
           key={i}
-          className="bg-white rounded-lg p-4 shadow border border-gray-200"
+          className="bg-white rounded-lg p-4 shadow border border-yfl-divider"
         >
           <div className="flex justify-between items-start">
             <div className="flex-1">

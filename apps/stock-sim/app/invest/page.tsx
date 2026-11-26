@@ -136,7 +136,7 @@ export default function InvestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-yfl-canvas pb-20">
       {/* Pull-to-refresh 인디케이터 */}
       {isPulling && (
         <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4">
@@ -181,14 +181,14 @@ export default function InvestPage() {
 
         {/* Portfolio Summary */}
         <div className="mb-6">
-          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-yfl-divider">
             <div className="mb-4">
               <p className="text-xs text-gray-600 mb-1.5">남은 현금</p>
               <p className="text-xl font-bold text-gray-900">
                 {balance.toLocaleString()}원
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-yfl-divider">
               <div>
                 <p className="text-xs text-gray-600 mb-1.5">내 주식</p>
                 <p className="text-base font-bold text-gray-900">
@@ -253,7 +253,7 @@ export default function InvestPage() {
         {/* Filter Toggle - 투자 종목 탭에서만 표시 */}
         {activeTab === "stocks" && (
           <>
-            <div className="mb-4 bg-gray-50 rounded-lg p-3 space-y-2">
+            <div className="mb-4 bg-yfl-canvas rounded-lg p-3 space-y-2">
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -291,7 +291,7 @@ export default function InvestPage() {
               </div>
               {/* 두 필터 동시 사용 안내 */}
               {showOnlyHoldings && showOnlyNews && (
-                <div className="pt-2 border-t border-gray-200">
+                <div className="pt-2 border-t border-yfl-divider">
                   <p className="text-xs text-emerald-700 flex items-center gap-1">
                     <span>✓</span>
                     <span>
@@ -403,8 +403,8 @@ export default function InvestPage() {
                             key={tx.id}
                             className={`rounded-lg p-4 shadow hover:shadow-md transition-shadow border-l-4 ${
                               isBenefit
-                                ? "bg-gray-50 border-gray-300"
-                                : "bg-white border-gray-200"
+                                ? "bg-yfl-canvas border-gray-300"
+                                : "bg-white border-yfl-divider"
                             }`}
                             style={{
                               borderLeftColor: isBenefit
@@ -572,7 +572,7 @@ export default function InvestPage() {
                   key={stock.id}
                   id={index === 0 ? "first-stock-card" : undefined}
                   onClick={() => !isLastDay && setSelectedStock(stock)}
-                  className={`bg-white rounded-3xl p-5 shadow-sm transition-all duration-200 border border-gray-100 relative group ${
+                  className={`bg-white rounded-3xl p-5 shadow-sm transition-all duration-200 border border-yfl-divider relative group ${
                     isLastDay 
                       ? "cursor-not-allowed" 
                       : "hover:shadow-lg hover:border-emerald-200 cursor-pointer"
@@ -645,7 +645,7 @@ export default function InvestPage() {
 
                   {/* Holdings Info */}
                   {isHolding && (
-                    <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="mt-3 pt-3 border-t border-yfl-divider">
                       <div className="flex items-center justify-between">
                         <div className="text-sm text-gray-600">
                           <span className="font-medium text-gray-900">

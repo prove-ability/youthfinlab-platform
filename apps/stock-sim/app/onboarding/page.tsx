@@ -166,7 +166,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* 하단 네비게이션 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-6">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-yfl-divider p-6">
         <div className="max-w-md mx-auto">
           {/* 인디케이터 */}
           <div className="flex justify-center gap-2 mb-6">
@@ -179,7 +179,7 @@ export default function OnboardingPage() {
                 }}
                 className={`h-2 rounded-full transition-all ${
                   index === currentSlide
-                    ? "w-8 bg-emerald-600"
+                    ? "w-8 bg-[var(--yfl-forest)]"
                     : "w-2 bg-gray-300"
                 }`}
               />
@@ -199,7 +199,7 @@ export default function OnboardingPage() {
             </button>
             <button
               onClick={handleNext}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors shadow-sm"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--yfl-forest)] text-white font-semibold hover:bg-[var(--yfl-emphasis)] transition-colors shadow-sm"
             >
               {currentSlide === slides.length - 1 ? "시작하기" : "다음"}
               {currentSlide < slides.length - 1 && (

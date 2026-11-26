@@ -36,7 +36,7 @@ export default function NewsList({ news, currentDay }: NewsListProps) {
       {news.map((newsItem, index) => (
         <div
           key={newsItem.id}
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
+          className="bg-white rounded-lg shadow-sm border border-yfl-divider p-4 hover:shadow-md transition-shadow"
         >
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">

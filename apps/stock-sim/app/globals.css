@@ -40,3 +40,8 @@ a, button, input, select, textarea {
     opacity: 0;
   }
 }
+
+@theme {
+ --color-yfl-canvas: #fff8e9;
+ --color-yfl-divider: #d5d5bb;
+}
