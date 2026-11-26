@@ -57,7 +57,7 @@ export function BottomNav() {
 
   return (
     <nav 
-      className="fixed bottom-0 left-0 right-0 w-full max-w-xl mx-auto border-t-2 border-gray-100 z-40 backdrop-blur-lg bg-white/90"
+      className="fixed bottom-0 left-0 right-0 w-full max-w-xl mx-auto border-t-2 border-yfl-divider z-40 backdrop-blur-lg bg-white/90"
       role="navigation"
       aria-label="주요 네비게이션"
     >
@@ -73,7 +73,7 @@ export function BottomNav() {
               role="tab"
               aria-selected={isActive}
               aria-label={`${item.label} 페이지`}
-              className="flex flex-col items-center justify-center w-full h-16 relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+              className="flex flex-col items-center justify-center w-full h-16 relative focus:outline-none focus:ring-2 focus:ring-[var(--yfl-forest)] focus:ring-offset-1"
               whileTap={{ scale: 0.95 }}
               onMouseEnter={() => handlePrefetch(item.href)}
               onTouchStart={() => handlePrefetch(item.href)}
@@ -81,12 +81,12 @@ export function BottomNav() {
               {isActive && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-blue-50/50"
+                  className="absolute inset-0 bg-[var(--yfl-sage-light)]"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}
               <div className={`flex flex-col items-center justify-center relative z-10 ${
-                isActive ? "text-blue-600" : "text-gray-500"
+                isActive ? "text-[var(--yfl-forest)]" : "text-gray-500"
               }`}>
                 <item.icon className="w-6 h-6 mb-1" strokeWidth={isActive ? 2 : 1} aria-hidden="true" />
                 <span className="text-xs font-medium">{item.label}</span>

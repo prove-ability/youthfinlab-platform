@@ -220,7 +220,7 @@ export default function TendencyPage() {
 
           {/* 설명 카드 */}
           <div
-            className={`bg-white rounded-2xl p-5 mb-4 border border-gray-100 shadow-xs transition-all duration-500 ${
+            className={`bg-white rounded-2xl p-5 mb-4 border border-yfl-divider shadow-xs transition-all duration-500 ${
               revealStep >= 2
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -242,7 +242,7 @@ export default function TendencyPage() {
 
           {/* 추천 포트폴리오 */}
           <div
-            className={`bg-white rounded-2xl p-5 mb-4 border border-gray-100 shadow-xs transition-all duration-500 ${
+            className={`bg-white rounded-2xl p-5 mb-4 border border-yfl-divider shadow-xs transition-all duration-500 ${
               revealStep >= 3
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -259,7 +259,7 @@ export default function TendencyPage() {
 
           {/* 나의 위치 - 5등급 스케일 */}
           <div
-            className={`bg-white rounded-2xl p-5 mb-6 border border-gray-100 shadow-xs transition-all duration-500 ${
+            className={`bg-white rounded-2xl p-5 mb-6 border border-yfl-divider shadow-xs transition-all duration-500 ${
               revealStep >= 4
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -308,7 +308,7 @@ export default function TendencyPage() {
                 setShowResult(false);
                 setRevealStep(0);
               }}
-              className="flex-1 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-colors"
+              className="flex-1 py-3.5 rounded-xl bg-white border border-yfl-divider text-gray-700 font-semibold text-sm hover:bg-yfl-canvas transition-colors"
             >
               다시 하기
             </button>
@@ -364,7 +364,7 @@ export default function TendencyPage() {
               className={`rounded-2xl p-4 transition-all duration-300 border ${
                 answers[q.id] !== undefined
                   ? "bg-forest-50 border-forest-200"
-                  : "bg-white border-gray-100 shadow-xs"
+                  : "bg-white border-yfl-divider shadow-xs"
               }`}
             >
               <p className="text-sm font-semibold text-gray-800 mb-3">
@@ -381,7 +381,7 @@ export default function TendencyPage() {
                     className={`w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200 ${
                       answers[q.id] === opt.score
                         ? "bg-forest-700 text-white shadow-md scale-[1.01]"
-                        : "bg-white border border-gray-200 text-gray-700 hover:bg-forest-50 hover:border-forest-200"
+                        : "bg-white border border-yfl-divider text-gray-700 hover:bg-forest-50 hover:border-forest-200"
                     }`}
                   >
                     {opt.label}

@@ -81,8 +81,8 @@ export default function StockInfoModal({
       ) : (
         <div className="space-y-5">
           {/* Stock Details */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="px-5 py-3 bg-gray-50 border-b border-gray-200">
+          <div className="bg-white rounded-2xl border border-yfl-divider overflow-hidden">
+            <div className="px-5 py-3 bg-yfl-canvas border-b border-yfl-divider">
               <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">
                 종목 정보
               </h3>

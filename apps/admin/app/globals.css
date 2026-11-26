@@ -125,3 +125,10 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.dark .yfl-intro {
+  background: var(--yfl-forest);
+  color: var(--yfl-ivory);
+  border-color: var(--yfl-muted);
+}
+.dark .yfl-intro p { color: var(--yfl-sage); }

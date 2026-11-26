@@ -144,7 +144,7 @@ export default function SetupPage() {
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 step === "nickname"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[var(--yfl-forest)] text-white"
                   : "bg-green-600 text-white"
               }`}
             >
@@ -154,7 +154,7 @@ export default function SetupPage() {
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 step === "password"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[var(--yfl-forest)] text-white"
                   : "bg-gray-300 text-gray-600"
               }`}
             >
@@ -251,7 +251,7 @@ export default function SetupPage() {
                     minLength={4}
                     required
                     disabled={loading}
-                    className="pr-10 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+                    className="pr-10 rounded-xl border-yfl-divider focus:border-emerald-500 focus:ring-emerald-500"
                   />
                   <button
                     type="button"
@@ -286,7 +286,7 @@ export default function SetupPage() {
                     placeholder="같은 비밀번호를 한 번 더 입력해주세요"
                     required
                     disabled={loading}
-                    className="pr-10 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+                    className="pr-10 rounded-xl border-yfl-divider focus:border-emerald-500 focus:ring-emerald-500"
                   />
                   <button
                     type="button"
@@ -313,7 +313,7 @@ export default function SetupPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded-xl py-3 font-semibold text-white transition-colors"
+                className="w-full bg-[var(--yfl-forest)] hover:bg-[var(--yfl-emphasis)] focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded-xl py-3 font-semibold text-white transition-colors"
                 disabled={loading || !newPassword || !confirmPassword}
               >
                 {loading ? "설정하는 중이에요..." : "완료하기"}
@@ -354,7 +354,7 @@ export default function SetupPage() {
                   </button>
                   <button
                     onClick={confirmNicknameSubmit}
-                    className="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-colors"
+                    className="flex-1 py-3 bg-[var(--yfl-forest)] text-white rounded-xl font-bold hover:bg-[var(--yfl-emphasis)] transition-colors"
                   >
                     좋아요!
                   </button>

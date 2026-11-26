@@ -1,5 +1,7 @@
 "use client";
 
+import { BrandIntro } from "@repo/ui/brand-intro";
+
 import { useMemo } from "react";
 import {
   Users,
@@ -83,7 +85,7 @@ export function DashboardClient() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-500">대시보드를 불러오는 중...</p>
+          <p className="text-[var(--yfl-secondary)]">대시보드를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -134,38 +136,33 @@ export function DashboardClient() {
         <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
           <Activity className="w-6 h-6 text-red-400" />
         </div>
-        <p className="text-gray-600 font-medium">데이터를 불러오지 못했습니다</p>
+        <p className="text-[var(--yfl-secondary)] font-medium">데이터를 불러오지 못했습니다</p>
         <p className="text-sm text-gray-400 mt-1">잠시 후 페이지를 새로고침해 주세요.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="yfl-dashboard space-y-6">
       {/* 헤더 */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">관리자 대시보드</h1>
-        <p className="text-gray-500 mt-1 text-sm">
-          주식 게임 및 재무 시뮬레이션 전체 현황을 한눈에 확인하세요
-        </p>
-      </div>
+      <BrandIntro title="관리자 대시보드" description="주식 게임 및 재무 시뮬레이션 전체 현황을 한눈에 확인하세요" />
 
       {/* 주요 통계 카드 */}
       {payload && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* 총 클라이언트 수 */}
           <Link href="/protected/clients">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="yfl-stat-card">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-blue-500 rounded-lg">
+                <div className="yfl-stat-icon p-3 rounded-xl">
                   <Building2 className="w-6 h-6 text-white" />
                 </div>
-                <ArrowRight className="w-5 h-5 text-blue-600" />
+                <ArrowRight className="w-5 h-5 text-[var(--yfl-ink)]" />
               </div>
-              <h3 className="text-sm font-medium text-blue-900 mb-1">
+              <h3 className="text-sm font-medium text-[var(--yfl-ink)] mb-1">
                 총 클라이언트
               </h3>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-3xl font-bold text-[var(--yfl-ink)]">
                 {payload.stats.totalClients}
               </p>
             </div>
@@ -173,20 +170,20 @@ export function DashboardClient() {
 
           {/* 총 클래스 수 */}
           <Link href="/protected/classes">
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="yfl-stat-card">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-green-500 rounded-lg">
+                <div className="yfl-stat-icon p-3 rounded-xl">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <ArrowRight className="w-5 h-5 text-green-600" />
+                <ArrowRight className="w-5 h-5 text-[var(--yfl-ink)]" />
               </div>
-              <h3 className="text-sm font-medium text-green-900 mb-1">
+              <h3 className="text-sm font-medium text-[var(--yfl-ink)] mb-1">
                 총 클래스
               </h3>
-              <p className="text-3xl font-bold text-green-600">
+              <p className="text-3xl font-bold text-[var(--yfl-ink)]">
                 {payload.stats.totalClasses}
               </p>
-              <p className="text-xs text-green-700 mt-2">
+              <p className="text-xs text-[var(--yfl-ink)] mt-2">
                 최근 7일: +{payload.stats.recentClassesCount}
               </p>
             </div>
@@ -194,20 +191,20 @@ export function DashboardClient() {
 
           {/* 총 학생 수 */}
           <Link href="/protected/classes">
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="yfl-stat-card">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-purple-500 rounded-lg">
+                <div className="yfl-stat-icon p-3 rounded-xl">
                   <GraduationCap className="w-6 h-6 text-white" />
                 </div>
-                <ArrowRight className="w-5 h-5 text-purple-600" />
+                <ArrowRight className="w-5 h-5 text-[var(--yfl-ink)]" />
               </div>
-              <h3 className="text-sm font-medium text-purple-900 mb-1">
+              <h3 className="text-sm font-medium text-[var(--yfl-ink)] mb-1">
                 총 학생 수
               </h3>
-              <p className="text-3xl font-bold text-purple-600">
+              <p className="text-3xl font-bold text-[var(--yfl-ink)]">
                 {payload.stats.totalGuests}
               </p>
-              <p className="text-xs text-purple-700 mt-2">
+              <p className="text-xs text-[var(--yfl-ink)] mt-2">
                 거래 {payload.stats.totalTransactions.toLocaleString()}건
               </p>
             </div>
@@ -215,17 +212,17 @@ export function DashboardClient() {
 
           {/* 활성 게임 */}
           <Link href="/protected/game-management">
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="yfl-stat-card yfl-stat-active">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-orange-500 rounded-lg">
+                <div className="yfl-stat-icon p-3 rounded-xl">
                   <Gamepad2 className="w-6 h-6 text-white" />
                 </div>
-                <ArrowRight className="w-5 h-5 text-orange-600" />
+                <ArrowRight className="w-5 h-5 text-[var(--yfl-ink)]" />
               </div>
-              <h3 className="text-sm font-medium text-orange-900 mb-1">
+              <h3 className="text-sm font-medium text-[var(--yfl-ink)] mb-1">
                 활성 게임
               </h3>
-              <p className="text-3xl font-bold text-orange-600">
+              <p className="text-3xl font-bold text-[var(--yfl-ink)]">
                 {payload.stats.activeGames}
               </p>
             </div>
@@ -237,42 +234,42 @@ export function DashboardClient() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 서베이 통계 */}
         {payload && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="yfl-dashboard-panel p-6">
             <div className="flex items-center gap-3 mb-6">
-              <MessageSquare className="w-6 h-6 text-blue-500" />
-              <h2 className="text-xl font-semibold text-gray-900">
+              <MessageSquare className="w-6 h-6 text-[var(--yfl-ink)]" />
+              <h2 className="text-xl font-semibold text-[var(--yfl-ink)]">
                 서베이 통계
               </h2>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-[var(--yfl-soft)] rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600">총 응답 수</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-sm text-[var(--yfl-secondary)]">총 응답 수</p>
+                  <p className="text-2xl font-bold text-[var(--yfl-ink)]">
                     {payload.stats.totalSurveys}
                   </p>
                 </div>
-                <MessageSquare className="w-12 h-12 text-blue-300" />
+                <MessageSquare className="w-12 h-12 text-[var(--yfl-ink)]" />
               </div>
-              <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-[var(--yfl-soft)] rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600">평균 평점</p>
+                  <p className="text-sm text-[var(--yfl-secondary)]">평균 평점</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-[var(--yfl-ink)]">
                       {payload.stats.averageRating}
                     </p>
-                    <span className="text-sm text-gray-600">/ 10.0</span>
+                    <span className="text-sm text-[var(--yfl-secondary)]">/ 10.0</span>
                   </div>
                 </div>
                 <Star className="w-12 h-12 text-yellow-400" />
               </div>
               <section
-                className="p-4 bg-green-50 rounded-lg"
+                className="p-4 bg-[var(--yfl-soft)] rounded-lg"
                 aria-labelledby="satisfaction-heading"
               >
                 <h3
                   id="satisfaction-heading"
-                  className="text-sm text-gray-600 mb-2"
+                  className="text-sm text-[var(--yfl-secondary)] mb-2"
                 >
                   만족도
                 </h3>
@@ -288,14 +285,14 @@ export function DashboardClient() {
                     aria-label="만족도 게이지"
                   >
                     <div
-                      className="bg-gradient-to-r from-green-400 to-green-500 h-3 rounded-full transition-all duration-300"
+                      className="bg-[var(--yfl-forest)] h-3 rounded-full transition-all duration-300"
                       style={{
                         width: `${(payload.stats.averageRating / 10) * 100}%`,
                       }}
                     ></div>
                   </div>
                   <output
-                    className="text-lg font-bold text-green-600"
+                    className="text-lg font-bold text-[var(--yfl-ink)]"
                     htmlFor="satisfaction-heading"
                   >
                     {Math.round((payload.stats.averageRating / 10) * 100)}%
@@ -308,10 +305,10 @@ export function DashboardClient() {
 
         {/* 클래스 진행 상황 */}
         {payload && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="yfl-dashboard-panel p-6">
             <div className="flex items-center gap-3 mb-6">
-              <Activity className="w-6 h-6 text-green-500" />
-              <h2 className="text-xl font-semibold text-gray-900">
+              <Activity className="w-6 h-6 text-[var(--yfl-ink)]" />
+              <h2 className="text-xl font-semibold text-[var(--yfl-ink)]">
                 클래스 진행 상황
               </h2>
             </div>
@@ -323,23 +320,23 @@ export function DashboardClient() {
                     key={classItem.id}
                     href={`/protected/classes/${classItem.id}`}
                   >
-                    <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer border border-gray-100">
+                    <div className="flex items-center justify-between p-3 hover:bg-[var(--yfl-soft)] rounded-lg transition-colors cursor-pointer border border-gray-100">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 truncate">
+                        <h4 className="font-semibold text-[var(--yfl-ink)] truncate">
                           {classItem.name}
                         </h4>
-                        <p className="text-sm text-gray-500 truncate">
+                        <p className="text-sm text-[var(--yfl-secondary)] truncate">
                           {classItem.client.name}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 ml-4">
                         <div className="text-right">
-                          <p className="text-xs text-gray-500">진행 Day</p>
-                          <p className="text-lg font-bold text-blue-600">
+                          <p className="text-xs text-[var(--yfl-secondary)]">진행 Day</p>
+                          <p className="text-lg font-bold text-[var(--yfl-ink)]">
                             {classItem.currentDay}
                           </p>
                         </div>
-                        <TrendingUp className="w-5 h-5 text-blue-500" />
+                        <TrendingUp className="w-5 h-5 text-[var(--yfl-ink)]" />
                       </div>
                     </div>
                   </Link>
@@ -353,17 +350,17 @@ export function DashboardClient() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 최근 생성된 클래스 */}
         {payload && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="yfl-dashboard-panel p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <Clock className="w-6 h-6 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-900">
+                <Clock className="w-6 h-6 text-[var(--yfl-ink)]" />
+                <h2 className="text-xl font-semibold text-[var(--yfl-ink)]">
                   최근 클래스
                 </h2>
               </div>
               <Link
                 href="/protected/classes"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm text-[var(--yfl-ink)] hover:text-[var(--yfl-ink)] font-medium"
               >
                 전체 보기 →
               </Link>
@@ -374,22 +371,22 @@ export function DashboardClient() {
                   key={classItem.id}
                   href={`/protected/classes/${classItem.id}`}
                 >
-                  <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer">
+                  <div className="p-4 border border-gray-200 rounded-lg hover:border-[var(--yfl-muted)] hover:bg-[var(--yfl-soft)] transition-colors cursor-pointer">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 truncate">
+                        <h4 className="font-semibold text-[var(--yfl-ink)] truncate">
                           {classItem.name}
                         </h4>
                         <div className="flex items-center gap-4 mt-1">
-                          <p className="text-sm text-gray-500 truncate">
+                          <p className="text-sm text-[var(--yfl-secondary)] truncate">
                             {classItem.client.name}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-[var(--yfl-secondary)]">
                             {classItem.manager.name}
                           </p>
                         </div>
                       </div>
-                      <div className="text-xs text-gray-500 ml-4">
+                      <div className="text-xs text-[var(--yfl-secondary)] ml-4">
                         {new Date(classItem.createdAt).toLocaleDateString(
                           "ko-KR",
                           {
@@ -408,17 +405,17 @@ export function DashboardClient() {
 
         {/* 최근 등록된 학생 */}
         {payload && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="yfl-dashboard-panel p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <Users className="w-6 h-6 text-purple-500" />
-                <h2 className="text-xl font-semibold text-gray-900">
+                <Users className="w-6 h-6 text-[var(--yfl-ink)]" />
+                <h2 className="text-xl font-semibold text-[var(--yfl-ink)]">
                   최근 등록 학생
                 </h2>
               </div>
               <Link
                 href="/protected/classes"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm text-[var(--yfl-ink)] hover:text-[var(--yfl-ink)] font-medium"
               >
                 전체 보기 →
               </Link>
@@ -427,22 +424,22 @@ export function DashboardClient() {
               {payload.recentGuests.map((guest: RecentGuest) => (
                 <div
                   key={guest.id}
-                  className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                  className="flex items-center justify-between p-3 hover:bg-[var(--yfl-soft)] rounded-lg transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                      <GraduationCap className="w-5 h-5 text-purple-600" />
+                    <div className="w-10 h-10 rounded-full bg-[var(--yfl-soft)] flex items-center justify-center">
+                      <GraduationCap className="w-5 h-5 text-[var(--yfl-ink)]" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900">
+                      <h4 className="font-medium text-[var(--yfl-ink)]">
                         {guest.name}
                       </h4>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-[var(--yfl-secondary)]">
                         {guest.class?.name || "클래스 없음"}
                       </p>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-[var(--yfl-secondary)]">
                     {new Date(guest.createdAt).toLocaleDateString("ko-KR", {
                       month: "short",
                       day: "numeric",
@@ -457,10 +454,10 @@ export function DashboardClient() {
 
       {/* 최근 서베이 응답 */}
       {payload && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="yfl-dashboard-panel p-6">
           <div className="flex items-center gap-3 mb-6">
-            <MessageSquare className="w-6 h-6 text-yellow-500" />
-            <h2 className="text-xl font-semibold text-gray-900">
+            <MessageSquare className="w-6 h-6 text-[var(--yfl-ink)]" />
+            <h2 className="text-xl font-semibold text-[var(--yfl-ink)]">
               최근 서베이 응답
             </h2>
           </div>
@@ -468,21 +465,21 @@ export function DashboardClient() {
             {payload.recentSurveys.map((survey: RecentSurvey) => (
               <div
                 key={survey.id}
-                className="p-4 border border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 transition-colors"
+                className="p-4 border border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-[var(--yfl-soft)] transition-colors"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 truncate">
+                    <h4 className="font-semibold text-[var(--yfl-ink)] truncate">
                       {survey.guest?.name || "익명"}
                     </h4>
-                    <p className="text-sm text-gray-500 truncate">
+                    <p className="text-sm text-[var(--yfl-secondary)] truncate">
                       {survey.class?.name}
                     </p>
                   </div>
                   {renderStars(survey.rating)}
                 </div>
                 {survey.feedback && (
-                  <p className="text-sm text-gray-600 line-clamp-2">
+                  <p className="text-sm text-[var(--yfl-secondary)] line-clamp-2">
                     {survey.feedback}
                   </p>
                 )}

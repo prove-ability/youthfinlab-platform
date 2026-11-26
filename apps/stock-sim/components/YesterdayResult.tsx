@@ -20,7 +20,7 @@ export default function YesterdayResult({
   if (currentDay < 2 || results.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 mb-5">
+    <div className="bg-white rounded-3xl p-5 shadow-sm border border-yfl-divider mb-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-bold text-gray-900">📊 어제의 결과</h3>
         <span className="text-xs text-gray-500">Day {currentDay - 1}</span>
@@ -30,7 +30,7 @@ export default function YesterdayResult({
         {results.map((result, index) => (
           <div
             key={index}
-            className="bg-gray-50 rounded-2xl p-4 border border-gray-100"
+            className="bg-yfl-canvas rounded-2xl p-4 border border-yfl-divider"
           >
             <p className="text-xs text-gray-600 mb-2 line-clamp-1">
               {result.newsTitle}

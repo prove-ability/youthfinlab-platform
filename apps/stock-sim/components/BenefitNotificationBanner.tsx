@@ -51,7 +51,7 @@ export default function BenefitNotificationBanner({
   if (!benefit || !isVisible || benefit.day === 1) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm animate-slide-down">
+    <div className="bg-white border border-yfl-divider rounded-3xl p-5 shadow-sm animate-slide-down">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="bg-emerald-50 rounded-full p-2.5 flex-shrink-0">

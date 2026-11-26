@@ -2,7 +2,7 @@ export default function StockListSkeleton() {
   return (
     <div className="space-y-3 animate-pulse">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="bg-white rounded-lg p-4 shadow border border-gray-200">
+        <div key={i} className="bg-white rounded-lg p-4 shadow border border-yfl-divider">
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">

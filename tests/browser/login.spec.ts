@@ -6,7 +6,7 @@ for (const app of ["stock", "finance"] as const) {
     async ({ page }) => {
       await page.goto("/tests/browser/index.html?" + app + "-login");
       await expect(
-        page.getByText("선생님께 받은 계정 정보로 로그인하세요"),
+        page.getByText("교육 담당자에게 받은 계정 정보로 로그인하세요"),
       ).toBeVisible();
       const password = page.getByLabel("비밀번호", { exact: true });
       await expect(password).toHaveAttribute(

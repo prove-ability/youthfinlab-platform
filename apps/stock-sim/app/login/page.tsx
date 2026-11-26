@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandIntro } from "@repo/ui/brand-intro";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/actions/auth";
@@ -37,20 +38,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 px-4">
-      <div className="w-full max-w-md space-y-6">
-        {/* 타이틀 */}
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            반가워요!
-          </h1>
-          <p className="text-sm text-gray-600">
-            수업 코드, 아이디, 비밀번호를 입력해주세요
-          </p>
-        </div>
-
+    <div className="yfl-entry">
+      <div className="yfl-entry-inner">
+        <BrandIntro title="모의 투자 게임" description="가상 돈으로 주식을 사고팔며 투자 판단을 연습하세요." />
         <form action={handleSubmit} className="space-y-4" aria-label="로그인 폼">
-          <div className="space-y-4 rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
+          <div className="yfl-entry-card space-y-4">
+            <div>
+              <h2 className="font-bold">반가워요!</h2>
+              <p className="text-sm">수업 코드, 아이디, 비밀번호를 입력해주세요</p>
+            </div>
             <div>
               <Label htmlFor="classCode" className="text-sm font-medium text-gray-700">
                 수업 코드
@@ -133,8 +129,8 @@ export default function LoginPage() {
         </form>
 
         {/* 하단 안내 */}
-        <p className="text-center text-xs text-gray-500">
-          선생님께 받은 계정 정보로 로그인하세요
+        <p className="yfl-entry-note">
+          교육 담당자에게 받은 계정 정보로 로그인하세요
         </p>
       </div>
     </div>

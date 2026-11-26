@@ -184,7 +184,7 @@ export default function StockNewsSheet({
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
+                          <div className="bg-white p-3 rounded-lg shadow-lg border border-yfl-divider">
                             <p className="text-sm font-semibold">
                               Day {data.day}
                             </p>
@@ -296,7 +296,7 @@ export default function StockNewsSheet({
                       className={`bg-white border rounded-xl p-4 transition-all cursor-pointer ${
                         selectedNews === newsItem.id
                           ? "border-yellow-400 bg-yellow-50"
-                          : "border-gray-200 hover:border-gray-300"
+                          : "border-yfl-divider hover:border-gray-300"
                       }`}
                       onClick={() => handleNewsClick(newsItem.id)}
                     >

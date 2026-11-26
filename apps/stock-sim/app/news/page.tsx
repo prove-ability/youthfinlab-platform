@@ -59,7 +59,7 @@ export default function NewsPage() {
     .sort((a, b) => b - a); // 최신 Day 먼저
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-yfl-canvas pb-20">
       {isRefreshing && <PageLoading />}
       <div className="max-w-4xl mx-auto p-4">
         <PageHeader
@@ -94,7 +94,7 @@ export default function NewsPage() {
                 {newsByDay[day]?.map((newsItem) => (
                   <div
                     key={newsItem.id}
-                    className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100"
+                    className="bg-white rounded-3xl p-5 shadow-sm border border-yfl-divider"
                   >
                     <div className="flex flex-wrap gap-2 mb-3">
                       {newsItem.relatedStocks.map((stock) => (

@@ -3,6 +3,7 @@ import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackServerApp } from "@/stack/server";
 
 import "./globals.css";
+import "@repo/ui/brand.css";
 
 // NanumSquareNeo 폰트 등록
 const nanumSquareNeo = localFont({
