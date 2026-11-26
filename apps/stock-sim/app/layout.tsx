@@ -9,8 +9,6 @@ import "driver.js/dist/driver.css";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1.0,
-  maximumScale: 1.0,
-  userScalable: false,
   viewportFit: "cover",
   themeColor: "#07726a",
 };

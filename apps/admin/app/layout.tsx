@@ -25,7 +25,11 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${nanumSquareNeo.variable}`}>
-        <StackProvider app={stackServerApp}>
+        <StackProvider
+          app={stackServerApp}
+          lang="ko-KR"
+          translationOverrides={{ "Sign in to your account": "유스핀랩 관리자 로그인" }}
+        >
           <StackTheme>{children}</StackTheme>
         </StackProvider>
       </body>

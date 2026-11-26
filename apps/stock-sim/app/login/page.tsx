@@ -61,7 +61,7 @@ export default function LoginPage() {
                 type="text"
                 required
                 placeholder="수업 코드를 입력해주세요"
-                className="mt-1.5 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 uppercase"
+                className="mt-1.5 text-base! rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 uppercase"
                 disabled={loading}
                 aria-describedby={error ? "login-error" : undefined}
                 maxLength={6}
@@ -79,7 +79,7 @@ export default function LoginPage() {
                 required
                 autoComplete="username"
                 placeholder="아이디를 입력해주세요"
-                className="mt-1.5 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+                className="mt-1.5 text-base! rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
                 disabled={loading}
                 aria-describedby={error ? "login-error" : undefined}
               />
@@ -97,14 +97,14 @@ export default function LoginPage() {
                   required
                   autoComplete="current-password"
                   placeholder="비밀번호를 입력해주세요"
-                  className="pr-10 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+                  className="h-11! pr-12 text-base! rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
                   disabled={loading}
                   aria-describedby={error ? "login-error" : undefined}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-600 focus:outline-none transition-colors"
+                  className="absolute right-0 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl text-gray-400 hover:text-emerald-600 focus-visible:outline-2 focus-visible:outline-emerald-600 transition-colors"
                   aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
                 >
                   {showPassword ? (

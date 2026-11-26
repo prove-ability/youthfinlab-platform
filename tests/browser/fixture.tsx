@@ -1,3 +1,5 @@
+import StockLogin from "../../apps/stock-sim/app/login/page";
+import FinanceLogin from "../../apps/finance-sim/app/login/page";
 import Onboarding from "../../apps/stock-sim/app/onboarding/page";
 import SeedData from "../../apps/admin/app/protected/seed-data/page";
 import { useState } from "react";
@@ -27,7 +29,11 @@ function Fixture() {
   );
 }
 createRoot(document.getElementById("root")!).render(
-  location.search === "?seed" ? (
+  location.search === "?stock-login" ? (
+    <StockLogin />
+  ) : location.search === "?finance-login" ? (
+    <FinanceLogin />
+  ) : location.search === "?seed" ? (
     <SeedData />
   ) : location.search === "?onboarding" ? (
     <Onboarding />

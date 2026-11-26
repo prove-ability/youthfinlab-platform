@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: {
     dedupe: ["react", "react-dom"],
     alias: {
+      "@/actions/auth": resolve("tests/browser/login-action.ts"),
       "next/navigation": resolve("tests/browser/navigation.ts"),
       "@/components/ui": resolve("apps/admin/src/components/ui"),
       "@/actions/newsActions": resolve("tests/browser/class-fixtures.ts"),
@@ -12,7 +13,7 @@ export default defineConfig({
       "@tanstack/react-query": resolve(
         "apps/admin/node_modules/@tanstack/react-query",
       ),
-      "@repo/ui": resolve("packages/ui/src/button.tsx"),
+      "@repo/ui": resolve("tests/browser/ui.ts"),
       "@repo/utils": resolve("packages/utils/src/cn.ts"),
       "@/components/common/modal": resolve(
         "apps/admin/src/components/common/modal.tsx",

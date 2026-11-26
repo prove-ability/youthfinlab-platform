@@ -64,9 +64,8 @@ test("keeps failed generation silent and retries the same class after list refre
     dialog.getByText("응답 연결 끊김", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText("목록 조회 오류: offline")).toBeAttached();
-  expect(alerts.some((text) => text.includes("게임 데이터 생성 실패"))).toBe(
-    true,
-  );
+  expect(alerts).toEqual([]);
+  await expect(dialog.getByRole("alert")).toContainText("수업은 만들어졌습니다");
   const state = () =>
     page.evaluate(() => {
       const w = window as Window & {
@@ -76,7 +75,7 @@ test("keeps failed generation silent and retries the same class after list refre
       return { sounds: w.sounds, ...w.attempts };
     });
   expect(await state()).toMatchObject({ sounds: 0, classes: 1 });
-  await dialog.getByRole("button", { name: /재시도/ }).click();
+  await dialog.getByRole("button", { name: "게임 데이터 다시 생성" }).click();
   await expect(dialog).toHaveCount(0);
   const result = await state();
   expect(result).toMatchObject({ sounds: 1, classes: 1 });
