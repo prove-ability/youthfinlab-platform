@@ -46,7 +46,7 @@ export default function LoginPage() {
         </div>
         <h1 className="text-2xl font-bold text-white">재무 시뮬레이션</h1>
         <p className="text-sm text-white/60 mt-2">
-          나의 재무 상태를 점검하고 미래를 설계해보세요
+          선생님께 받은 계정 정보로 로그인하세요
         </p>
       </div>
 
@@ -65,9 +65,10 @@ export default function LoginPage() {
                 id="classCode"
                 name="classCode"
                 type="text"
+                aria-describedby={error ? "login-error" : undefined}
                 required
                 placeholder="수업 코드를 입력하세요"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-shadow"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-shadow"
               />
             </div>
             <div>
@@ -80,10 +81,12 @@ export default function LoginPage() {
               <input
                 id="loginId"
                 name="loginId"
+                autoComplete="username"
                 type="text"
+                aria-describedby={error ? "login-error" : undefined}
                 required
                 placeholder="아이디를 입력하세요"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-shadow"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-shadow"
               />
             </div>
             <div>
@@ -96,15 +99,17 @@ export default function LoginPage() {
               <input
                 id="password"
                 name="password"
+                autoComplete="current-password"
                 type="password"
+                aria-describedby={error ? "login-error" : undefined}
                 required
                 placeholder="비밀번호를 입력하세요"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-shadow"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent transition-shadow"
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-500 text-center">{error}</p>
+              <p id="login-error" role="alert" className="text-sm text-red-700 text-center">{error}</p>
             )}
 
             <button
@@ -112,7 +117,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-3.5 rounded-xl bg-forest-700 text-white font-semibold text-sm hover:bg-forest-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? "로그인 중..." : "시작하기"}
+              {loading ? "로그인 중..." : "로그인하기"}
             </button>
           </form>
         </div>
