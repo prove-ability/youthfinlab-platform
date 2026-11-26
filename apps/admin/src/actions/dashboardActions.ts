@@ -33,20 +33,20 @@ export const getDashboardStats = withAuth(async (user) => {
       ? await db
           .select({ count: count() })
           .from(guests)
-          .where(sql`${guests.classId} = ANY(${classIds})`)
+          .where(inArray(guests.classId, classIds))
       : [{ count: 0 }];
     const [surveyCount] = classIds.length > 0
       ? await db
           .select({ count: count() })
           .from(surveys)
-          .where(sql`${surveys.classId} = ANY(${classIds})`)
+          .where(inArray(surveys.classId, classIds))
       : [{ count: 0 }];
 
     const [transactionCount] = classIds.length > 0
       ? await db
           .select({ count: count() })
           .from(transactions)
-          .where(sql`${transactions.classId} = ANY(${classIds})`)
+          .where(inArray(transactions.classId, classIds))
       : [{ count: 0 }];
 
     // 2. 활성 게임 수 (currentDay >= 1인 클래스, 관리자별)
@@ -62,7 +62,7 @@ export const getDashboardStats = withAuth(async (user) => {
             avg: sql<number>`COALESCE(AVG(${surveys.rating}), 0)`,
           })
           .from(surveys)
-          .where(sql`${surveys.classId} = ANY(${classIds})`)
+          .where(inArray(surveys.classId, classIds))
       : [{ avg: 0 }];
 
     // 4. 최근 7일간 신규 클래스 수 (관리자별)
@@ -285,7 +285,7 @@ export const getRecentGuests = withAuth(async (user, limit: number = 10) => {
     }
 
     const data = await db.query.guests.findMany({
-      where: sql`${guests.classId} = ANY(${classIds})`,
+      where: inArray(guests.classId, classIds),
       with: {
         class: {
           columns: {
@@ -363,7 +363,7 @@ export const getRecentSurveys = withAuth(async (user, limit: number = 5) => {
     }
 
     const data = await db.query.surveys.findMany({
-      where: sql`${surveys.classId} = ANY(${classIds})`,
+      where: inArray(surveys.classId, classIds),
       with: {
         guest: {
           columns: {
