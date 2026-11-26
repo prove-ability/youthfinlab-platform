@@ -1,0 +1,75 @@
+:root {
+  --yfl-ivory: #fff8e9;
+  --yfl-sage: #cdddab;
+  --yfl-sage-light: #ebeed7;
+  --yfl-forest: #19391f;
+  --yfl-emphasis: #354e2c;
+  --yfl-muted: #52604a;
+  --yfl-divider: #d5d5bb;
+  --yfl-gutter: clamp(1rem, 4vw, 2rem);
+  --yfl-inset: clamp(1.25rem, 5vw, 2rem);
+  --yfl-radius: 1.5rem;
+}
+
+.yfl-entry {
+  min-height: 100dvh;
+  display: grid;
+  align-content: center;
+  padding: var(--yfl-inset) var(--yfl-gutter);
+  background: var(--yfl-ivory);
+  color: var(--yfl-forest);
+}
+
+.yfl-entry-inner {
+  width: min(100%, 32rem);
+  margin-inline: auto;
+  display: grid;
+  gap: 1rem;
+}
+
+.yfl-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(5rem, 20vw, 8rem);
+  align-items: center;
+  gap: 1rem;
+  padding: var(--yfl-inset);
+  border-radius: var(--yfl-radius);
+  background: linear-gradient(110deg, var(--yfl-sage-light), var(--yfl-sage));
+  color: var(--yfl-forest);
+  border: 1px solid var(--yfl-divider);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.yfl-intro h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -.035em;
+}
+
+.yfl-intro p { margin-top: .625rem; color: var(--yfl-emphasis); line-height: 1.6; }
+.yfl-sprout {
+  width: 100%;
+  aspect-ratio: 1;
+  background: url("./sprout-felt-web.webp") center / contain no-repeat;
+}
+
+.yfl-entry-card {
+  border: 1px solid var(--yfl-divider);
+  background: white;
+  border-radius: var(--yfl-radius);
+  padding: var(--yfl-inset);
+}
+
+.yfl-entry-card label { color: var(--yfl-forest); }
+.yfl-entry-card input { color: var(--yfl-forest); background: #fffefa; border-color: var(--yfl-muted); }
+.yfl-entry-card input::placeholder { color: var(--yfl-muted); }
+.yfl-entry-card button[type="submit"] { color: var(--yfl-ivory); background: var(--yfl-forest); }
+.yfl-entry-card button[type="submit"]:hover { background: var(--yfl-emphasis); }
+.yfl-entry-card :is(input, button):focus-visible { outline: 3px solid var(--yfl-forest); outline-offset: 2px; }
+.yfl-entry-note { text-align: center; color: var(--yfl-muted); font-size: .875rem; }
+
+@media (max-width: 22rem) {
+  .yfl-intro { gap: .625rem; grid-template-columns: minmax(0, 1fr) 4rem; }
+}

@@ -4,6 +4,7 @@ import PWAInstaller from "@/components/PWAInstaller";
 import { ToastProvider } from "@/contexts/ToastContext";
 import QueryProvider from "@/contexts/QueryProvider";
 import "./globals.css";
+import "@repo/ui/brand.css";
 import "driver.js/dist/driver.css";
 
 export const viewport: Viewport = {

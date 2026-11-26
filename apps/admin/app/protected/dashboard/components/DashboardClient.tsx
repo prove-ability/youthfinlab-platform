@@ -1,5 +1,7 @@
 "use client";
 
+import { BrandIntro } from "@repo/ui/brand-intro";
+
 import { useMemo } from "react";
 import {
   Users,
@@ -143,12 +145,7 @@ export function DashboardClient() {
   return (
     <div className="space-y-6">
       {/* 헤더 */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">관리자 대시보드</h1>
-        <p className="text-gray-500 mt-1 text-sm">
-          주식 게임 및 재무 시뮬레이션 전체 현황을 한눈에 확인하세요
-        </p>
-      </div>
+      <BrandIntro title="관리자 대시보드" description="주식 게임 및 재무 시뮬레이션 전체 현황을 한눈에 확인하세요" />
 
       {/* 주요 통계 카드 */}
       {payload && (

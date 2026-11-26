@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./brand-intro": "./src/brand-intro.tsx",
+    "./brand.css": "./src/brand.css"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

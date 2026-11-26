@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import QueryProvider from "@/contexts/QueryProvider";
 import { ToastProvider } from "@/contexts/ToastContext";
 import "./globals.css";
+import "@repo/ui/brand.css";
 
 const APP_NAME = "재무 시뮬레이션";
 const APP_DESCRIPTION =
