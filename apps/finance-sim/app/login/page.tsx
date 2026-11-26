@@ -97,7 +97,7 @@ export default function LoginPage() {
             {loading ? "로그인 중..." : "로그인하기"}
           </button>
         </form>
-        <p className="yfl-entry-note">선생님께 받은 계정 정보로 로그인하세요</p>
+        <p className="yfl-entry-note">교육 담당자에게 받은 계정 정보로 로그인하세요</p>
       </div>
     </div>
   );

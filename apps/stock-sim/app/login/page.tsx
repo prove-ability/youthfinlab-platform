@@ -40,7 +40,7 @@ export default function LoginPage() {
   return (
     <div className="yfl-entry">
       <div className="yfl-entry-inner">
-        <BrandIntro title="모의 투자 게임" description="가상 돈으로 주식을 사고팔며 투자 판단을 연습해요." />
+        <BrandIntro title="모의 투자 게임" description="가상 돈으로 주식을 사고팔며 투자 판단을 연습하세요." />
         <form action={handleSubmit} className="space-y-4" aria-label="로그인 폼">
           <div className="yfl-entry-card space-y-4">
             <div>
@@ -130,7 +130,7 @@ export default function LoginPage() {
 
         {/* 하단 안내 */}
         <p className="yfl-entry-note">
-          선생님께 받은 계정 정보로 로그인하세요
+          교육 담당자에게 받은 계정 정보로 로그인하세요
         </p>
       </div>
     </div>
