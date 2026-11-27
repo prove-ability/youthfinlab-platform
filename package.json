@@ -12,6 +12,7 @@
     "db:debug": "tsx ./debug-env.ts",
     "test": "vitest run",
     "test:browser": "playwright test",
+    "test:hydration": "playwright test -c playwright.hydration.config.ts",
     "test:loading": "playwright test -c playwright.loading.config.ts",
     "preview:loading": "node tests/loading/build.cjs && node tests/loading/serve.cjs",
     "test:events": "playwright test -c playwright.events.config.ts",
