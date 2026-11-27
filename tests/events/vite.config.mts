@@ -15,6 +15,7 @@ export default defineConfig({
   resolve: {
     dedupe: ["react", "react-dom"],
     alias: {
+      "next/link": resolve("tests/events/link.tsx"),
       "@/actions/classActions": resolve("tests/events/admin-fixtures.ts"),
       "@/actions/gameActions": resolve("tests/events/admin-fixtures.ts"),
       "@/actions/stockActions": resolve("tests/events/admin-fixtures.ts"),

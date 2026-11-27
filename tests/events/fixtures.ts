@@ -22,8 +22,8 @@ export const scenario = buildCrisisScenario(
     : "normal",
 );
 export const state = {
-  day: 4,
-  configured: true,
+  day: Number(new URLSearchParams(location.search).get("day")) || 4,
+  configured: new URLSearchParams(location.search).get("mode") !== "basic",
   failRead: false,
   failSave: false,
   decisions: [

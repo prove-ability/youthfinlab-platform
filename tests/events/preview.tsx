@@ -1,3 +1,4 @@
+import { HomeGuidance, InvestGuidance, InvestPageHeader } from "../../apps/stock-sim/components/ClassGuidance";
 import GameManagementPage from "../../apps/admin/app/protected/game-management/page";
 import { CreateClassModal } from "../../apps/admin/app/protected/classes/components/create-class-modal";
 import React, { useState } from "react";
@@ -27,6 +28,7 @@ function Preview() {
   const [failSave, setFailSave] = useState(false);
   const [failRead, setFailRead] = useState(false);
   const refresh = () => client.invalidateQueries();
+  if (view === "guidance") return <main><InvestPageHeader currentDay={day} totalDays={10} /><HomeGuidance currentDay={day} totalDays={10} /><InvestGuidance currentDay={day} totalDays={10} placement="top" hasStocks hasHoldings /><InvestGuidance currentDay={day} totalDays={10} placement="day" hasStocks hasHoldings /></main>;
   return (
     <>
       <aside className="preview-toolbar">
