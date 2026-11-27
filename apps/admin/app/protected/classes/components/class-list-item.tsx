@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import "../../list-refinement.css";
 import { useState } from "react";
 import { Button } from "@repo/ui";
 import { deleteClass, updateClassStatus } from "@/actions/classActions";
@@ -103,7 +104,7 @@ export function ClassListItem({
   const status = statusConfig[classItem.status as keyof typeof statusConfig] ?? statusConfig.setting;
 
   return (
-    <div className="yfl-class-row">
+    <div className="yfl-class-row yfl-class-refined">
       {/* 카드 헤더 */}
       <Link
         className="yfl-class-summary"
@@ -163,7 +164,7 @@ export function ClassListItem({
       <div className="yfl-class-actions flex items-center justify-between gap-1">
         <div className="flex items-center gap-1">
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => router.push(`/protected/classes/${classItem.id}`)}
             className="text-xs text-blue-600 hover:bg-blue-50 h-7 px-2.5"
           >
@@ -177,7 +178,9 @@ export function ClassListItem({
             학생 추가
           </Button>
         </div>
-        <div className="flex items-center gap-1">
+        <details className="yfl-secondary-actions">
+          <summary aria-label={`${classItem.name} 수업 관리`}>수업 관리</summary>
+          <div className="yfl-secondary-action-items">
           {classItem.status !== "ended" && (
             <Button
               onClick={handleStatusChange}
@@ -213,7 +216,8 @@ export function ClassListItem({
           >
             {isDeleting ? "삭제중..." : "삭제"}
           </Button>
-        </div>
+          </div>
+        </details>
       </div>
 
       <CreateUserModal

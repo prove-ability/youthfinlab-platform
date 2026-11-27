@@ -1,5 +1,7 @@
 "use client";
 
+import "../../list-refinement.css";
+
 import { deleteClientAction } from "@/actions/clientActions";
 import { useState } from "react";
 import { type Client } from "@/types/client";
@@ -117,8 +119,9 @@ export function ClientList() {
   }
 
   return (
-    <div className="yfl-client-list space-y-4">
-      <div className="flex justify-end mb-4">
+    <div className="yfl-client-list yfl-client-refined space-y-4">
+      <div className="yfl-list-toolbar">
+        <p>고객사 <strong>{clients.length}</strong>곳</p>
         <Button
           onClick={() => setIsCreateClientModalOpen(true)}
           className="h-9 px-4 text-sm"
@@ -163,7 +166,9 @@ export function ClientList() {
                   </span>
                 </span>
               </button>
-              <div className="flex items-center gap-2">
+              <div className="yfl-client-controls">
+                <details className="yfl-secondary-actions">
+                  <summary aria-label={`${client.name} 고객사 관리`}>관리</summary>
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -175,6 +180,7 @@ export function ClientList() {
                 >
                   {deletingClientId === client.id ? "삭제 중..." : "삭제"}
                 </Button>
+                </details>
                 <button type="button" onClick={() => toggleManagers(client.id)} aria-label={`${client.name} 매니저 ${isOpen ? "접기" : "보기"}`} aria-expanded={isOpen} className={`w-6 h-6 rounded-md flex items-center justify-center text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -209,12 +215,15 @@ export function ClientList() {
                     등록된 매니저가 없습니다.
                   </p>
                 )}
+                <details className="yfl-manager-add">
+                  <summary>매니저 추가</summary>
                 <AddManagerForm
                   clientId={client.id}
                   onManagerAdded={(manager) =>
                     handleManagerAdded(client.id, manager)
                   }
                 />
+                </details>
               </div>
             )}
           </div>
