@@ -102,6 +102,8 @@ test("hard mode is opt-in and shows its own news and retrospective", async ({
   await page.getByLabel("금융 위기 이벤트 · 10일 체험").check();
   await expect(page.getByLabel("보통 · 서로 다른 신호를 비교")).toBeChecked();
   await page.getByLabel("어려움 · 상반된 뉴스와 기업별 반응 비교").check();
+  await page.getByText("고급 설정 · 종목 직접 수정", {exact:true}).click();
+  await page.getByLabel("직접 구성 사용", {exact:true}).check();
   await page.getByLabel("새싹테크", { exact: true }).check();
   await page.getByLabel("온기생활", { exact: true }).check();
   await page.getByLabel("가상 기업 특성").nth(1).selectOption("defensive");
