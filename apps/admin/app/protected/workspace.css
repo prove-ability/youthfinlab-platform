@@ -1,4 +1,23 @@
 /* Authenticated admin workspace only. Login and learner apps are unaffected. */
+/* Preserve the former CssBaseline's measured typography and light canvas.
+   Tailwind Preflight already supplies border-box, zero margins and text sizing.
+   Scope to the mounted workspace so these defaults do not leak into sign-in. */
+body:has(.yfl-admin-content) {
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.00938em;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #fff;
+}
+html:has(.yfl-admin-content) {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body:has(.yfl-admin-content) :where(b, strong) { font-weight: 700; }
+body:has(.yfl-admin-content)::backdrop { background-color: #fff; }
+@media print { body:has(.yfl-admin-content) { background-color: #fff; } }
 .yfl-admin-content { --workspace-ink:var(--yfl-forest); --workspace-muted:var(--yfl-muted); --workspace-soft:#f5f7f6; --workspace-panel:#fff; min-inline-size:0; }
 .yfl-admin-content [data-slot="card"] { min-inline-size:0; box-shadow:none; border-radius:.75rem; gap:1.25rem; }
 .yfl-admin-content [data-slot="card"] [data-slot="card"] { border-inline:0; border-block-end:0; border-radius:0; padding-block-start:1.25rem; }
