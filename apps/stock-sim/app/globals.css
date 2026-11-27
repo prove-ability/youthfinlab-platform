@@ -45,3 +45,7 @@ a, button, input, select, textarea {
  --color-yfl-canvas: #fff8e9;
  --color-yfl-divider: #d5d5bb;
 }
+
+/* Keep bottom navigation clear of the home indicator without uneven item padding. */
+.yfl-bottom-nav { padding: .5rem max(.5rem, env(safe-area-inset-right, 0px)) max(.5rem, env(safe-area-inset-bottom, 0px)) max(.5rem, env(safe-area-inset-left, 0px)); }
+html { scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }

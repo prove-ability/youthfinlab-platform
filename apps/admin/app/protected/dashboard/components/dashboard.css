@@ -1,0 +1,50 @@
+/* Dashboard-only hierarchy; shared brand tokens and components remain unchanged. */
+.yfl-dashboard-review { container-type: inline-size; }
+.yfl-dashboard-review .yfl-intro { background: transparent; border: 0; padding: .5rem 0 1rem; }
+.yfl-dashboard-review .yfl-dashboard-stats {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-block: 1px solid var(--yfl-divider); padding-block: .75rem;
+}
+.yfl-dashboard-review .yfl-dashboard-stats > a { min-inline-size: 0; }
+.yfl-dashboard-review .yfl-stat-card { border: 0; border-radius: .75rem; background: transparent; padding: 1rem; }
+.yfl-dashboard-review .yfl-stat-active { background: var(--yfl-soft); }
+.yfl-dashboard-review .yfl-stat-card > div { margin-block-end: .65rem; }
+.yfl-dashboard-review .yfl-stat-icon { padding: 0; background: transparent; }
+.yfl-dashboard-review .yfl-stat-icon svg { color: var(--yfl-secondary); inline-size: 1.25rem; block-size: 1.25rem; }
+.yfl-dashboard-review .yfl-stat-card > p:first-of-type { font-size: 2.25rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.yfl-dashboard-review .yfl-stat-card > p:last-child:not(:first-of-type) { color: var(--yfl-secondary); }
+.yfl-dashboard-review .yfl-dashboard-primary,
+.yfl-dashboard-review .yfl-dashboard-recent { display: grid; gap: 1.5rem; align-items: start; }
+.yfl-dashboard-review .yfl-dashboard-panel { min-inline-size: 0; padding: 1.25rem; border-radius: 1rem; }
+.yfl-dashboard-review .yfl-dashboard-progress { border-block-start: 3px solid var(--yfl-ink); }
+.yfl-dashboard-review .yfl-dashboard-panel h2 { font-size: 1.125rem; }
+.yfl-dashboard-review .yfl-dashboard-panel > div:first-child { margin-block-end: 1rem; flex-wrap: wrap; gap: .75rem; }
+.yfl-dashboard-review .yfl-dashboard-rows { display: grid; gap: 0; padding: .25rem; }
+.yfl-dashboard-review .yfl-dashboard-rows > a { display: block; min-inline-size: 0; }
+.yfl-dashboard-review .yfl-dashboard-rows > a > div,
+.yfl-dashboard-review .yfl-dashboard-rows > div { padding: 1rem .25rem; border: 0; border-radius: .25rem; }
+.yfl-dashboard-review .yfl-dashboard-rows > * + * { border-block-start: 1px solid var(--yfl-divider); }
+.yfl-dashboard-review .yfl-dashboard-rows h4 { white-space: normal; overflow-wrap: anywhere; }
+.yfl-dashboard-review .yfl-dashboard-rows .text-xs { flex-shrink: 0; }
+.yfl-dashboard-review .yfl-dashboard-rows .flex-1,
+.yfl-dashboard-review .yfl-dashboard-rows .gap-3 > div { min-inline-size: 0; }
+.yfl-dashboard-review .yfl-dashboard-rows .gap-4 { flex-wrap: wrap; gap: .25rem .75rem; }
+.yfl-dashboard-review .yfl-dashboard-survey { background: var(--yfl-soft); border-color: transparent; }
+.yfl-dashboard-review .yfl-dashboard-survey > .space-y-4 > * { padding: .75rem 0; border-radius: 0; background: transparent; }
+.yfl-dashboard-review .yfl-dashboard-survey > .space-y-4 > * + * { border-block-start: 1px solid var(--yfl-divider); margin-block-start: 0; }
+.yfl-dashboard-review .yfl-dashboard-survey .w-12 { inline-size: 1.5rem; block-size: 1.5rem; }
+.yfl-dashboard-review .yfl-dashboard-recent .yfl-dashboard-panel { background: transparent; border: 0; border-block-start: 1px solid var(--yfl-divider); border-radius: 0; padding-inline: 0; }
+.yfl-dashboard-review .yfl-dashboard-feedback { display: grid; gap: 1rem; }
+.yfl-dashboard-review .yfl-dashboard-feedback > div { border: 0; border-inline-start: 2px solid var(--yfl-divider); border-radius: 0; }
+.yfl-dashboard-review .yfl-dashboard-feedback > div > .text-xs { color: var(--yfl-secondary); }
+.yfl-dashboard-review .yfl-dashboard-rows a:focus-visible { outline-offset: 0; border-radius: .25rem; }
+@container (min-width: 640px) {
+  .yfl-dashboard-review .yfl-dashboard-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .yfl-dashboard-review .yfl-dashboard-stats > a + a { border-inline-start: 1px solid var(--yfl-divider); }
+  .yfl-dashboard-review .yfl-dashboard-recent { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; }
+  .yfl-dashboard-review .yfl-dashboard-feedback { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (min-width: 900px) {
+  .yfl-dashboard-review .yfl-dashboard-primary { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
+  .yfl-dashboard-review .yfl-dashboard-feedback { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

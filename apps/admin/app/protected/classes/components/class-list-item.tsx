@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@repo/ui";
 import { deleteClass, updateClassStatus } from "@/actions/classActions";
@@ -102,13 +103,13 @@ export function ClassListItem({
   const status = statusConfig[classItem.status as keyof typeof statusConfig] ?? statusConfig.setting;
 
   return (
-    <div className="border rounded-xl bg-white hover:shadow-md transition-shadow overflow-hidden">
+    <div className="yfl-class-row">
       {/* 카드 헤더 */}
-      <div
-        className="px-5 pt-5 pb-4 cursor-pointer"
-        onClick={() => router.push(`/protected/classes/${classItem.id}`)}
+      <Link
+        className="yfl-class-summary"
+        href={`/protected/classes/${classItem.id}`}
       >
-        <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="yfl-class-heading flex items-start justify-between gap-2 mb-3">
           <h3 className="text-base font-semibold text-gray-900 leading-snug hover:text-blue-600 transition-colors">
             {classItem.name}
           </h3>
@@ -127,7 +128,7 @@ export function ClassListItem({
         </div>
 
         {/* 정보 그리드 */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-gray-500">
+        <div className="yfl-class-meta grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-gray-500">
           <div>
             <span className="text-gray-400">고객사</span>
             <p className="font-medium text-gray-700 mt-0.5">
@@ -156,10 +157,10 @@ export function ClassListItem({
             </p>
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* 액션 버튼 영역 */}
-      <div className="border-t bg-gray-50 px-4 py-2.5 flex items-center justify-between gap-1">
+      <div className="yfl-class-actions flex items-center justify-between gap-1">
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"

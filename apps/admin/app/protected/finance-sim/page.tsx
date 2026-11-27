@@ -48,7 +48,7 @@ export default async function FinanceSimPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="yfl-finance-classes grid gap-4 md:grid-cols-2">
           {classes.map((cls) => {
             const completionRate =
               cls.studentCount > 0
@@ -59,10 +59,10 @@ export default async function FinanceSimPage() {
               <Link
                 key={cls.id}
                 href={`/protected/finance-sim/${cls.id}`}
-                className="group rounded-xl border bg-card p-5 hover:shadow-md transition-shadow"
+                className="yfl-finance-class group border-b bg-card p-5 transition-colors"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-lg group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-semibold text-lg group-hover:text-[var(--yfl-forest)] transition-colors">
                     {cls.name}
                   </h3>
                   <span

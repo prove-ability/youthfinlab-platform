@@ -11,7 +11,7 @@ const STEPS = [
 
 export default function StepProgress({ currentStep }: { currentStep: number }) {
   return (
-    <div className="px-5 pt-4 pb-3 bg-forest-700">
+    <div className="px-5 pt-5 pb-4 bg-forest-700">
       <div className="flex items-center justify-between mb-2.5">
         <span className="text-xs font-semibold text-white/90">
           {currentStep}/6 단계
@@ -20,11 +20,11 @@ export default function StepProgress({ currentStep }: { currentStep: number }) {
           {STEPS[currentStep - 1]?.label}
         </span>
       </div>
-      <div className="flex gap-1.5">
+      <div className="flex gap-1.5" role="progressbar" aria-label="학습 진행 단계" aria-valuemin={0} aria-valuemax={6} aria-valuenow={currentStep} aria-valuetext={`${currentStep}/6 단계: ${STEPS[currentStep - 1]?.label}`}>
         {STEPS.map((s) => (
           <div
             key={s.step}
-            className={`h-1.5 flex-1 rounded-full transition-colors ${
+            className={`h-1 flex-1 rounded-full transition-colors ${
               s.step <= currentStep ? "bg-forest-300" : "bg-white/20"
             }`}
           />

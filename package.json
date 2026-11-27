@@ -33,7 +33,7 @@
     "vite": "6.4.1",
     "vitest": "3.2.6"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@9.15.9",
   "pnpm": {
     "overrides": {
       "drizzle-orm": "^0.44.5"

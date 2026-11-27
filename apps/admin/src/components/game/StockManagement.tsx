@@ -282,7 +282,7 @@ export default function StockManagement({
               return (
                 <div
                   key={stock.id}
-                  className="flex items-center justify-between px-4 py-3 border rounded-xl hover:bg-gray-50 transition-colors"
+                  className="yfl-stock-row flex flex-wrap items-center justify-between gap-3 py-4 border-b transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">

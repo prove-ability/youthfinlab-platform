@@ -117,7 +117,7 @@ export default function SnapshotPage() {
         </div>
 
         {/* 세부 내역 - 카드 스타일 */}
-        <div className="bg-white rounded-2xl border border-yfl-divider p-4 mb-5 shadow-xs">
+        <div className="bg-white border-t border-yfl-divider py-8 mb-5">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">
             월 자산 현황
           </h3>
@@ -145,7 +145,7 @@ export default function SnapshotPage() {
         </div>
 
         {/* 자산 현황 */}
-        <div className="bg-white rounded-2xl border border-yfl-divider p-4 mb-5 shadow-xs">
+        <div className="bg-white border-t border-yfl-divider py-8 mb-5">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">
             보유 자산
           </h3>

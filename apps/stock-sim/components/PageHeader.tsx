@@ -16,13 +16,13 @@ export default function PageHeader({
 }: PageHeaderProps) {
   return (
     <motion.header
-      className="mb-8"
+      className="mb-8 pb-5 border-b border-yfl-divider"
       role="banner"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           {icon && (
             <motion.div
@@ -34,12 +34,12 @@ export default function PageHeader({
               {icon}
             </motion.div>
           )}
-          <h1 className="text-2xl font-bold text-[var(--yfl-forest)]">{title}</h1>
+          <h1 className="text-2xl leading-snug font-bold text-[var(--yfl-forest)]">{title}</h1>
         </div>
       </div>
       {description && (
         <motion.p
-          className="text-sm text-[var(--yfl-muted)] mt-1.5"
+          className="text-sm text-[var(--yfl-muted)] mt-2 leading-relaxed"
           role="doc-subtitle"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
