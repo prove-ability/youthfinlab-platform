@@ -187,7 +187,7 @@ export default function InvestmentPage() {
         )}
 
         {/* 차트 */}
-        <div className="bg-white rounded-2xl border border-yfl-divider p-4 mb-5 shadow-xs">
+        <div className="bg-white border-t border-yfl-divider py-8 mb-5">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">
             자산 성장 추이
           </h3>
@@ -228,7 +228,7 @@ export default function InvestmentPage() {
         </div>
 
         {/* 결과 요약 */}
-        <div className="bg-white rounded-2xl border border-yfl-divider p-4 mb-5 shadow-xs">
+        <div className="bg-white border-t border-yfl-divider py-8 mb-5">
           <div className="space-y-2.5 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-500">총 납입금액</span>

@@ -57,11 +57,11 @@ export function BottomNav() {
 
   return (
     <nav 
-      className="fixed bottom-0 left-0 right-0 w-full max-w-xl mx-auto border-t-2 border-yfl-divider z-40 backdrop-blur-lg bg-white/90"
+      className="yfl-bottom-nav fixed bottom-0 left-0 right-0 w-full max-w-xl mx-auto border-t border-yfl-divider z-40 bg-[#f8faf9]"
       role="navigation"
       aria-label="주요 네비게이션"
     >
-      <div className="grid grid-cols-4 h-full relative" role="tablist">
+      <div className="grid grid-cols-4 gap-1 relative">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const MotionLink = motion(Link);
@@ -70,10 +70,9 @@ export function BottomNav() {
               key={item.label}
               id={item.id}
               href={item.href}
-              role="tab"
-              aria-selected={isActive}
+              aria-current={isActive ? "page" : undefined}
               aria-label={`${item.label} 페이지`}
-              className="flex flex-col items-center justify-center w-full h-16 relative focus:outline-none focus:ring-2 focus:ring-[var(--yfl-forest)] focus:ring-offset-1"
+              className="flex flex-col items-center justify-center w-full min-h-14 py-1.5 relative focus:outline-none focus:ring-2 focus:ring-[var(--yfl-forest)] focus:ring-offset-1"
               whileTap={{ scale: 0.95 }}
               onMouseEnter={() => handlePrefetch(item.href)}
               onTouchStart={() => handlePrefetch(item.href)}
@@ -81,7 +80,7 @@ export function BottomNav() {
               {isActive && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-[var(--yfl-sage-light)]"
+                  className="absolute inset-0 rounded-xl bg-[#e8efec]"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}

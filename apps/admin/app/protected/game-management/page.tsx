@@ -252,7 +252,7 @@ export default function GameManagementPage() {
 
           {/* 게임 진행 상황 */}
           {selectedClass && gameProgress && (
-            <div className={`mb-6 rounded-xl border bg-blue-50 border-blue-200 p-4 transition-opacity ${isDayOperationLoading ? "opacity-60" : ""}`}>
+            <div className={`yfl-game-summary mb-6 border-y p-4 transition-opacity ${isDayOperationLoading ? "opacity-60" : ""}`}>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-semibold text-blue-800">게임 진행 상황</p>
                 {isDayOperationLoading && (
@@ -263,15 +263,15 @@ export default function GameManagementPage() {
                 )}
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                <div className="p-3 text-center">
                   <p className="text-xs text-gray-500 mb-1">최대 Day</p>
                   <p className="text-2xl font-bold text-blue-600">{gameProgress.maxDay}</p>
                 </div>
-                <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                <div className="p-3 text-center">
                   <p className="text-xs text-gray-500 mb-1">총 뉴스</p>
                   <p className="text-2xl font-bold text-blue-600">{gameProgress.totalNews}<span className="text-sm font-normal ml-0.5">개</span></p>
                 </div>
-                <div className="bg-white rounded-lg p-3 text-center border border-blue-100">
+                <div className="p-3 text-center">
                   <p className="text-xs text-gray-500 mb-1">가격 데이터</p>
                   <p className="text-2xl font-bold text-blue-600">{gameProgress.totalPrices}<span className="text-sm font-normal ml-0.5">개</span></p>
                 </div>

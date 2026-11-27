@@ -172,7 +172,7 @@ export default function PensionPage() {
         </div>
 
         {/* 차트 */}
-        <div className="bg-white rounded-2xl border border-yfl-divider p-4 mb-5 shadow-xs">
+        <div className="bg-white border-t border-yfl-divider py-8 mb-5">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">
             시작 시점별 자산 성장 비교
           </h3>

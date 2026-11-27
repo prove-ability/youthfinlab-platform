@@ -1,5 +1,7 @@
 "use client";
 
+import "./dashboard.css";
+
 import { BrandIntro } from "@repo/ui/brand-intro";
 
 import { useMemo } from "react";
@@ -143,13 +145,13 @@ export function DashboardClient() {
   }
 
   return (
-    <div className="yfl-dashboard space-y-6">
+    <div className="yfl-dashboard yfl-dashboard-review space-y-6">
       {/* 헤더 */}
       <BrandIntro title="관리자 대시보드" description="주식 게임 및 재무 시뮬레이션 전체 현황을 한눈에 확인하세요" />
 
       {/* 주요 통계 카드 */}
       {payload && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="yfl-dashboard-stats">
           {/* 총 클라이언트 수 */}
           <Link href="/protected/clients">
             <div className="yfl-stat-card">
@@ -231,10 +233,52 @@ export function DashboardClient() {
       )}
 
       {/* 서베이 통계 및 최근 활동 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="yfl-dashboard-primary">
+        {/* 클래스 진행 상황 */}
+        {payload && (
+          <div className="yfl-dashboard-panel yfl-dashboard-progress p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Activity className="w-6 h-6 text-[var(--yfl-ink)]" />
+              <h2 className="text-xl font-semibold text-[var(--yfl-ink)]">
+                클래스 진행 상황
+              </h2>
+            </div>
+            <div className="yfl-dashboard-rows max-h-[300px] overflow-y-auto">
+              {payload.classProgress
+                .slice(0, 5)
+                .map((classItem: ClassProgressItem) => (
+                  <Link
+                    key={classItem.id}
+                    href={`/protected/classes/${classItem.id}`}
+                  >
+                    <div className="flex items-center justify-between p-3 hover:bg-[var(--yfl-soft)] rounded-lg transition-colors cursor-pointer border border-gray-100">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-[var(--yfl-ink)] truncate">
+                          {classItem.name}
+                        </h4>
+                        <p className="text-sm text-[var(--yfl-secondary)] truncate">
+                          {classItem.client.name}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        <div className="text-right">
+                          <p className="text-xs text-[var(--yfl-secondary)]">진행 Day</p>
+                          <p className="text-lg font-bold text-[var(--yfl-ink)]">
+                            {classItem.currentDay}
+                          </p>
+                        </div>
+                        <TrendingUp className="w-5 h-5 text-[var(--yfl-ink)]" />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+          </div>
+        )}
+
         {/* 서베이 통계 */}
         {payload && (
-          <div className="yfl-dashboard-panel p-6">
+          <div className="yfl-dashboard-panel yfl-dashboard-survey p-6">
             <div className="flex items-center gap-3 mb-6">
               <MessageSquare className="w-6 h-6 text-[var(--yfl-ink)]" />
               <h2 className="text-xl font-semibold text-[var(--yfl-ink)]">
@@ -302,52 +346,10 @@ export function DashboardClient() {
             </div>
           </div>
         )}
-
-        {/* 클래스 진행 상황 */}
-        {payload && (
-          <div className="yfl-dashboard-panel p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Activity className="w-6 h-6 text-[var(--yfl-ink)]" />
-              <h2 className="text-xl font-semibold text-[var(--yfl-ink)]">
-                클래스 진행 상황
-              </h2>
-            </div>
-            <div className="space-y-3 max-h-[300px] overflow-y-auto">
-              {payload.classProgress
-                .slice(0, 5)
-                .map((classItem: ClassProgressItem) => (
-                  <Link
-                    key={classItem.id}
-                    href={`/protected/classes/${classItem.id}`}
-                  >
-                    <div className="flex items-center justify-between p-3 hover:bg-[var(--yfl-soft)] rounded-lg transition-colors cursor-pointer border border-gray-100">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-[var(--yfl-ink)] truncate">
-                          {classItem.name}
-                        </h4>
-                        <p className="text-sm text-[var(--yfl-secondary)] truncate">
-                          {classItem.client.name}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        <div className="text-right">
-                          <p className="text-xs text-[var(--yfl-secondary)]">진행 Day</p>
-                          <p className="text-lg font-bold text-[var(--yfl-ink)]">
-                            {classItem.currentDay}
-                          </p>
-                        </div>
-                        <TrendingUp className="w-5 h-5 text-[var(--yfl-ink)]" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* 최근 클래스 및 학생 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="yfl-dashboard-recent">
         {/* 최근 생성된 클래스 */}
         {payload && (
           <div className="yfl-dashboard-panel p-6">
@@ -365,7 +367,7 @@ export function DashboardClient() {
                 전체 보기 →
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="yfl-dashboard-rows">
               {payload.recentClasses.map((classItem: RecentClass) => (
                 <Link
                   key={classItem.id}
@@ -420,7 +422,7 @@ export function DashboardClient() {
                 전체 보기 →
               </Link>
             </div>
-            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            <div className="yfl-dashboard-rows max-h-[300px] overflow-y-auto">
               {payload.recentGuests.map((guest: RecentGuest) => (
                 <div
                   key={guest.id}
@@ -461,7 +463,7 @@ export function DashboardClient() {
               최근 서베이 응답
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="yfl-dashboard-feedback">
             {payload.recentSurveys.map((survey: RecentSurvey) => (
               <div
                 key={survey.id}

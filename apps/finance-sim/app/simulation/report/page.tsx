@@ -131,7 +131,7 @@ export default function ReportPage() {
             {/* 1. 재무 상태 요약 */}
             <section className="mb-4">
               <SectionHeader num={1} title="나의 현재 재무 상태" />
-              <div className="bg-white rounded-2xl border border-yfl-divider p-4 shadow-xs">
+              <div className="bg-white border-t border-yfl-divider py-8">
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <InfoItem
                     label="나이 / 상태"
@@ -156,7 +156,7 @@ export default function ReportPage() {
             {investResult && (
               <section className="mb-4">
                 <SectionHeader num={2} title="저축 vs 투자 시뮬레이션" />
-                <div className="bg-white rounded-2xl border border-yfl-divider p-4 shadow-xs">
+                <div className="bg-white border-t border-yfl-divider py-8">
                   <div className="space-y-2 text-sm">
                     <Row
                       label="선택 비율"
@@ -186,7 +186,7 @@ export default function ReportPage() {
             {pensionResult && (
               <section className="mb-4">
                 <SectionHeader num={3} title="연금 준비 시뮬레이션" />
-                <div className="bg-white rounded-2xl border border-yfl-divider p-4 shadow-xs">
+                <div className="bg-white border-t border-yfl-divider py-8">
                   <div className="space-y-2 text-sm">
                     <Row
                       label="시작 시점"
@@ -218,7 +218,7 @@ export default function ReportPage() {
             {tendency && tendencyInfo && (
               <section className="mb-4">
                 <SectionHeader num={4} title="나의 투자 성향" />
-                <div className="bg-white rounded-2xl border border-yfl-divider p-4 shadow-xs">
+                <div className="bg-white border-t border-yfl-divider py-8">
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-lg">{tendencyInfo.emoji}</span>
                     <span
@@ -245,7 +245,7 @@ export default function ReportPage() {
                 {actions.map((action, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-3 bg-white rounded-xl border border-yfl-divider p-3 shadow-xs"
+                    className="flex items-start gap-3 bg-white border-l-2 border-yfl-divider p-3"
                   >
                     <span className="w-6 h-6 rounded-full bg-forest-500 text-white text-xs flex items-center justify-center shrink-0 mt-0.5">
                       {i + 1}

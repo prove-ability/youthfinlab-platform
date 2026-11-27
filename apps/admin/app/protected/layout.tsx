@@ -1,3 +1,5 @@
+import "./workspace.css";
+import "@repo/ui/editorial.css";
 import type { Metadata } from "next";
 import Providers from "../providers";
 import { Suspense } from "react";
@@ -36,7 +38,7 @@ export default function ProtectedLayout({
           <div className="flex flex-1 flex-col">
             <div className="@container/main flex flex-1 flex-col gap-2">
               <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                <div className="px-4 lg:px-6 text-foreground">
+                <div className="yfl-editorial yfl-admin-content px-4 lg:px-6 text-foreground">
                   {children}
                 </div>
               </div>

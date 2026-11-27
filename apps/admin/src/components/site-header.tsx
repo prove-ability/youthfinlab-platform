@@ -54,7 +54,7 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <nav className="flex items-center gap-1.5 text-sm">
+        <nav aria-label="현재 위치" className="flex flex-wrap items-center gap-1.5 text-sm">
           {parent && (
             <>
               <span className="text-muted-foreground">{parent}</span>

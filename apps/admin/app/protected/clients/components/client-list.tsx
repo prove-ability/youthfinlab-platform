@@ -117,7 +117,7 @@ export function ClientList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="yfl-client-list space-y-4">
       <div className="flex justify-end mb-4">
         <Button
           onClick={() => setIsCreateClientModalOpen(true)}
@@ -145,25 +145,24 @@ export function ClientList() {
       {clients.map((client) => {
         const isOpen = selectedClientId === client.id;
         return (
-          <div key={client.id} className="border rounded-xl bg-white overflow-hidden transition-shadow hover:shadow-sm">
+          <div key={client.id} className="yfl-client-record">
             {/* 고객사 헤더 */}
             <div
-              className="flex items-center justify-between px-5 py-4 cursor-pointer select-none"
-              onClick={() => toggleManagers(client.id)}
+              className="yfl-client-heading flex items-center justify-between gap-3"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+              <button type="button" aria-expanded={isOpen} aria-controls={`managers-${client.id}`} onClick={() => toggleManagers(client.id)} className="yfl-client-toggle flex items-center gap-3 text-left">
+                <span className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                   </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{client.name}</h3>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                </span>
+                <span>
+                  <span className="yfl-client-name block font-semibold text-gray-900">{client.name}</span>
+                  <span className="block text-xs text-gray-400 mt-0.5">
                     매니저 {client.managers.length}명
-                  </p>
-                </div>
-              </div>
+                  </span>
+                </span>
+              </button>
               <div className="flex items-center gap-2">
                 <Button
                   onClick={(e) => {
@@ -176,17 +175,17 @@ export function ClientList() {
                 >
                   {deletingClientId === client.id ? "삭제 중..." : "삭제"}
                 </Button>
-                <div className={`w-6 h-6 rounded-md flex items-center justify-center text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}>
+                <button type="button" onClick={() => toggleManagers(client.id)} aria-label={`${client.name} 매니저 ${isOpen ? "접기" : "보기"}`} aria-expanded={isOpen} className={`w-6 h-6 rounded-md flex items-center justify-center text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                   </svg>
-                </div>
+                </button>
               </div>
             </div>
 
             {/* 매니저 목록 (펼쳐진 경우) */}
             {isOpen && (
-              <div className="border-t bg-gray-50/60 px-5 py-4">
+              <div id={`managers-${client.id}`} className="yfl-client-details">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-semibold text-gray-700">
                     담당 매니저

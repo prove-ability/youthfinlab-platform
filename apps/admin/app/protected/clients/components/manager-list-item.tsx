@@ -37,16 +37,16 @@ export function ManagerListItem({
   };
 
   return (
-    <li className="flex items-center justify-between bg-white rounded-lg border border-gray-100 px-3.5 py-3">
-      <div className="flex items-center gap-3">
+    <li className="yfl-manager-row flex items-center justify-between gap-3 py-3">
+      <div className="flex items-center gap-3 min-w-0">
         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
           <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
           </svg>
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-sm font-medium text-gray-900">{manager.name}</p>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex flex-wrap items-center gap-2 mt-0.5 break-all">
             {manager.mobilePhone && (
               <span className="text-xs text-gray-400">{manager.mobilePhone}</span>
             )}

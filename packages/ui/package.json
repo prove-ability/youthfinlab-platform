@@ -5,7 +5,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./brand-intro": "./src/brand-intro.tsx",
-    "./brand.css": "./src/brand.css"
+    "./brand.css": "./src/brand.css",
+    "./editorial.css": "./src/editorial.css"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

@@ -220,7 +220,7 @@ export default function TendencyPage() {
 
           {/* 설명 카드 */}
           <div
-            className={`bg-white rounded-2xl p-5 mb-4 border border-yfl-divider shadow-xs transition-all duration-500 ${
+            className={`bg-white py-8 mb-4 border-t border-yfl-divider transition-all duration-500 ${
               revealStep >= 2
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -242,7 +242,7 @@ export default function TendencyPage() {
 
           {/* 추천 포트폴리오 */}
           <div
-            className={`bg-white rounded-2xl p-5 mb-4 border border-yfl-divider shadow-xs transition-all duration-500 ${
+            className={`bg-white py-8 mb-4 border-t border-yfl-divider transition-all duration-500 ${
               revealStep >= 3
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -259,7 +259,7 @@ export default function TendencyPage() {
 
           {/* 나의 위치 - 5등급 스케일 */}
           <div
-            className={`bg-white rounded-2xl p-5 mb-6 border border-yfl-divider shadow-xs transition-all duration-500 ${
+            className={`bg-white py-8 mb-6 border-t border-yfl-divider transition-all duration-500 ${
               revealStep >= 4
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"

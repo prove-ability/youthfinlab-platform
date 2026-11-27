@@ -14,21 +14,23 @@ export default function InfoBanner({
   onClose,
 }: InfoBannerProps) {
   return (
-    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-4 mb-4">
+    <div className="bg-[#f3f6f5] border-l-4 border-[var(--yfl-forest)] rounded-r-lg p-4 mb-6">
       <div className="flex items-start gap-3">
         <div className="text-2xl flex-shrink-0">{icon}</div>
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-emerald-900 mb-1">
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-[var(--yfl-forest)] mb-1">
             {title}
           </p>
-          <p className="text-xs text-emerald-800">
+          <p className="text-sm leading-relaxed text-[var(--yfl-muted)]">
             {description}
           </p>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="text-emerald-600 hover:text-emerald-800 text-xl flex-shrink-0"
+            type="button"
+            aria-label="안내 닫기"
+            className="text-[var(--yfl-forest)] text-xl flex-shrink-0 min-w-10 min-h-10"
           >
             ×
           </button>

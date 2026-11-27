@@ -1,5 +1,6 @@
 "use client";
 
+import "@repo/ui/editorial.css";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { BottomNav } from "@/components/BottomNav";
@@ -29,7 +30,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="max-w-xl mx-auto h-full min-h-screen">{children}</div>
+      <div className={`max-w-xl mx-auto h-full min-h-screen ${hideBottomNav ? "" : "yfl-editorial"}`} style={hideBottomNav ? undefined : { paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>{children}</div>
       {!hideBottomNav && <BottomNav />}
       {/* 게임 관련 모달 - 모든 페이지에서 표시 */}
       {gameProgress && (

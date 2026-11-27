@@ -1,5 +1,7 @@
 "use client";
 
+import "./class-list.css";
+
 import { useState } from "react";
 import { getClasses } from "@/actions/classActions";
 import { Button } from "@repo/ui";
@@ -74,9 +76,9 @@ export function ClassList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="yfl-class-list space-y-4">
       {queryError instanceof Error && <p role="alert">목록 조회 오류: {queryError.message}</p>}
-      <div className="flex justify-between items-center">
+      <div className="yfl-class-toolbar flex justify-between items-center">
         <p className="text-gray-600">총 {classes.length}개의 수업</p>
         <Button
           onClick={() => setIsCreateModalOpen(true)}
@@ -97,7 +99,7 @@ export function ClassList() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="yfl-class-rows">
           {classes.map((classItem) => (
             <ClassListItem
               key={classItem.id}

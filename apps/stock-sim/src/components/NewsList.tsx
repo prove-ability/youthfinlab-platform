@@ -32,20 +32,20 @@ export default function NewsList({ news, currentDay }: NewsListProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="divide-y divide-yfl-divider">
       {news.map((newsItem, index) => (
         <div
           key={newsItem.id}
-          className="bg-white rounded-lg shadow-sm border border-yfl-divider p-4 hover:shadow-md transition-shadow"
+          className="py-7"
         >
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-sm font-bold text-blue-600">
+            <div className="flex-shrink-0 w-7 pt-1 flex items-start justify-center">
+              <span className="text-sm font-bold text-[var(--yfl-muted)]">
                 {index + 1}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg leading-snug font-semibold text-[var(--yfl-forest)] mb-2">
                 {newsItem.title}
               </h3>
               <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">

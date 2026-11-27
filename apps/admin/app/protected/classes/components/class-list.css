@@ -1,0 +1,32 @@
+/* Scoped to class management; reuse the existing brand palette. */
+.yfl-class-list { --class-ink:var(--yfl-forest); --class-muted:var(--yfl-muted); --class-panel:#fffefa; --class-soft:var(--yfl-sage-light); container-type:inline-size; }
+.yfl-class-toolbar { flex-wrap:wrap; gap:1rem; padding-block:.75rem 1.25rem; border-block-end:1px solid var(--yfl-divider); }
+.yfl-class-toolbar > p { color:var(--class-muted); }
+.yfl-class-toolbar > button { background:var(--yfl-forest); color:var(--yfl-ivory); }
+.yfl-class-toolbar > button:hover { background:var(--yfl-emphasis); }
+.yfl-class-rows { display:grid; gap:0; }
+.yfl-class-row { min-inline-size:0; padding-block:1.5rem; border-block-end:1px solid var(--yfl-divider); }
+.yfl-class-summary { display:block; padding:.5rem; border-radius:.5rem; min-inline-size:0; }
+.yfl-class-summary:hover { background:var(--class-soft); }
+.yfl-class-heading { flex-wrap:wrap; gap:.75rem; }
+.yfl-class-heading h3 { color:var(--class-ink); font-size:1.125rem; overflow-wrap:anywhere; }
+.yfl-class-meta { gap:1rem; }
+.yfl-class-meta > div { min-inline-size:0; overflow-wrap:anywhere; }
+.yfl-class-meta span { color:var(--class-muted); }
+.yfl-class-meta p { color:var(--class-ink); font-size:.875rem; margin-block-start:.25rem; }
+.yfl-class-actions { flex-wrap:wrap; gap:.5rem 1rem; padding:.75rem .5rem 0; }
+.yfl-class-actions > div { flex-wrap:wrap; gap:.25rem; }
+.yfl-class-actions button { min-block-size:2.5rem; }
+.yfl-class-actions > div:first-child button { color:var(--class-ink); }
+.yfl-class-actions > div:first-child button:first-child { background:var(--class-soft); }
+.yfl-class-list :is(a,button):focus-visible { outline:3px solid var(--class-ink); outline-offset:3px; }
+@container (min-width:640px) {
+ .yfl-class-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:1.5rem; align-items:center; }
+ .yfl-class-meta { grid-template-columns:repeat(4,minmax(0,1fr)); }
+ .yfl-class-actions { display:flex; flex-direction:column; align-items:flex-start; padding:0 0 0 1rem; border-inline-start:1px solid var(--yfl-divider); }
+}
+.dark .yfl-class-list { --class-ink:var(--yfl-ivory); --class-muted:var(--yfl-sage); --class-panel:#19281e; --class-soft:#253a2d; --yfl-divider:#52604a; }
+@media (forced-colors:active) {
+ .yfl-class-list { --class-ink:CanvasText; --class-muted:CanvasText; --class-panel:Canvas; --class-soft:Canvas; --yfl-divider:CanvasText; }
+ .yfl-class-list :is(a,button):focus-visible { outline-color:Highlight; }
+}

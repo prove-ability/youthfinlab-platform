@@ -1,3 +1,4 @@
+import "@repo/ui/editorial.css";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
@@ -18,5 +19,5 @@ export default async function SimulationLayout({
     redirect("/login");
   }
 
-  return <>{children}</>;
+  return <div className="yfl-editorial">{children}</div>;
 }

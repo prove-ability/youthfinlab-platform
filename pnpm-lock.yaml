@@ -126,6 +126,9 @@ importers:
 
   apps/admin:
     dependencies:
+      drizzle-orm:
+        specifier: ^0.44.5
+        version: 0.44.5(@electric-sql/pglite@0.3.16)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(pg@8.16.3)(postgres@3.4.7)
       '@dnd-kit/core':
         specifier: ^6.3.1
         version: 6.3.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -250,6 +253,9 @@ importers:
 
   apps/finance-sim:
     dependencies:
+      drizzle-orm:
+        specifier: ^0.44.5
+        version: 0.44.5(@electric-sql/pglite@0.3.16)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(pg@8.16.3)(postgres@3.4.7)
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.60.0(react@19.2.1))
@@ -317,6 +323,9 @@ importers:
 
   apps/stock-sim:
     dependencies:
+      drizzle-orm:
+        specifier: ^0.44.5
+        version: 0.44.5(@electric-sql/pglite@0.3.16)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(pg@8.16.3)(postgres@3.4.7)
       '@repo/db':
         specifier: workspace:*
         version: link:../../packages/db
