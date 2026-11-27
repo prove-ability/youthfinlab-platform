@@ -19,7 +19,7 @@ import { revalidatePath } from "next/cache";
 
 const settings = z.object({
   classId: z.string().uuid(),
-  difficulty: z.enum(["easy", "normal"]),
+  difficulty: z.enum(["easy", "normal", "hard"]),
   stocks: z
     .array(
       z.object({
@@ -91,33 +91,33 @@ export const configureMarketScenario = withAuth(
         .insert(classMarketScenarios)
         .values({ classId: course.id, scenario });
       await tx.insert(gameDataGenerations).values({ classId: course.id });
-      await tx
-        .insert(classStockPrices)
-        .values(
-          scenario.days.flatMap((day) =>
-            day.prices.map((p) => ({
-              classId: course.id,
-              stockId: p.stockId,
-              day: day.day,
-              price: String(p.price),
-            })),
-          ),
-        );
-      await tx
-        .insert(news)
-        .values(
-          scenario.days.map((day) => ({
+      await tx.insert(classStockPrices).values(
+        scenario.days.flatMap((day) =>
+          day.prices.map((p) => ({
             classId: course.id,
-            createdBy: user.id,
+            stockId: p.stockId,
             day: day.day,
-            title: `[가상 시장 속보] ${day.title}`,
-            content: day.news,
-            relatedStockIds: scenario.stocks.map((s) => s.stockId),
+            price: String(p.price),
           })),
-        );
+        ),
+      );
+      await tx.insert(news).values(
+        scenario.days.map((day) => ({
+          classId: course.id,
+          createdBy: user.id,
+          day: day.day,
+          title: `[가상 시장 속보] ${day.title}`,
+          content: day.news,
+          relatedStockIds: scenario.stocks.map((s) => s.stockId),
+        })),
+      );
       await tx
         .update(classes)
-        .set({ totalDays: scenario.days.length, difficulty: parsed.difficulty })
+        .set({
+          totalDays: scenario.days.length,
+          difficulty:
+            parsed.difficulty === "hard" ? "normal" : parsed.difficulty,
+        })
         .where(eq(classes.id, course.id));
     });
     revalidatePath("/protected/game-management");

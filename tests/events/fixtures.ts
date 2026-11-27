@@ -16,7 +16,9 @@ export const scenario = buildCrisisScenario(
     initialPrice: 10000,
     exposure: (["sensitive", "defensive", "balanced"] as const)[i]!,
   })),
-  "normal",
+  new URLSearchParams(location.search).get("difficulty") === "hard"
+    ? "hard"
+    : "normal",
 );
 export const state = {
   day: 4,

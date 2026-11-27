@@ -22,7 +22,9 @@ export default function MarketScenarioPanel({
   onConfigured: () => Promise<unknown>;
 }) {
   const [mode, setMode] = useState("basic");
-  const [difficulty, setDifficulty] = useState<"easy" | "normal">("normal");
+  const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">(
+    "normal",
+  );
   const [selected, setSelected] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -69,7 +71,9 @@ export default function MarketScenarioPanel({
             <span className="event-tag">
               {data.scenario.difficulty === "easy"
                 ? "쉬움 · 완만한 변동"
-                : "보통"}
+                : data.scenario.difficulty === "hard"
+                  ? "어려움 · 복합 정보 판단"
+                  : "보통"}
             </span>
             <span className="event-tag">시나리오 확정</span>
           </div>
@@ -258,6 +262,22 @@ export default function MarketScenarioPanel({
                       />
                       쉬움 · 쉬운 표현과 절반 수준의 가격 변동
                     </label>
+                    <label className="event-choice">
+                      <input
+                        name="crisisDifficulty"
+                        type="radio"
+                        checked={difficulty === "hard"}
+                        onChange={() => setDifficulty("hard")}
+                      />
+                      어려움 · 상반된 뉴스와 기업별 반응 비교
+                    </label>
+                    {difficulty === "hard" && (
+                      <p className="event-muted">
+                        좋은 소식과 나쁜 소식이 함께 제시됩니다. 기업마다 다른
+                        가격 반응과 재하락을 살피고 선택 이유를 남깁니다. 기본
+                        거래·지원금 규칙은 보통과 같습니다.
+                      </p>
+                    )}
                   </div>
                 </fieldset>
                 <fieldset disabled={busy}>

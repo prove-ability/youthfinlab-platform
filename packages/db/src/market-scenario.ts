@@ -27,7 +27,7 @@ export type ScenarioDay = {
 };
 export type CrisisScenario = {
   version: 1;
-  difficulty: "easy" | "normal";
+  difficulty: "easy" | "normal" | "hard";
   stocks: ScenarioStock[];
   days: ScenarioDay[];
 };

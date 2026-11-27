@@ -91,3 +91,35 @@ test("current news, labels and controls fit narrow widths with readable text", a
       .evaluate((e) => parseFloat(getComputedStyle(e).fontSize)),
   ).toBeGreaterThanOrEqual(16);
 });
+
+test("hard mode is opt-in and shows its own news and retrospective", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "새 수업 설정 체험" }).click();
+  await expect(page.getByLabel("기본 모드 · 기존 뉴스와 거래")).toBeChecked();
+  await page.getByLabel("금융 위기 이벤트 · 10일 체험").check();
+  await expect(page.getByLabel("보통 · 서로 다른 신호를 비교")).toBeChecked();
+  await page.getByLabel("어려움 · 상반된 뉴스와 기업별 반응 비교").check();
+  await page.getByLabel("새싹테크", { exact: true }).check();
+  await page.getByLabel("온기생활", { exact: true }).check();
+  await page.getByLabel("가상 기업 특성").nth(1).selectOption("defensive");
+  await page.getByRole("button", { name: "금융 위기 모드로 확정" }).click();
+  await expect(
+    page.getByText("어려움 · 복합 정보 판단", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "학생 화면", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "시장 급락 속 공급 계약 소식" }),
+  ).toBeVisible();
+  await page.getByLabel("정보가 부족해서 더 지켜보려 해요").check();
+  await page.getByRole("button", { name: "선택 이유 저장" }).click();
+  await expect(page.getByRole("status")).toContainText("저장했어요");
+  await page.getByLabel("진행 Day").selectOption("5");
+  await expect(
+    page.getByText("같은 시장 속보 속에서도", { exact: false }),
+  ).toBeVisible();
+  await page.getByLabel("진행 Day").selectOption("10");
+  await expect(
+    page.getByRole("button", { name: "선택 이유 저장" }),
+  ).toHaveCount(0);
+});

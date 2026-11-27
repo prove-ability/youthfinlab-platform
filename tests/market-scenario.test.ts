@@ -394,3 +394,81 @@ it("keeps day 9 writable, ends day 10, and preserves stored six-day boundaries",
     (await getMarketScenarioAdmin(f.course.id)).scenario.days,
   ).toHaveLength(6);
 });
+
+it("adds hard information and cross-stock reversals without changing normal/easy paths", () => {
+  const stocks = ["sensitive", "balanced", "defensive"].map((exposure, i) => ({
+    stockId: String(i),
+    name: "가상 " + i,
+    exposure: exposure as "sensitive" | "balanced" | "defensive",
+    initialPrice: 10000,
+  }));
+  const normal = buildCrisisScenario(stocks, "normal"),
+    easy = buildCrisisScenario(stocks, "easy"),
+    hard = buildCrisisScenario(stocks, "hard");
+  const expected = [
+    [100, 104, 98, 73, 79, 70, 74, 82, 88, 86],
+    [100, 102, 100, 84, 89, 83, 87, 91, 94, 95],
+    [100, 101, 102, 94, 95, 93, 95, 97, 99, 98],
+  ];
+  for (let i = 0; i < 3; i++) {
+    expect(normal.days.map((d) => d.prices[i].price)).toEqual(
+      expected[i].map((p) => p * 100),
+    );
+    expect(easy.days.map((d) => d.prices[i].price)).toEqual(
+      expected[i].map((p) => (100 + (p - 100) * 0.5) * 100),
+    );
+  }
+  expect(hard.days).toHaveLength(10);
+  expect(buildCrisisScenario(stocks, "hard")).toEqual(hard);
+  expect(hard.days[4].prices[0].price).toBeGreaterThan(
+    hard.days[3].prices[0].price,
+  );
+  expect(hard.days[4].prices[2].price).toBeLessThan(
+    hard.days[3].prices[2].price,
+  );
+  expect(hard.days[5].prices[0].price).toBeLessThan(
+    hard.days[4].prices[0].price,
+  );
+  expect(hard.days[5].prices[2].price).toBeGreaterThan(
+    hard.days[4].prices[2].price,
+  );
+  hard.days.forEach((d, i) => {
+    expect(d.news).not.toBe(normal.days[i].news);
+    expect(
+      d.prices.every((p) => Number.isSafeInteger(p.price) && p.price > 0),
+    ).toBe(true);
+  });
+  const view = studentMarketView(hard, 5, "active", []);
+  expect(view.history).toHaveLength(4);
+  expect(JSON.stringify(view)).not.toContain(hard.days[5].news);
+  expect(JSON.stringify(view)).not.toContain(hard.days[4].explanation);
+});
+it("persists hard scenarios while retaining normal base rules and trading actual hard prices", async () => {
+  const f = await fixture(false);
+  await configureMarketScenario({ ...f.config, difficulty: "hard" });
+  const teacher = await getMarketScenarioAdmin(f.course.id);
+  expect(teacher.scenario.difficulty).toBe("hard");
+  expect(teacher.scenario.days).toHaveLength(10);
+  const course = await db.query.classes.findFirst({
+    where: eq(schema.classes.id, f.course.id),
+  });
+  expect(course.difficulty).toBe("normal");
+  await studentFor(f.course.id);
+  await db
+    .update(schema.classes)
+    .set({ status: "active", currentDay: 4 })
+    .where(eq(schema.classes.id, f.course.id));
+  expect((await buyStock(f.stocks[0].id, 1, "7300", 4)).success).toBe(false);
+  expect((await buyStock(f.stocks[0].id, 1, "7500", 4)).success).toBe(true);
+  await saveMarketDecision({
+    day: 4,
+    reason: "wait",
+    note: "상반된 정보를 더 살펴봅니다",
+  });
+  expect((await incrementDayAndPayAllowance(f.course.id, 4)).success).toBe(
+    true,
+  );
+  expect((await getStudentMarketScenario()).history[3].decision.note).toContain(
+    "상반된",
+  );
+});
