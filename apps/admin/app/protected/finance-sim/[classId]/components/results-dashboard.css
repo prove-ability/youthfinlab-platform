@@ -1,0 +1,12 @@
+/* Preserve table semantics and readable values; overflow belongs to the table, not the page. */
+.yfl-results-dashboard { min-inline-size:0; max-inline-size:100%; }
+.yfl-results-dashboard > section { min-inline-size:0; }
+.yfl-student-results-scroll { max-inline-size:100%; overflow-x:auto; overscroll-behavior-inline:contain; border-radius:.375rem; }
+.yfl-student-results-scroll:focus-visible { outline:3px solid var(--workspace-ink, #19391f); outline-offset:3px; }
+.yfl-student-results-table { min-inline-size:48rem; border-collapse:separate; border-spacing:0; }
+.yfl-student-results-table :is(th,td) { white-space:nowrap; padding:.875rem .75rem; vertical-align:middle; border-bottom:1px solid var(--yfl-divider, #d5d5bb); }
+.yfl-student-results-table tbody tr:last-child > * { border-bottom:0; }
+.yfl-student-results-table td { font-variant-numeric:tabular-nums; }
+.yfl-student-results-table .yfl-student-name { min-inline-size:8rem; inline-size:12rem; white-space:normal; overflow-wrap:anywhere; word-break:keep-all; position:sticky; inset-inline-start:0; z-index:1; background:var(--workspace-panel, white); }
+.yfl-student-name a { display:block; max-inline-size:12rem; padding-block:.375rem; }
+.yfl-student-results-table td > span { display:inline-block; white-space:nowrap; }
