@@ -14,7 +14,7 @@ Vitest는 프로젝트의 Drizzle 스키마로 메모리 PostgreSQL(PGlite)을 �
 
 Playwright는 모바일 크기의 WebKit에서 관리자 수업 생성, 실패 후 동일 클래스 재시도, QR 모달의 키보드 조작, 주식 앱 온보딩 및 시드 데이터 생성을 검증합니다. Vite로 실제 컴포넌트를 렌더링하고 서버 액션 응답을 제어합니다. 운영 계정이나 API 키는 필요하지 않습니다.
 
-`test:hydration`은 실제 관리자 `Providers`를 사용하는 별도 Next.js SSR 앱을 14314 포트에서 실행합니다. Chrome과 모바일 WebKit에서 JavaScript 실행 전 스타일의 head 배치, 흰 배경 유지, 초기 hydration·버튼 동작·클라이언트 이동·새로고침을 검증합니다. 로그인·DB 연결은 하지 않습니다. 단순 `createRoot` 미리보기에서는 잡히지 않는 서버/클라이언트 DOM 불일치를 검사합니다.
+`test:hydration`은 실제 관리자 `Providers`·CSS·Button을 사용하는 별도 Next.js SSR 앱을 14315 포트에서 실행합니다. Chrome과 모바일 WebKit에서 JavaScript 실행 전 정적 스타일과 Emotion 태그 없음, 본문 기본값 유지, 초기 hydration·버튼 동작·클라이언트 이동·새로고침, 관리자 영역 밖으로 이동한 뒤 스타일 격리를 검증합니다. 로그인·DB 연결은 하지 않습니다. 단순 `createRoot` 미리보기에서는 잡히지 않는 서버/클라이언트 DOM 불일치를 검사합니다.
 
 ## 관리자 회귀 시나리오
 
