@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import "../../../app/protected/list-refinement.css";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -152,7 +153,7 @@ export default function StockManagement({
   };
 
   return (
-    <Card>
+    <Card className="yfl-stock-refined">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -282,20 +283,17 @@ export default function StockManagement({
               return (
                 <div
                   key={stock.id}
-                  className="yfl-stock-row flex flex-wrap items-center justify-between gap-3 py-4 border-b transition-colors"
+                  className="yfl-stock-row yfl-stock-record"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                      <TrendingUp className="w-4 h-4 text-blue-500" />
-                    </div>
+                  <div className="yfl-stock-identity">
                     <div>
                       <h4 className="font-semibold text-sm text-gray-900">{stock.name}</h4>
-                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                        <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">
+                      <div className="yfl-stock-metadata">
+                        <span className="yfl-stock-market-label">
                           {market.flag} {market.label}
                         </span>
                         {stock.industrySector && (
-                          <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">
+                          <span className="yfl-stock-sector-label">
                             {stock.industrySector}
                           </span>
                         )}
@@ -307,7 +305,9 @@ export default function StockManagement({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <details className="yfl-secondary-actions">
+                    <summary aria-label={`${stock.name} 종목 관리`}>종목 관리</summary>
+                    <div className="yfl-secondary-action-items">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -327,7 +327,8 @@ export default function StockManagement({
                       <Trash2 className="h-3.5 w-3.5 mr-1" />
                       삭제
                     </Button>
-                  </div>
+                    </div>
+                  </details>
                 </div>
               );
             })

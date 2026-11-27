@@ -1,0 +1,44 @@
+/* Secondary actions are native disclosures, in document flow for touch and keyboard. */
+.yfl-secondary-actions > summary,
+.yfl-manager-add > summary {
+  cursor:pointer; min-block-size:44px; padding:10px 12px;
+  color:var(--editorial-ink, #19391f); font-size:.875rem; font-weight:600;
+  border-radius:6px; width:fit-content;
+}
+.yfl-secondary-actions > summary:hover,
+.yfl-manager-add > summary:hover { background:var(--workspace-soft, #f3f6f5); }
+.yfl-secondary-actions > summary:focus-visible,
+.yfl-manager-add > summary:focus-visible { outline:3px solid var(--editorial-ink, #19391f); outline-offset:3px; }
+.yfl-secondary-action-items { display:flex; flex-wrap:wrap; gap:4px; padding-block:4px; }
+.yfl-class-refined .yfl-class-actions { align-items:flex-start; justify-content:flex-start; }
+.yfl-class-refined .yfl-class-actions > div:first-child button:first-child { background:var(--editorial-paper, white); }
+.yfl-editorial .yfl-class-refined { padding-block:1.5rem; }
+@container (min-width:640px) {
+  .yfl-class-refined { grid-template-columns:minmax(0,1fr) 15rem; }
+}
+.yfl-list-toolbar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1rem; padding-block:0 1rem; border-bottom:1px solid var(--yfl-divider); }
+.yfl-list-toolbar p { font-size:.9375rem; color:var(--editorial-muted, #52604a); }
+.yfl-client-controls { display:flex; align-items:flex-start; gap:.25rem; }
+.yfl-client-controls > button { min-width:44px; min-height:44px; }
+.yfl-editorial .yfl-client-refined .yfl-client-heading { padding-block:1rem; align-items:flex-start; }
+.yfl-editorial .yfl-client-refined .yfl-client-details { border:0; border-top:1px solid var(--yfl-divider); border-radius:0; padding:1.25rem .5rem; margin-bottom:.5rem; }
+.yfl-manager-add { border-top:1px solid var(--yfl-divider); padding-top:.5rem; }
+.yfl-manager-add[open] > summary { margin-bottom:1rem; }
+.yfl-client-refined .yfl-manager-row { border:0; border-radius:0; }
+.yfl-admin-content .yfl-stock-refined { border:0; padding:0; box-shadow:none; gap:1rem; }
+.yfl-stock-refined > [data-slot="card-header"],
+.yfl-stock-refined > [data-slot="card-content"] { padding-inline:0; }
+.yfl-editorial .yfl-stock-record { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:.75rem; padding-block:1.25rem; border-bottom:1px solid var(--yfl-divider); }
+.yfl-stock-identity { min-inline-size:0; }
+.yfl-stock-identity h4 { font-size:1.0625rem; line-height:1.5; }
+.yfl-stock-metadata { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .75rem; margin-top:.5rem; color:var(--editorial-muted, #52604a); font-size:.8125rem; overflow-wrap:anywhere; }
+.yfl-stock-metadata > * { min-inline-size:0; }
+@media (max-width:420px) {
+ .yfl-editorial .yfl-stock-record { grid-template-columns:minmax(0,1fr); gap:.25rem; }
+ .yfl-stock-record > details { justify-self:start; }
+ .yfl-client-refined .yfl-client-toggle { gap:.5rem; }
+ .yfl-client-refined .yfl-client-toggle > span:first-child { display:none; }
+}
+@media (forced-colors:active) {
+ .yfl-secondary-actions > summary:focus-visible,.yfl-manager-add > summary:focus-visible { outline-color:Highlight; }
+}

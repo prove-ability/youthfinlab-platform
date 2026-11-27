@@ -1,0 +1,61 @@
+/* Game operations have a different hierarchy from read-only data inspection. */
+.yfl-game-workspace { container: game-workspace / inline-size; max-inline-size: 72rem; margin-inline: auto; color: var(--workspace-ink); }
+.yfl-game-heading { margin-block-end: 1.5rem; }
+.yfl-game-heading h1 { margin: 0 0 .5rem; }
+.yfl-game-heading p, .yfl-game-run > p, .yfl-game-stocks-heading p { color: var(--workspace-muted); font-size: .875rem; line-height: 1.65; }
+.yfl-game-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; margin-block-end: 1.5rem; }
+.yfl-game-filters > * { min-inline-size: 0; }
+.yfl-game-filters select { min-block-size: 2.75rem; max-inline-size: 100%; }
+.yfl-game-operation { border-block: 1px solid var(--yfl-divider); padding-block: 1.25rem; }
+.yfl-game-operation-main { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem 2rem; }
+.yfl-game-current { min-inline-size: 0; flex: 1 1 12rem; }
+.yfl-game-workspace .yfl-game-current h2 { font-size: .8125rem; font-weight: 600; color: var(--workspace-muted); margin: 0; }
+.yfl-game-day { display: flex; align-items: baseline; gap: .625rem; margin-block: .25rem; font-variant-numeric: tabular-nums; }
+.yfl-game-day strong { font-size: 2rem; line-height: 1.25; letter-spacing: -.04em; }
+.yfl-game-day > span { font-size: 1rem; color: var(--workspace-muted); }
+.yfl-game-class-name { font-size: .875rem; overflow-wrap: anywhere; }
+.yfl-game-run { min-inline-size: 0; }
+.yfl-game-run-buttons { display: flex; flex-wrap: wrap; gap: .5rem; }
+.yfl-game-run > p { margin-block-start: .5rem; max-inline-size: 24rem; font-size: .8125rem; }
+.yfl-game-data-summary { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-block-start: 1.25rem; padding-block-start: .875rem; border-block-start: 1px solid var(--yfl-divider); }
+.yfl-game-data-summary > div { display: flex; align-items: baseline; gap: .5rem; }
+.yfl-game-data-summary dt { font-size: .8125rem; color: var(--workspace-muted); }
+.yfl-game-data-summary dd { margin: 0; font-size: .9375rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.yfl-game-data-summary dd span { font-size: .8125rem; font-weight: 400; margin-inline-start: .125rem; }
+.yfl-game-data { margin-block-start: 2rem; }
+.yfl-game-data-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.5rem; margin-block-end: .75rem; }
+.yfl-game-data-heading h2 { margin: 0; }
+.yfl-game-view-day { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; font-size: .8125rem; color: var(--workspace-muted); }
+.yfl-game-view-day strong { color: var(--workspace-ink); margin-inline-start: .25rem; }
+.yfl-game-workspace .yfl-game-tabs { display: flex; inline-size: 100%; justify-content: flex-start; gap: 1.25rem; }
+.yfl-game-workspace .yfl-game-tabs [data-slot="tabs-trigger"] { flex: 0 1 auto; padding-inline: .25rem; font-size: .875rem; }
+.yfl-game-workspace [data-slot="tabs-content"] { min-inline-size: 0; }
+.yfl-game-stocks-heading { margin-block: 1.25rem .5rem; }
+.yfl-game-stocks-heading h3 { font-size: 1rem; font-weight: 700; }
+.yfl-game-stocks-heading h3 span { color: var(--workspace-muted); font-size: .875rem; margin-inline-start: .5rem; font-weight: 400; }
+.yfl-game-stocks-heading p { margin-block-start: .25rem; font-size: .8125rem; }
+.yfl-game-stock-list { list-style: none; padding: 0; margin: 0; }
+.yfl-game-stock-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .25rem .75rem; padding-block: .875rem; border-block-end: 1px solid var(--yfl-divider); align-items: baseline; }
+.yfl-game-stock-name { font-size: .9375rem; font-weight: 600; overflow-wrap: anywhere; }
+.yfl-game-stock-sector { grid-column: 1; font-size: .8125rem; color: var(--workspace-muted); overflow-wrap: anywhere; }
+.yfl-game-stock-market { grid-column: 2; grid-row: 1 / 3; font-size: .8125rem; color: var(--workspace-muted); white-space: nowrap; }
+.yfl-game-empty { padding-block: 2rem; color: var(--workspace-muted); }
+@container game-workspace (max-width: 41.99rem) {
+  .yfl-game-heading { margin-block-end: 1rem; }
+  .yfl-game-filters { gap: .75rem; margin-block-end: 1rem; }
+  .yfl-game-operation { padding-block: 1rem; }
+  .yfl-game-operation-main { gap: 1rem; }
+  .yfl-game-data-summary { margin-block-start: 1rem; padding-block-start: .75rem; }
+  .yfl-game-data { margin-block-start: 1.5rem; }
+  .yfl-game-data-heading { gap: .5rem; margin-block-end: .25rem; }
+  .yfl-game-stocks-heading { margin-block-start: 1rem; }
+}
+@container game-workspace (min-width: 42rem) {
+  .yfl-game-filters { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+  .yfl-game-stock-list li { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 4rem; gap: 1rem; }
+  .yfl-game-stock-sector { grid-column: auto; }
+  .yfl-game-stock-market { grid-column: auto; grid-row: auto; text-align: end; }
+}
+@media (forced-colors: active) {
+  .yfl-game-workspace { --workspace-ink: CanvasText; --workspace-muted: CanvasText; --yfl-divider: CanvasText; }
+}
