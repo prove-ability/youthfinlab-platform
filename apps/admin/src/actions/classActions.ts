@@ -3,6 +3,8 @@
 import {
   db,
   classMarketScenarios,
+  marketEventDecisions,
+  marketPortfolioReviews,
   dbWithTransaction,
   classes,
   clients,
@@ -456,7 +458,12 @@ export const updateClassStatus = withAuth(
 
 // Day 증가 + 모든 게스트에게 지원금 지급
 export const incrementDayAndPayAllowance = withAuth(
-  async (user, classId: string, expectedCurrentDay?: number) => {
+  async (
+    user,
+    classId: string,
+    expectedCurrentDay?: number,
+    allowUnwritten = false,
+  ) => {
     try {
       return await dbWithTransaction.transaction(async (tx) => {
         // 1. 클래스 정보 조회
@@ -484,6 +491,95 @@ export const incrementDayAndPayAllowance = withAuth(
 
         if (event && expectedCurrentDay !== classInfo.currentDay)
           throw new Error("수업 Day가 이미 변경되었습니다. 새로고침해 주세요.");
+        if (event) {
+          const participants = await tx.query.guests.findMany({
+            where: eq(guests.classId, classId),
+          });
+          const recorded = await tx
+            .select({ guestId: marketEventDecisions.guestId })
+            .from(marketEventDecisions)
+            .where(
+              and(
+                eq(marketEventDecisions.classId, classId),
+                eq(marketEventDecisions.day, classInfo.currentDay),
+              ),
+            );
+          const done = new Set(recorded.map((r) => r.guestId));
+          const missing = participants.filter((g) => !done.has(g.id)).length;
+          if (missing > 0 && !allowUnwritten)
+            return {
+              success: false,
+              needsConfirmation: true,
+              missingCount: missing,
+              message:
+                "아직 " +
+                missing +
+                "명이 이유를 남기지 않았습니다. 그대로 다음 Day로 진행할까요?",
+            };
+          const classWallets = participants.length
+            ? await tx.query.wallets.findMany({
+                where: inArray(
+                  wallets.guestId,
+                  participants.map((g) => g.id),
+                ),
+              })
+            : [];
+          const positions = await tx.query.holdings.findMany({
+            where: eq(holdings.classId, classId),
+          });
+          const today = event.scenario.days[classInfo.currentDay - 1]!;
+          const tomorrow = event.scenario.days[classInfo.currentDay]!;
+          const round = (v: number) => Math.round(v * 100) / 100;
+          for (const wallet of classWallets) {
+            const cash = Number(wallet.balance);
+            const assets = positions
+              .filter((p) => p.guestId === wallet.guestId && p.quantity > 0)
+              .map((p) => {
+                const now = today.prices.find((x) => x.stockId === p.stockId),
+                  next = tomorrow.prices.find((x) => x.stockId === p.stockId);
+                if (!now || !next)
+                  throw new Error(
+                    "보유 종목의 이벤트 가격을 확인할 수 없습니다.",
+                  );
+                return {
+                  name: event.scenario.stocks.find(
+                    (s) => s.stockId === p.stockId,
+                  )!.name,
+                  value: round(now.price * p.quantity),
+                  nextValue: round(next.price * p.quantity),
+                };
+              });
+            const before = round(
+              cash + assets.reduce((v, a) => v + a.value, 0),
+            );
+            const after = round(
+              cash + assets.reduce((v, a) => v + a.nextValue, 0),
+            );
+            const allocation = [
+              { name: "현금", value: cash },
+              ...assets.map(({ name, value }) => ({ name, value })),
+            ].map((a) => ({
+              ...a,
+              percent: before > 0 ? round((a.value / before) * 100) : 0,
+            }));
+            await tx
+              .insert(marketPortfolioReviews)
+              .values({
+                classId,
+                guestId: wallet.guestId,
+                day: classInfo.currentDay,
+                snapshot: {
+                  day: classInfo.currentDay,
+                  cash,
+                  before,
+                  after,
+                  marketChange: round(after - before),
+                  allowance: 100000,
+                  allocation,
+                },
+              });
+          }
+        }
         const newDay = (classInfo.currentDay || 0) + 1;
 
         // 2. 클래스의 currentDay +1

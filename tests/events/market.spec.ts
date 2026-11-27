@@ -225,3 +225,54 @@ test("illustration stops after one short animation and stays visible with reduce
     ),
   ).toBe(false);
 });
+test("first-use guide, fixed path and recording counts are visible to the teacher", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "관리자 설정", exact: true }).click();
+  await expect(
+    page.getByText("기록 완료 0 / 전체 3명", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("이벤트 수업은 난이도별 사건·가격 경로가 고정", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await page
+    .getByText("처음 사용하는 강사를 위한 진행 안내", { exact: true })
+    .click();
+  await expect(page.getByText("수업 준비:", { exact: false })).toBeVisible();
+  await page.getByLabel("진행 Day").selectOption("10");
+  await expect(
+    page.getByText("최종 회고 Day입니다.", { exact: false }),
+  ).toBeVisible();
+});
+test("additional reasons save and retrospective separates allowance from market change", async ({
+  page,
+}) => {
+  await page.getByLabel("기존 판단을 유지했어요").check();
+  await page
+    .getByRole("button", { name: "선택 이유 저장", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText("저장했어요");
+  await page.getByLabel("다른 이유가 있어요").check();
+  await page
+    .getByRole("button", { name: "선택 이유 저장", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText("저장했어요");
+  await expect(
+    page
+      .getByText("시세 변동 손익", { exact: false })
+      .filter({ visible: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByText("하루 전체 매매 수익률은 아닙니다.", { exact: false })
+      .filter({ visible: true }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 360, height: 780 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+  ).toBe(false);
+});

@@ -160,6 +160,7 @@ export const getMarketScenarioAdmin = withAuth(
       ? await db
           .select({
             day: marketEventDecisions.day,
+            guestId: marketEventDecisions.guestId,
             reason: marketEventDecisions.reason,
             note: marketEventDecisions.note,
             name: guests.name,
@@ -168,7 +169,24 @@ export const getMarketScenarioAdmin = withAuth(
           .innerJoin(guests, eq(guests.id, marketEventDecisions.guestId))
           .where(eq(marketEventDecisions.classId, classId))
       : [];
+    const participants = configured
+      ? await db
+          .select({ id: guests.id })
+          .from(guests)
+          .where(eq(guests.classId, classId))
+      : [];
+    const completed = new Set(
+      decisions
+        .filter((d) => d.day === course.currentDay)
+        .map((d) => d.guestId),
+    ).size;
     return {
+      currentDay: course.currentDay,
+      participation: {
+        total: participants.length,
+        completed,
+        missing: participants.length - completed,
+      },
       scenario: configured?.scenario ?? null,
       decisions,
       status: course.status,

@@ -121,10 +121,15 @@ export default function GameManagementPage() {
 
     setIsDayOperationLoading(true);
     try {
-      const result = await incrementDayAndPayAllowance(
-        selectedClass,
-        currentDay,
-      );
+      let result = await incrementDayAndPayAllowance(selectedClass, currentDay);
+      if ("needsConfirmation" in result && result.needsConfirmation) {
+        if (!window.confirm(result.message)) return;
+        result = await incrementDayAndPayAllowance(
+          selectedClass,
+          currentDay,
+          true,
+        );
+      }
       if (!result.success)
         throw new Error(
           ("error" in result && typeof result.error === "string"
@@ -134,6 +139,9 @@ export default function GameManagementPage() {
               : undefined) || "Day 변경에 실패했습니다.",
         );
       await queryClient.invalidateQueries({ queryKey: ["game-management"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["market-scenario-admin", selectedClass],
+      });
       alert(`Day ${newDay}로 진행되었으며, 용돈이 지급되었습니다.`);
     } catch (error) {
       console.error("Day 증가 실패:", error);

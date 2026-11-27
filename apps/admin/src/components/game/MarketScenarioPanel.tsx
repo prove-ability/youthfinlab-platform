@@ -49,6 +49,32 @@ export default function MarketScenarioPanel({
         기본 게임은 그대로, 새로운 수업에서는 공통 사건 속에서 판단을
         연습합니다.
       </p>
+      <details className="event-rule" open={data ? !data.scenario : false}>
+        <summary>처음 사용하는 강사를 위한 진행 안내</summary>
+        <ol>
+          <li>
+            수업 준비: AI 자동 생성을 끈 새 수업에서 이벤트 모드와 난이도를
+            고르고 확정하세요. 기본 기업 3개가 자동 준비됩니다.
+          </li>
+          <li>
+            학생 참여: 수업을 시작하고 오늘의 속보를 읽게 합니다. 거래·관망을
+            판단한 뒤 이유를 저장하게 하세요.
+          </li>
+          <li>
+            다음 Day: 아래 기록 완료 인원을 확인하고 기존 Day +1 버튼을
+            누르세요. 미작성자가 있으면 확인 후 진행할 수 있습니다.
+          </li>
+          <li>
+            함께 회고: 다음 Day에는 이전 선택·자산 변화·해설이 공개됩니다. Day
+            10은 새 거래 없이 전체 선택을 돌아봅니다.
+          </li>
+        </ol>
+      </details>
+      <p className="event-callout">
+        이벤트 수업은 난이도별 사건·가격 경로가 고정되어 있습니다. 같은 난이도로
+        반복하면 같은 흐름을 경험합니다. 실제 시장 예측이 아닌 판단
+        연습용입니다.
+      </p>
       {query.isPending && <p role="status">이벤트 설정을 불러오는 중…</p>}
       {query.isError && (
         <div className="event-stack">
@@ -66,6 +92,35 @@ export default function MarketScenarioPanel({
       )}
       {data?.scenario ? (
         <div className="event-stack">
+          <div className="event-callout" role="status">
+            <strong>
+              Day {data.currentDay} ·{" "}
+              {data.status === "active" &&
+              data.currentDay < data.scenario.days.length
+                ? "이유 기록 현황"
+                : "수업 기록 현황"}
+            </strong>
+            {data.currentDay < data.scenario.days.length ? (
+              <p>
+                기록 완료 {data.participation.completed} / 전체{" "}
+                {data.participation.total}명 · 미작성{" "}
+                {data.participation.missing}명
+              </p>
+            ) : (
+              <p>최종 회고 Day입니다. 새 이유는 작성하지 않습니다.</p>
+            )}
+            <p className="event-muted">
+              30초마다 갱신합니다. Day +1을 누르면 최신 미작성 인원을 다시
+              확인합니다. 이유 저장은 거래와 별개입니다.
+            </p>
+            <button
+              type="button"
+              disabled={query.isFetching}
+              onClick={() => query.refetch()}
+            >
+              기록 현황 새로고침
+            </button>
+          </div>
           <div className="event-tags">
             <span className="event-tag">
               금융 위기 · {data.scenario.days.length}일

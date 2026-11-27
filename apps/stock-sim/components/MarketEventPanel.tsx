@@ -239,6 +239,39 @@ export function MarketEventView({
                 )}
               </p>
               <p>{h.explanation}</p>
+              {h.portfolio ? (
+                <div className="event-rule">
+                  <h3>그때의 내 자산</h3>
+                  <p>
+                    Day {h.day} 마감 {h.portfolio.before.toLocaleString()}원 →
+                    다음 Day 시세 적용 {h.portfolio.after.toLocaleString()}원
+                  </p>
+                  <p>
+                    <strong>
+                      시세 변동 손익 {h.portfolio.marketChange > 0 ? "+" : ""}
+                      {h.portfolio.marketChange.toLocaleString()}원
+                    </strong>
+                  </p>
+                  <p className="event-muted">
+                    위 금액은 지원금과 이후 거래를 제외한 평가액입니다. 다음 Day
+                    지원금 {h.portfolio.allowance.toLocaleString()}원은 별도로
+                    지급됐습니다. 하루 전체 매매 수익률은 아닙니다.
+                  </p>
+                  <h3>Day {h.day} 마감 당시 보유 비중</h3>
+                  <ul>
+                    {h.portfolio.allocation.map((a, i) => (
+                      <li key={i}>
+                        {a.name} · {a.percent}% ({a.value.toLocaleString()}원)
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p className="event-muted">
+                  이 Day의 자산 기록이 없습니다. 당시 보유 비중을 현재 보유
+                  내역으로 추정하지 않습니다.
+                </p>
+              )}
               <div className="event-tags">
                 {h.changes.map((c) => (
                   <span key={c.name} className="event-tag">

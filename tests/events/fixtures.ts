@@ -40,7 +40,13 @@ export async function getMarketScenarioAdmin() {
   if (state.failRead) throw Error("로컬 읽기 실패");
   return {
     scenario: state.configured ? scenario : null,
-    status: "setting",
+    status: "active",
+    currentDay: state.day,
+    participation: {
+      total: 3,
+      completed: state.decisions.some((d) => d.day === state.day) ? 1 : 0,
+      missing: state.decisions.some((d) => d.day === state.day) ? 2 : 3,
+    },
     decisions: state.decisions.map((d) => ({ ...d, name: "미리보기 학생" })),
   };
 }
@@ -63,9 +69,45 @@ export async function configureMarketScenario(input: any) {
 export async function getStudentMarketScenario() {
   await delay();
   if (state.failRead) throw Error("로컬 읽기 실패");
-  return state.configured
-    ? studentMarketView(scenario, state.day, "active", state.decisions)
-    : null;
+  if (!state.configured) return null;
+  const view = studentMarketView(
+    scenario,
+    state.day,
+    "active",
+    state.decisions,
+  );
+  return {
+    ...view,
+    history: view.history.map((h) => {
+      const current = scenario.days[h.day - 1]!.prices[0]!.price * 5;
+      const next = scenario.days[h.day]!.prices[0]!.price * 5;
+      const cash = 50000;
+      const before = cash + current;
+      return {
+        ...h,
+        portfolio: {
+          day: h.day,
+          cash,
+          before,
+          after: cash + next,
+          marketChange: next - current,
+          allowance: 100000,
+          allocation: [
+            {
+              name: "현금",
+              value: cash,
+              percent: Math.round((cash / before) * 1000) / 10,
+            },
+            {
+              name: scenario.stocks[0]!.name,
+              value: current,
+              percent: Math.round((current / before) * 1000) / 10,
+            },
+          ],
+        },
+      };
+    }),
+  };
 }
 export async function saveMarketDecision(input: Decision) {
   await delay();

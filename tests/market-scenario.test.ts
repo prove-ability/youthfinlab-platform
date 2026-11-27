@@ -535,3 +535,103 @@ it("does not create default stocks for a forbidden or nonempty class", async () 
   ).rejects.toThrow("접근");
   expect(await db.select().from(schema.stocks)).toEqual(before);
 });
+it("warns before advancing and freezes own portfolio separately from allowance", async () => {
+  const f = await fixture();
+  const second = await studentFor(f.course.id, "다른 학생");
+  const first = await studentFor(f.course.id);
+  await db
+    .update(schema.classes)
+    .set({ status: "active" })
+    .where(eq(schema.classes.id, f.course.id));
+  expect((await buyStock(f.stocks[0].id, 2, "10000", 1)).success).toBe(true);
+  await saveMarketDecision({ day: 1, reason: "maintain", note: "" });
+  expect((await getMarketScenarioAdmin(f.course.id)).participation).toEqual({
+    total: 2,
+    completed: 1,
+    missing: 1,
+  });
+  const blocked = await incrementDayAndPayAllowance(f.course.id, 1);
+  expect(blocked).toMatchObject({
+    success: false,
+    needsConfirmation: true,
+    missingCount: 1,
+  });
+  expect(
+    (
+      await db.query.classes.findFirst({
+        where: eq(schema.classes.id, f.course.id),
+      })
+    ).currentDay,
+  ).toBe(1);
+  expect(
+    await db
+      .select()
+      .from(schema.marketPortfolioReviews)
+      .where(eq(schema.marketPortfolioReviews.classId, f.course.id)),
+  ).toHaveLength(0);
+  expect(
+    (
+      await db.query.wallets.findFirst({
+        where: eq(schema.wallets.id, first.wallet.id),
+      })
+    ).balance,
+  ).toBe("80000.00");
+  expect(
+    (await incrementDayAndPayAllowance(f.course.id, 1, true)).success,
+  ).toBe(true);
+  const review = (await getStudentMarketScenario()).history[0].portfolio;
+  expect(review).toMatchObject({
+    before: 100000,
+    after: 100800,
+    cash: 80000,
+    marketChange: 800,
+    allowance: 100000,
+  });
+  expect(review.allocation).toEqual([
+    { name: "현금", value: 80000, percent: 80 },
+    { name: f.stocks[0].name, value: 20000, percent: 20 },
+  ]);
+  expect(
+    (
+      await db.query.wallets.findFirst({
+        where: eq(schema.wallets.id, first.wallet.id),
+      })
+    ).balance,
+  ).toBe("180000.00");
+  expect((await sellStock(f.stocks[0].id, 1, "10400", 2)).success).toBe(true);
+  expect((await getStudentMarketScenario()).history[0].portfolio).toEqual(
+    review,
+  );
+  await saveMarketDecision({ day: 2, reason: "other", note: "다른 관점" });
+  expect((await getStudentMarketScenario()).decision.reason).toBe("other");
+  expect(
+    (await incrementDayAndPayAllowance(f.course.id, 1, true)).success,
+  ).toBe(false);
+  expect(
+    await db
+      .select()
+      .from(schema.marketPortfolioReviews)
+      .where(eq(schema.marketPortfolioReviews.classId, f.course.id)),
+  ).toHaveLength(2);
+  await createSession({
+    id: second.guest.id,
+    classId: f.course.id,
+    name: second.guest.name,
+    loginId: second.guest.loginId,
+  });
+  expect((await getStudentMarketScenario()).history[0].portfolio).toMatchObject(
+    { before: 100000, after: 100000, marketChange: 0 },
+  );
+  expect((await getStudentMarketScenario()).history[0].decision).toBeNull();
+});
+it("does not invent portfolio history for an existing past Day", async () => {
+  const f = await fixture();
+  await studentFor(f.course.id);
+  await db
+    .update(schema.classes)
+    .set({ status: "active", currentDay: 3 })
+    .where(eq(schema.classes.id, f.course.id));
+  expect(
+    (await getStudentMarketScenario()).history.map((h) => h.portfolio),
+  ).toEqual([null, null]);
+});

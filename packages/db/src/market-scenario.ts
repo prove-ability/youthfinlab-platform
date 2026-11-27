@@ -10,6 +10,8 @@ export const reasonLabels = {
   spread: "한 종목에 집중된 위험을 나누려 해요",
   value: "가격과 기업의 상황을 비교했어요",
   wait: "정보가 부족해서 더 지켜보려 해요",
+  maintain: "기존 판단을 유지했어요",
+  other: "다른 이유가 있어요",
 } as const;
 export type DecisionReason = keyof typeof reasonLabels;
 export type ScenarioStock = {
@@ -46,6 +48,7 @@ export type StudentMarketView = {
     explanation: string;
     decision: Decision | null;
     changes: { name: string; percent: number }[];
+    portfolio?: PortfolioReview | null;
   }[];
 };
 
@@ -74,3 +77,13 @@ export function marketMoodFromBulletin(
     return "review";
   return "observe";
 }
+
+export type PortfolioReview = {
+  day: number;
+  cash: number;
+  before: number;
+  after: number;
+  marketChange: number;
+  allowance: number;
+  allocation: { name: string; value: number; percent: number }[];
+};

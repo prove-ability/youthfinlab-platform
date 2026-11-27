@@ -6,6 +6,7 @@ import {
   guests,
   classMarketScenarios,
   marketEventDecisions,
+  marketPortfolioReviews,
 } from "@repo/db";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -39,17 +40,30 @@ export const getStudentMarketScenario = withAuth(async (user) => {
         eq(marketEventDecisions.classId, guest.classId),
       ),
     );
-  return studentMarketView(
+  const reviews = await db.query.marketPortfolioReviews.findMany({
+    where: and(
+      eq(marketPortfolioReviews.guestId, user.id),
+      eq(marketPortfolioReviews.classId, guest.classId),
+    ),
+  });
+  const view = studentMarketView(
     configured.scenario,
     course.currentDay,
     course.status,
     decisions,
   );
+  return {
+    ...view,
+    history: view.history.map((h) => ({
+      ...h,
+      portfolio: reviews.find((r) => r.day === h.day)?.snapshot ?? null,
+    })),
+  };
 });
 
 const decisionSchema = z.object({
   day: z.number().int().min(1),
-  reason: z.enum(["cash", "spread", "value", "wait"]),
+  reason: z.enum(["cash", "spread", "value", "wait", "maintain", "other"]),
   note: z.string().trim().max(500),
 });
 export const saveMarketDecision = withAuth(

@@ -1,4 +1,4 @@
-import type { CrisisScenario, DecisionReason } from "./market-scenario";
+import type { CrisisScenario, DecisionReason, PortfolioReview } from "./market-scenario";
 import {
   pgTable,
   uniqueIndex,
@@ -484,3 +484,12 @@ export const marketEventDecisions = pgTable("market_event_decisions", {
   note: text("note").notNull().default(""),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, table => [uniqueIndex("market_decision_guest_day").on(table.classId, table.guestId, table.day)]);
+
+export const marketPortfolioReviews = pgTable("market_portfolio_reviews", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  classId: uuid("class_id").notNull().references(() => classes.id, {onDelete:"cascade"}),
+  guestId: uuid("guest_id").notNull().references(() => guests.id, {onDelete:"cascade"}),
+  day: integer("day").notNull(),
+  snapshot: jsonb("snapshot").$type<PortfolioReview>().notNull(),
+  createdAt: timestamp("created_at", {withTimezone:true}).defaultNow().notNull(),
+}, table => [uniqueIndex("market_portfolio_guest_day").on(table.classId,table.guestId,table.day)]);
