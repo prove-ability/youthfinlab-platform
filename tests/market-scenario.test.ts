@@ -129,7 +129,7 @@ it("materializes the same ten-day path for everyone, with bounded easy mode", ()
   const normal = buildCrisisScenario(stocks, "normal"),
     easy = buildCrisisScenario(stocks, "easy");
   expect(buildCrisisScenario(stocks, "normal")).toEqual(normal);
-  expect(normal.days[3].prices.map((p) => p.price)).toEqual([6500, 9200]);
+  expect(normal.days[3].prices.map((p) => p.price)).toEqual([7300, 9600]);
   expect(easy.days[3].prices[0].price).toBeGreaterThan(
     normal.days[3].prices[0].price,
   );
@@ -144,7 +144,7 @@ it("materializes the same ten-day path for everyone, with bounded easy mode", ()
   expect(view.history.map((h) => h.day)).toEqual([1, 2]);
   expect(JSON.stringify(view)).not.toContain(normal.days[3].news);
   expect(JSON.stringify(view)).not.toContain(normal.days[2].explanation);
-  expect(JSON.stringify(view)).not.toContain("6500");
+  expect(JSON.stringify(view)).not.toContain("7300");
 });
 it("configures atomically and retries without duplicate prices or news", async () => {
   const f = await fixture();
@@ -322,17 +322,17 @@ it("uses materialized event prices for trading and stops trades and reasons on t
     .set({ status: "active", currentDay: 4 })
     .where(eq(schema.classes.id, f.course.id));
   expect((await buyStock(f.stocks[0].id, 1, "100", 4)).success).toBe(false);
-  expect((await buyStock(f.stocks[0].id, 1.5, "6500", 4)).success).toBe(false);
-  expect((await buyStock(f.stocks[0].id, 2, "6500", 4)).success).toBe(true);
-  expect((await sellStock(f.stocks[0].id, 1, "6500", 4)).success).toBe(true);
+  expect((await buyStock(f.stocks[0].id, 1.5, "7300", 4)).success).toBe(false);
+  expect((await buyStock(f.stocks[0].id, 2, "7300", 4)).success).toBe(true);
+  expect((await sellStock(f.stocks[0].id, 1, "7300", 4)).success).toBe(true);
   expect(
     (
       await db.query.wallets.findFirst({
         where: eq(schema.wallets.id, wallet.id),
       })
     ).balance,
-  ).toBe("93500.00");
-  expect((await buyStock(f.stocks[0].id, 1, "6500", 3)).dayMismatch).toBe(true);
+  ).toBe("92700.00");
+  expect((await buyStock(f.stocks[0].id, 1, "7300", 3)).dayMismatch).toBe(true);
   await db
     .update(schema.classes)
     .set({ currentDay: 10 })
@@ -411,9 +411,9 @@ it("adds hard information and cross-stock reversals while keeping easy unchanged
     [100, 101, 102, 94, 95, 93, 95, 97, 99, 98],
   ];
   const expected = [
-    [100, 104, 98, 65, 82, 70, 76, 82, 88, 86],
-    [100, 102, 100, 78, 88, 80, 87, 91, 94, 95],
-    [100, 101, 102, 92, 95, 91, 95, 97, 99, 98],
+    [100, 104, 98, 73, 82, 75, 80, 84, 88, 86],
+    [100, 102, 100, 84, 90, 85, 89, 92, 94, 95],
+    [100, 101, 102, 96, 98, 95, 97, 98, 99, 98],
   ];
   for (let i = 0; i < 3; i++) {
     expect(normal.days.map((d) => d.prices[i].price)).toEqual(
@@ -463,7 +463,7 @@ it("persists hard scenarios while retaining normal base rules and trading actual
     .update(schema.classes)
     .set({ status: "active", currentDay: 4 })
     .where(eq(schema.classes.id, f.course.id));
-  expect((await buyStock(f.stocks[0].id, 1, "6500", 4)).success).toBe(false);
+  expect((await buyStock(f.stocks[0].id, 1, "7300", 4)).success).toBe(false);
   expect((await buyStock(f.stocks[0].id, 1, "5900", 4)).success).toBe(true);
   await saveMarketDecision({
     day: 4,

@@ -49,9 +49,9 @@ const easyBasePaths = {
 };
 
 const paths = {
-  sensitive: [100, 104, 98, 65, 82, 70, 76, 82, 88, 86],
-  balanced: [100, 102, 100, 78, 88, 80, 87, 91, 94, 95],
-  defensive: [100, 101, 102, 92, 95, 91, 95, 97, 99, 98],
+  sensitive: [100, 104, 98, 73, 82, 75, 80, 84, 88, 86],
+  balanced: [100, 102, 100, 84, 90, 85, 89, 92, 94, 95],
+  defensive: [100, 101, 102, 96, 98, 95, 97, 98, 99, 98],
 };
 
 // Hard mode combines conflicting information with stronger, uneven shocks.

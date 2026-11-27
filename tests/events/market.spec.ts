@@ -65,7 +65,7 @@ test("admin config validates selection and displays the actual materialized sche
   await page.getByRole("button", { name: "금융 위기 모드로 확정" }).click();
   await expect(page.getByText("시나리오 확정", { exact: true })).toBeVisible();
   await page.getByText("교사용 시나리오·가격 확인", { exact: true }).click();
-  await expect(page.getByRole("table")).toContainText("6,500원");
+  await expect(page.getByRole("table")).toContainText("7,300원");
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > window.innerWidth,
   );
