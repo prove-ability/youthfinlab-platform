@@ -65,7 +65,7 @@ export function ManagerListItem({
         onClick={handleDelete}
         disabled={isDeleting}
       >
-        {isDeleting ? "삭제 중..." : "삭제"}
+        {isDeleting ? "삭제 중…" : "삭제"}
       </Button>
     </li>
   );

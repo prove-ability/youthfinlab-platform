@@ -225,7 +225,7 @@ export default function PriceManagement({
           <CardContent>
             {newsLoading ? (
               <div className="flex items-center justify-center py-8">
-                <span className="animate-spin inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full" />
+                <span className="animate-spin inline-block w-6 h-6 border-2 border-[#19391f] border-t-transparent rounded-full" />
               </div>
             ) : previousDayNews.length > 0 ? (
               <div className="space-y-2">

@@ -105,7 +105,7 @@ export function AddManagerForm({
           {error && <p className="text-red-500 text-xs">{error}</p>}
         </div>
         <Button type="submit" disabled={loading} className="h-8 px-4 text-xs">
-          {loading ? "저장 중..." : "매니저 저장"}
+          {loading ? "저장 중…" : "매니저 저장"}
         </Button>
       </div>
     </form>

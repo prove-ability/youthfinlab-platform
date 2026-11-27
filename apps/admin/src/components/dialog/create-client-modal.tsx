@@ -135,7 +135,7 @@ export function CreateClientModal({
             닫기
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "저장 중..." : "저장"}
+            {isLoading ? "저장 중…" : "저장"}
           </Button>
         </div>
       </form>

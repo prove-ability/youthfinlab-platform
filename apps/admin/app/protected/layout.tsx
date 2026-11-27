@@ -1,3 +1,4 @@
+import { LoadingState } from "@repo/ui/async-state";
 import "./workspace.css";
 import "@repo/ui/editorial.css";
 import type { Metadata } from "next";
@@ -30,7 +31,7 @@ export default function ProtectedLayout({
           } as React.CSSProperties
         }
       >
-        <Suspense fallback={<div>Loading sidebar...</div>}>
+        <Suspense fallback={<LoadingState compact label="메뉴를 불러오는 중…" />}>
           <AppSidebar variant="inset" />
         </Suspense>
         <SidebarInset>

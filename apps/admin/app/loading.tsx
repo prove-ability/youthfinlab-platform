@@ -1,4 +1,2 @@
-export default function Loading() {
-  // You can use any loading indicator here
-  return <>Loading...</>;
-}
+import { LoadingState } from "@repo/ui/async-state";
+export default function Loading() { return <LoadingState />; }

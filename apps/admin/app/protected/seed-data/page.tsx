@@ -65,7 +65,7 @@ export default function SeedDataPage() {
 
       // 3. 8일치 데이터 생성
       for (let day = 1; day <= 8; day++) {
-        addLog(`\n📅 Day ${day} 데이터 생성 중...`);
+        addLog(`\n📅 Day ${day} 데이터 생성 중…`);
 
         // 각 날짜마다 8개의 뉴스 생성
         const newsItems = [];
@@ -130,7 +130,7 @@ export default function SeedDataPage() {
             disabled={loading}
             size="lg"
           >
-            {loading ? "생성 중..." : "데이터 생성 시작"}
+            {loading ? "생성 중…" : "데이터 생성 시작"}
           </Button>
 
           {logs.length > 0 && (

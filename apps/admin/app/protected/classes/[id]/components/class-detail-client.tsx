@@ -305,7 +305,7 @@ export function ClassDetailClient({
                         <Trash2 className="w-4 h-4" />
                         <span>
                           {isDeleting
-                            ? "삭제 중..."
+                            ? "삭제 중…"
                             : `선택한 ${selectedIds.size}명 삭제`}
                         </span>
                       </Button>
@@ -365,9 +365,9 @@ export function ClassDetailClient({
               <div className="p-6">
                 {isLoading ? (
                   <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#19391f] mx-auto mb-4"></div>
                     <p className="text-gray-500 text-lg">
-                      학생 목록을 불러오는 중...
+                      학생 목록을 불러오는 중…
                     </p>
                   </div>
                 ) : error ? (

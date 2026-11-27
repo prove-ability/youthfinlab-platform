@@ -194,7 +194,7 @@ export function CreateUserModal({
             disabled={isSubmitting}
             className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
           >
-            {isSubmitting ? "등록 중..." : "등록"}
+            {isSubmitting ? "등록 중…" : "등록"}
           </Button>
         </div>
       </form>

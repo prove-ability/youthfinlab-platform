@@ -103,7 +103,7 @@ function QRLoginContent() {
       <div className="flex min-h-dvh items-center justify-center px-4">
         <div className="w-full max-w-md space-y-6 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-3 border-forest-700 mx-auto"></div>
-          <p className="text-base text-gray-600">QR 코드 확인 중...</p>
+          <p className="text-base text-gray-600">QR 코드 확인 중…</p>
         </div>
       </div>
     );
@@ -210,7 +210,7 @@ export default function QRLoginPage() {
         <div className="flex min-h-dvh items-center justify-center px-4">
           <div className="w-full max-w-md space-y-6 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-3 border-forest-700 mx-auto"></div>
-            <p className="text-base text-gray-600">페이지 로딩 중...</p>
+            <p className="text-base text-gray-600">화면을 준비하는 중…</p>
           </div>
         </div>
       }

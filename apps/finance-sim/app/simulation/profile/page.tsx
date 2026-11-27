@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState, LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -74,7 +75,7 @@ function ProfilePageContent() {
     totalDebtAmount: "",
   });
 
-  const { data: simulation, isLoading } = useQuery({
+  const { data: simulation, isLoading, isSuccess, isError, isFetching, refetch } = useQuery({
     queryKey: ["simulation"],
     queryFn: () => getOrCreateSimulation(),
   });
@@ -85,7 +86,7 @@ function ProfilePageContent() {
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (isLoading || isEditMode) return;
+    if (!isSuccess || isEditMode) return;
     if (profile && currentStep >= 2) {
       const stepRoutes: Record<number, string> = {
         2: "/simulation/snapshot",
@@ -96,7 +97,7 @@ function ProfilePageContent() {
       };
       router.replace(stepRoutes[currentStep] || "/simulation/snapshot");
     }
-  }, [isLoading, profile, currentStep, isEditMode, router]);
+  }, [isSuccess, profile, currentStep, isEditMode, router]);
 
   useEffect(() => {
     if (isLoading || !simulationId || initializedRef.current) return;
@@ -171,12 +172,14 @@ function ProfilePageContent() {
     }
   }
 
+  if (isError && !simulation) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
+
   if (isLoading || !isReady) {
     return (
       <div className="min-h-dvh flex flex-col">
         <StepProgress currentStep={1} />
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-pulse text-gray-400">불러오는 중...</div>
+          <LoadingState label="재무 정보를 불러오는 중…" />
         </div>
       </div>
     );
@@ -187,6 +190,7 @@ function ProfilePageContent() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-white">
+      {isError ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData /> : <RefreshStatus active={isFetching} />}
       <StepProgress currentStep={1} />
 
       <div className="flex-1 px-5 py-6">
@@ -378,7 +382,7 @@ function ProfilePageContent() {
             disabled={saving}
             className="w-full py-3.5 rounded-xl bg-forest-700 text-white font-semibold text-sm hover:bg-forest-800 disabled:opacity-50 transition-colors"
           >
-            {saving ? "저장 중..." : "다음 단계로"}
+            {saving ? "저장 중…" : "다음 단계로"}
           </button>
         </form>
       </div>
@@ -393,7 +397,7 @@ export default function ProfilePage() {
         <div className="min-h-dvh flex flex-col">
           <StepProgress currentStep={1} />
           <div className="flex-1 flex items-center justify-center">
-            <div className="animate-pulse text-gray-400">불러오는 중...</div>
+            <LoadingState label="재무 정보를 불러오는 중…" />
           </div>
         </div>
       }

@@ -289,7 +289,7 @@ export default function TradeBottomSheet({
           }`}
         >
           {tradeMutation.isPending
-            ? "처리 중..."
+            ? "처리 중…"
             : tradeType === "buy"
               ? "살래요!"
               : "팔래요!"}

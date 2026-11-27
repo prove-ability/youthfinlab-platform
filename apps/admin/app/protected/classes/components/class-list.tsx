@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState, LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import "./class-list.css";
 
@@ -45,7 +46,7 @@ export function ClassList() {
     });
   };
 
-  const { data, isLoading, error: queryError, refetch } = useQuery({
+  const { data, isLoading, error: queryError, isFetching, refetch } = useQuery({
     queryKey: ["classes", "list"],
     queryFn: async () => {
       const result = await getClasses();
@@ -68,16 +69,16 @@ export function ClassList() {
   };
 
   if (isLoading && !isCreateModalOpen) {
-    return <div>로딩 중...</div>;
+    return <LoadingState label="클래스 목록을 불러오는 중…" />;
   }
 
-  if (queryError instanceof Error && !isCreateModalOpen) {
-    return <div className="text-red-500">오류: {queryError.message}</div>;
+  if (queryError instanceof Error && !data && !isCreateModalOpen) {
+    return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
   }
 
   return (
     <div className="yfl-class-list space-y-4">
-      {queryError instanceof Error && <p role="alert">목록 조회 오류: {queryError.message}</p>}
+      {queryError ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData={!!data} /> : <RefreshStatus active={isFetching} />}
       <div className="yfl-class-toolbar flex justify-between items-center">
         <p className="text-gray-600">총 {classes.length}개의 수업</p>
         <Button

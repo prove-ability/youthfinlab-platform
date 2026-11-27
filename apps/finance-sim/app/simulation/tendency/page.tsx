@@ -317,7 +317,7 @@ export default function TendencyPage() {
               disabled={saving}
               className="flex-[2] py-3.5 rounded-xl bg-forest-700 text-white font-semibold text-sm disabled:opacity-50 transition-colors hover:bg-forest-800"
             >
-              {saving ? "저장 중..." : "최종 리포트 보기"}
+              {saving ? "저장 중…" : "최종 리포트 보기"}
             </button>
           </div>
         </div>

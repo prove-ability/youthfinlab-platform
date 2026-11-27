@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState, LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import "../../list-refinement.css";
 
@@ -20,12 +21,12 @@ type ClientWithManagers = Client & {
 
 export function ClientList() {
   const queryClient = useQueryClient();
-  const { data, isLoading, error } = useQuery<ClientWithManagers[]>({
+  const { data, isLoading, error, isFetching, refetch } = useQuery<ClientWithManagers[]>({
     queryKey: ["clients", "list"],
     queryFn: async () => {
       const res = await getClients();
-      if ("data" in res) return res.data as ClientWithManagers[];
-      return [];
+      if (!res.success || !("data" in res)) throw new Error("고객사 조회 실패");
+      return res.data as ClientWithManagers[];
     },
   });
   const clients = data ?? [];
@@ -107,19 +108,12 @@ export function ClientList() {
     }
   };
 
-  if (isLoading && clients.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-500 text-lg">고객사 목록을 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading && !data) return <LoadingState label="고객사 목록을 불러오는 중…" />;
+  if (error && !data) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   return (
     <div className="yfl-client-list yfl-client-refined space-y-4">
+      {error ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData /> : <RefreshStatus active={isFetching} />}
       <div className="yfl-list-toolbar">
         <p>고객사 <strong>{clients.length}</strong>곳</p>
         <Button
@@ -178,7 +172,7 @@ export function ClientList() {
                   className="text-xs text-red-500 hover:bg-red-50 h-7 px-2.5"
                   variant="ghost"
                 >
-                  {deletingClientId === client.id ? "삭제 중..." : "삭제"}
+                  {deletingClientId === client.id ? "삭제 중…" : "삭제"}
                 </Button>
                 </details>
                 <button type="button" onClick={() => toggleManagers(client.id)} aria-label={`${client.name} 매니저 ${isOpen ? "접기" : "보기"}`} aria-expanded={isOpen} className={`w-6 h-6 rounded-md flex items-center justify-center text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}>

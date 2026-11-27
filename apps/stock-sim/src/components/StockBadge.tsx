@@ -61,8 +61,8 @@ export default function StockBadge({ stockId, stockName }: StockBadgeProps) {
         <div className="bg-white rounded-lg shadow-xl border-2 border-blue-200 p-4 min-w-[280px]">
           {isLoading ? (
             <div className="text-center py-2">
-              <div className="inline-block w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-xs text-gray-500 mt-2">로딩 중...</p>
+              <div className="inline-block w-4 h-4 border-2 border-[#19391f] border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-xs text-gray-500 mt-2">종목 정보를 불러오는 중…</p>
             </div>
           ) : stockInfo ? (
             <div className="space-y-3">

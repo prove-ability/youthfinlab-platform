@@ -96,7 +96,7 @@ export default function NicknameSetupPage() {
               disabled={isLoading || !nickname.trim()}
               className="group relative flex w-full justify-center rounded-md bg-indigo-600 py-3 px-4 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "설정 중..." : "닉네임 설정하기"}
+              {isLoading ? "설정 중…" : "닉네임 설정하기"}
             </button>
           </div>
         </form>

@@ -11,7 +11,9 @@
     "db:migrate": "tsx ./packages/db/src/migrate.ts",
     "db:debug": "tsx ./debug-env.ts",
     "test": "vitest run",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "test:loading": "playwright test -c playwright.loading.config.ts",
+    "preview:loading": "node tests/loading/build.cjs && node tests/loading/serve.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.16",

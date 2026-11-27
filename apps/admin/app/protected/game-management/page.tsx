@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState, LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import "./game-management.css";
@@ -30,13 +31,14 @@ export default function GameManagementPage() {
   const isInitialized = useRef(false);
 
   // 단일 쿼리로 모든 데이터 조회
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, isFetching, isPlaceholderData, refetch } = useQuery({
     queryKey: ["game-management", { classId: selectedClass, day: selectedDay }],
     queryFn: () =>
       getGameManagementData({
         selectedClassId: selectedClass || undefined,
         selectedDay: selectedDay,
       }),
+    placeholderData: (previous) => previous,
     staleTime: 30_000, // 30초 캐시
   });
 
@@ -145,16 +147,8 @@ export default function GameManagementPage() {
     setDayAdjustmentModal({ ...dayAdjustmentModal, isOpen: false });
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-500">게임 관리 데이터를 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingState label="게임 관리 데이터를 불러오는 중…" />;
+  if (isError && !data) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   const uniqueClients = Array.from(
     new Set(classes.map((c) => c.client?.id).filter(Boolean))
@@ -173,12 +167,14 @@ export default function GameManagementPage() {
         <h1>게임 관리</h1>
         <p>수업 진행을 조정하고, 종목·뉴스·가격을 관리하세요.</p>
       </header>
+      {!isFetching && classes.length === 0 && <p>등록된 클래스가 없습니다. 클래스 관리에서 수업을 추가해 주세요.</p>}
       {/* 클래스 선택 */}
       <div className="yfl-game-filters">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="game-client" className="text-sm font-medium">고객사</label>
           <select
             id="game-client"
+            disabled={isDayOperationLoading || isFetching || isError}
             value={selectedClientId}
             onChange={(e) => {
               const newClientId = e.target.value;
@@ -217,7 +213,7 @@ export default function GameManagementPage() {
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
                 className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isDayOperationLoading}
+                disabled={isDayOperationLoading || isFetching || isError}
               >
                 <option value="">클래스를 선택하세요</option>
                 {classesOfSelectedClient.map((cls) => (
@@ -228,13 +224,13 @@ export default function GameManagementPage() {
               </select>
               {isDayOperationLoading && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <span className="animate-spin inline-block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+                  <span className="animate-spin inline-block w-4 h-4 border-2 border-[#19391f] border-t-transparent rounded-full" />
                 </div>
               )}
             </div>
             {isDayOperationLoading && (
               <p className="text-xs text-blue-600 flex items-center gap-1">
-                <span className="animate-spin inline-block w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full" />
+                <span className="animate-spin inline-block w-3 h-3 border-2 border-[#19391f] border-t-transparent rounded-full" />
                 Day 업데이트 중... 잠시만 기다려주세요
               </p>
             )}
@@ -242,7 +238,7 @@ export default function GameManagementPage() {
         )}
       </div>
 
-      {selectedClass && (
+      {selectedClass && !isPlaceholderData && (
         <section className="yfl-game-operation" aria-labelledby="game-progress-title" aria-busy={isDayOperationLoading}>
           <div className="yfl-game-operation-main">
             <div className="yfl-game-current">
@@ -252,8 +248,8 @@ export default function GameManagementPage() {
             </div>
             <div className="yfl-game-run">
               <div className="yfl-game-run-buttons">
-                <Button onClick={handleDayDecrease} variant="outline" size="sm" isLoading={isDayOperationLoading} disabled={isDayOperationLoading}>Day −1</Button>
-                <Button onClick={handleDayIncrease} size="sm" isLoading={isDayOperationLoading} disabled={isDayOperationLoading}>Day +1 · 용돈 지급</Button>
+                <Button onClick={handleDayDecrease} variant="outline" size="sm" isLoading={isDayOperationLoading} disabled={isDayOperationLoading || isFetching || isError}>Day −1</Button>
+                <Button onClick={handleDayIncrease} size="sm" isLoading={isDayOperationLoading} disabled={isDayOperationLoading || isFetching || isError}>Day +1 · 용돈 지급</Button>
               </div>
               <p>Day +1 실행 시 수업이 진행되고 용돈이 지급됩니다.</p>
               {isDayOperationLoading && <p role="status">진행 상태 업데이트 중…</p>}
@@ -269,14 +265,15 @@ export default function GameManagementPage() {
         </section>
       )}
 
+      {isPlaceholderData ? <LoadingState label="선택한 수업 정보를 불러오는 중…" /> : isError ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData /> : <RefreshStatus active={isFetching} />}
       {/* 탭 */}
-      {selectedClass && (
+      {selectedClass && !isPlaceholderData && (
         <Tabs defaultValue="stock-management" className="yfl-game-data w-full">
           <div className="yfl-game-data-heading">
             <h2>게임 데이터</h2>
             <div className="yfl-game-view-day">
               <span>조회 기준 <strong>Day {selectedDay}</strong></span>
-              <Button onClick={handleDaySelection} variant="outline" size="sm" disabled={isDayOperationLoading}>조회 Day 변경</Button>
+              <Button onClick={handleDaySelection} variant="outline" size="sm" disabled={isDayOperationLoading || isFetching || isError}>조회 Day 변경</Button>
             </div>
           </div>
           <TabsList className="yfl-game-tabs" aria-label="게임 데이터 종류">

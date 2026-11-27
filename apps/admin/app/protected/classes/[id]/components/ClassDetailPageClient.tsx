@@ -62,8 +62,8 @@ export function ClassDetailPageClient({
         </div>
         {/* 본문 로딩 */}
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg">데이터를 불러오는 중…</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#19391f] mx-auto mb-4" />
+          <p className="text-gray-500 text-lg">수업 정보를 불러오는 중…</p>
         </div>
       </div>
     );

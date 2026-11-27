@@ -1,4 +1,5 @@
 "use client";
+import { LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -58,6 +59,8 @@ export default function InvestPage() {
   const {
     data: stockData,
     isLoading: isLoadingStocks,
+    isFetching: fetchingStocks,
+    isError: stocksError,
     refetch: refetchStocks,
   } = useQuery({
     queryKey: ["stocks"],
@@ -69,6 +72,8 @@ export default function InvestPage() {
   const {
     data: transactions = [],
     isLoading: isLoadingHistory,
+    isFetching: fetchingHistory,
+    isError: historyError,
     refetch: refetchHistory,
   } = useQuery({
     queryKey: ["transactions"],
@@ -89,7 +94,7 @@ export default function InvestPage() {
 
   const isInitialLoading = isLoadingStocks;
   const isRefreshing =
-    activeTab === "stocks" ? isLoadingStocks : isLoadingHistory;
+    activeTab === "stocks" ? fetchingStocks : fetchingHistory;
 
   // 투어 훅 추가
   useTour(true);
@@ -99,12 +104,11 @@ export default function InvestPage() {
     await queryClient.invalidateQueries({ queryKey: ["stocks"] });
     await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     await queryClient.invalidateQueries({ queryKey: ["dashboard"] }); // 홈 화면도 갱신
-    // 즉시 데이터 다시 가져오기
-    await refetchStocks();
+
   };
 
   // Pull-to-refresh 기능
-  const { isRefreshing: isPulling } = usePullToRefresh(async () => {
+  usePullToRefresh(async () => {
     if (activeTab === "stocks") {
       await refetchStocks();
     } else {
@@ -131,21 +135,14 @@ export default function InvestPage() {
     displayStocks = newsStocks;
   }
 
+  if (stocksError && !stockData) return <LoadError onRetry={() => refetchStocks()} retrying={fetchingStocks} />;
+
   if (isInitialLoading) {
-    return <PageLoading />;
+    return <PageLoading label="투자 정보를 불러오는 중…" />;
   }
 
   return (
     <div className="min-h-screen bg-yfl-canvas pb-20">
-      {/* Pull-to-refresh 인디케이터 */}
-      {isPulling && (
-        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4">
-          <div className="bg-emerald-700 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-sm font-medium">새로고침 중...</span>
-          </div>
-        </div>
-      )}
       <div className="max-w-4xl mx-auto p-4">
         <PageHeader
           title="투자"
@@ -322,6 +319,9 @@ export default function InvestPage() {
           </>
         )}
 
+        {stocksError && <LoadError onRetry={() => refetchStocks()} retrying={fetchingStocks} hasData />}
+        <RefreshStatus active={isRefreshing} />
+        {activeTab === "history" && historyError && transactions.length > 0 && <LoadError onRetry={() => refetchHistory()} retrying={fetchingHistory} hasData />}
         {/* Transaction History */}
         {activeTab === "history" ? (
           <>
@@ -332,7 +332,9 @@ export default function InvestPage() {
               description="수익률은 사고 팔기 거래만 반영됩니다. 지원금은 초기 자본이므로 수익률 계산에서 제외됩니다."
             />
 
-            {isRefreshing ? (
+            {historyError && transactions.length === 0 ? (
+              <LoadError onRetry={() => refetchHistory()} retrying={fetchingHistory} hasData={transactions.length > 0} />
+            ) : isLoadingHistory ? (
               <TransactionListSkeleton />
             ) : transactions.length === 0 ? (
               <EmptyState
@@ -529,7 +531,7 @@ export default function InvestPage() {
               </div>
             )}
           </>
-        ) : isRefreshing ? (
+        ) : isLoadingStocks ? (
           <StockListSkeleton />
         ) : displayStocks.length === 0 ? (
           <EmptyState

@@ -94,7 +94,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full py-3.5 rounded-xl bg-forest-700 text-white font-semibold text-sm hover:bg-forest-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? "로그인 중..." : "로그인하기"}
+            {loading ? "로그인 중…" : "로그인하기"}
           </button>
         </form>
         <p className="yfl-entry-note">교육 담당자에게 받은 계정 정보로 로그인하세요</p>

@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState, LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import "./dashboard.css";
 
@@ -71,9 +72,9 @@ type DashboardAllSuccess = {
 };
 
 export function DashboardClient() {
-  const { data, isLoading } = useQuery<any>({
+  const { data, isLoading, isFetching, refetch, isError } = useQuery<any>({
     queryKey: ["dashboard", "all"],
-    queryFn: () => getDashboardAll(),
+    queryFn: async () => { const result = await getDashboardAll(); if (!result.success) throw new Error("대시보드 조회 실패"); return result; },
     staleTime: 60_000,
   });
 
@@ -82,16 +83,7 @@ export function DashboardClient() {
     ? (data.data as DashboardAllSuccess["data"])
     : null;
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-[var(--yfl-secondary)]">대시보드를 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingState label="대시보드를 불러오는 중…" />;
 
   const renderStars = (rating: number) => {
     // 10점 만점을 5개 별로 표현 (1점 = 반별)
@@ -132,20 +124,11 @@ export function DashboardClient() {
     );
   };
 
-  if (!loading && !payload) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[40vh] text-center">
-        <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
-          <Activity className="w-6 h-6 text-red-400" />
-        </div>
-        <p className="text-[var(--yfl-secondary)] font-medium">데이터를 불러오지 못했습니다</p>
-        <p className="text-sm text-gray-400 mt-1">잠시 후 페이지를 새로고침해 주세요.</p>
-      </div>
-    );
-  }
+  if (!payload) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   return (
     <div className="yfl-dashboard yfl-dashboard-review space-y-6">
+      {isError ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData /> : <RefreshStatus active={isFetching} />}
       {/* 헤더 */}
       <BrandIntro title="관리자 대시보드" description="주식 게임 및 재무 시뮬레이션 전체 현황을 한눈에 확인하세요" />
 

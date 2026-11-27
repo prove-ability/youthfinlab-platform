@@ -310,9 +310,9 @@ export default function GameDayManagement({
           {newsLoading ? (
             <div className="flex items-center justify-center py-10">
               <div className="text-center">
-                <span className="animate-spin inline-block w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mb-3" />
+                <span className="animate-spin inline-block w-8 h-8 border-2 border-[#19391f] border-t-transparent rounded-full mb-3" />
                 <p className="text-sm text-muted-foreground">
-                  뉴스를 불러오는 중...
+                  뉴스를 불러오는 중…
                 </p>
               </div>
             </div>
@@ -370,7 +370,7 @@ export default function GameDayManagement({
                             }
                             className="h-7 px-2.5 text-xs text-gray-500 hover:text-red-600 hover:bg-red-50"
                           >
-                            {deletingNewsId === news.id ? "삭제 중..." : "삭제"}
+                            {deletingNewsId === news.id ? "삭제 중…" : "삭제"}
                           </Button>
                         </div>
                       </div>
@@ -460,7 +460,7 @@ export default function GameDayManagement({
                             }
                             className="h-7 px-3 text-xs"
                           >
-                            {savingNewsIndex === index ? "저장 중..." : "저장"}
+                            {savingNewsIndex === index ? "저장 중…" : "저장"}
                           </Button>
                           {newsItems.length > 1 && (
                             <Button

@@ -1,0 +1,91 @@
+.yfl-async-state {
+  background-color: #fff;
+  display: flex;
+  min-block-size: 16rem;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--workspace-muted, #52604a);
+  padding: 1.5rem;
+  text-align: center;
+}
+.yfl-async-compact {
+  min-block-size: 3rem;
+  padding: 0.75rem;
+  flex-direction: row;
+}
+.yfl-loading-progress {
+  appearance: none;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: 3px solid #dfe8e1;
+  border-top-color: #19391f;
+  border-radius: 50%;
+  background: none;
+  animation: yfl-loading-spin 1s linear infinite;
+  flex-shrink: 0;
+}
+.yfl-loading-progress::-webkit-progress-bar {
+  display: none;
+}
+.yfl-loading-progress::-moz-progress-bar {
+  display: none;
+  background: none;
+}
+@keyframes yfl-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (forced-colors: active) {
+  .yfl-async-state {
+    background-color: Canvas;
+  }
+}
+.yfl-load-error {
+  padding: 1.25rem;
+  border: 1px solid var(--yfl-divider, #d5d5bb);
+  border-radius: 0.5rem;
+  color: var(--workspace-ink, #19391f);
+  overflow-wrap: anywhere;
+}
+.yfl-load-error button {
+  margin-block-start: 0.75rem;
+  padding: 0.5rem 1rem;
+  min-block-size: 44px;
+  border: 1px solid currentColor;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.yfl-load-error button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.yfl-load-error button:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}
+.yfl-refresh-status {
+  min-block-size: 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--workspace-muted, #52604a);
+  margin-block: 0.25rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .yfl-loading-progress {
+    animation-duration: 6s;
+  }
+}
+@media (forced-colors: active) {
+  .yfl-loading-progress {
+    border-color: GrayText;
+    border-top-color: CanvasText;
+  }
+  .yfl-load-error {
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+}

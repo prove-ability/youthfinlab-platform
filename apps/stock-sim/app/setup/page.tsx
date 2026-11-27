@@ -114,10 +114,10 @@ export default function SetupPage() {
 
   if (step === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100">
+      <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">확인하는 중이에요...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#19391f] mx-auto"></div>
+          <p className="mt-4 text-gray-600">계정 설정을 확인하는 중…</p>
         </div>
       </div>
     );
@@ -213,7 +213,7 @@ export default function SetupPage() {
                 className="w-full"
                 disabled={loading || !nickname.trim()}
               >
-                {loading ? "설정 중..." : "다음"}
+                {loading ? "설정 중…" : "다음"}
               </Button>
             </form>
           </div>

@@ -84,8 +84,8 @@ export function StudentHistoryModal({
     >
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-gray-500">데이터를 불러오는 중...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#19391f] mb-4"></div>
+          <p className="text-gray-500">학생 활동 내역을 불러오는 중…</p>
         </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center py-20">
