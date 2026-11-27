@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import "./results-dashboard.css";
 import { formatMoney } from "../utils";
 import type { ClassWithRelations } from "@/types";
 
@@ -94,7 +95,7 @@ export function ResultsDashboard({
       : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="yfl-results-dashboard space-y-6">
       {/* 참여 현황 */}
       <div className="grid gap-4 md:grid-cols-4">
         <StatCard
@@ -294,18 +295,19 @@ export function ResultsDashboard({
             아직 시뮬레이션을 시작한 학생이 없습니다.
           </p>
         ) : (
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full text-sm">
+          <div className="yfl-student-results-scroll mt-4" role="region" aria-label="개별 학생 결과 표, 좌우 스크롤 가능" tabIndex={0}>
+            <table className="yfl-student-results-table w-full text-sm">
+              <caption className="sr-only">개별 학생의 진행 상태 및 재무 시뮬레이션 결과</caption>
               <thead>
                 <tr className="border-b text-left text-muted-foreground bg-gray-50">
-                  <th className="pb-2 pt-1 px-2 font-medium rounded-tl">이름</th>
-                  <th className="pb-2 pt-1 px-2 font-medium">진행</th>
-                  <th className="pb-2 pt-1 px-2 font-medium">나이</th>
-                  <th className="pb-2 pt-1 px-2 font-medium">상태</th>
-                  <th className="pb-2 pt-1 px-2 font-medium">소득</th>
-                  <th className="pb-2 pt-1 px-2 font-medium">저축/투자</th>
-                  <th className="pb-2 pt-1 px-2 font-medium">연금</th>
-                  <th className="pb-2 pt-1 px-2 font-medium rounded-tr">투자 성향</th>
+                  <th scope="col" className="pb-2 pt-1 px-2 font-medium rounded-tl">이름</th>
+                  <th scope="col" className="pb-2 pt-1 px-2 font-medium">진행</th>
+                  <th scope="col" className="pb-2 pt-1 px-2 font-medium">나이</th>
+                  <th scope="col" className="pb-2 pt-1 px-2 font-medium">상태</th>
+                  <th scope="col" className="pb-2 pt-1 px-2 font-medium">소득</th>
+                  <th scope="col" className="pb-2 pt-1 px-2 font-medium">저축/투자</th>
+                  <th scope="col" className="pb-2 pt-1 px-2 font-medium">연금</th>
+                  <th scope="col" className="pb-2 pt-1 px-2 font-medium rounded-tr">투자 성향</th>
                 </tr>
               </thead>
               <tbody>
@@ -315,7 +317,7 @@ export function ResultsDashboard({
                     className="border-b last:border-0 hover:bg-blue-50/40 transition-colors cursor-pointer"
                     onClick={() => window.location.href = `/protected/finance-sim/${classId}/${sim.id}`}
                   >
-                    <td className="py-2 px-2 font-medium">
+                    <th scope="row" className="yfl-student-name py-2 px-2 font-medium text-left">
                       <Link
                         href={`/protected/finance-sim/${classId}/${sim.id}`}
                         className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
@@ -323,7 +325,7 @@ export function ResultsDashboard({
                       >
                         {sim.guest?.name || "-"}
                       </Link>
-                    </td>
+                    </th>
                     <td className="py-2 px-2">
                       <span
                         className={`text-xs px-1.5 py-0.5 rounded ${
