@@ -55,3 +55,22 @@ export const defaultEventStocks = [
   { name: "든든산업", exposure: "balanced", initialPrice: 10000 },
   { name: "온기생활", exposure: "defensive", initialPrice: 10000 },
 ] as const;
+
+export const marketMoodLabels = {
+  observe: "정보 살펴보기",
+  caution: "불확실성 확대",
+  crisis: "시장 충격",
+  response: "정책 발표 확인",
+  review: "엇갈린 정보 점검",
+} as const;
+/** Deliberately accepts no prices, future days, difficulty, or outcomes. */
+export function marketMoodFromBulletin(
+  title: string,
+): keyof typeof marketMoodLabels {
+  if (/시장 급락|시장 전반으로 확산/.test(title)) return "crisis";
+  if (/지원책 발표|시장 안정 대책이 발표/.test(title)) return "response";
+  if (/불안|대출.*강화|대출 심사|지원 심사 지연/.test(title)) return "caution";
+  if (/회복|반등|대응이 갈리|재조정|이익 감소|상환 부담/.test(title))
+    return "review";
+  return "observe";
+}

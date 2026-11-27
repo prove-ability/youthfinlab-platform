@@ -212,3 +212,130 @@
 .market-event .event-stack > * {
   min-width: 0;
 }
+
+/* Static illustrations are the default; no price data drives these scenes. */
+.market-event .event-bulletin-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 20px;
+  align-items: start;
+}
+.market-event .event-bulletin-copy {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+.market-event .event-mood {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  width: 150px;
+  text-align: center;
+}
+.market-event .event-mood-scene {
+  position: relative;
+  width: 150px;
+  height: 120px;
+}
+.market-event .event-mood-props {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.market-event .event-mood-sprout {
+  position: absolute;
+  width: 94px;
+  height: 94px;
+  left: 15px;
+  bottom: 7px;
+  background: url("./sprout-felt-web.webp") center / contain no-repeat;
+  transform-origin: 50% 85%;
+}
+.market-event .event-mood-notebook {
+  position: absolute;
+  width: 66px;
+  height: 42px;
+  bottom: 9px;
+  left: 40px;
+}
+.market-event .event-mood figcaption {
+  color: #536158;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+@keyframes event-mood-observe {
+  0% {
+    transform: rotate(-3deg);
+  }
+  55% {
+    transform: rotate(2deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+@keyframes event-mood-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes event-mood-document {
+  from {
+    opacity: 0;
+    transform: translateX(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (min-width: 768px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .market-event .event-mood-sprout {
+    animation: event-mood-observe 1.6s ease-out 1;
+  }
+  .market-event .event-mood-cloud {
+    animation: event-mood-arrive 1.6s ease-out 1;
+  }
+  .market-event .event-mood-document {
+    animation: event-mood-document 1.6s ease-out 1;
+  }
+}
+@media (max-width: 767px) {
+  .market-event .event-bulletin-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .market-event .event-mood {
+    grid-column: 1;
+    grid-row: 1;
+    width: 112px;
+    justify-self: end;
+  }
+  .market-event .event-mood-scene {
+    width: 112px;
+    height: 90px;
+  }
+  .market-event .event-mood-sprout {
+    width: 72px;
+    height: 72px;
+    left: 10px;
+    bottom: 5px;
+  }
+  .market-event .event-mood-notebook {
+    width: 50px;
+    height: 32px;
+    left: 30px;
+    bottom: 7px;
+  }
+  .market-event .event-bulletin-copy {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}

@@ -12,6 +12,7 @@ import {
   type DecisionReason,
 } from "@repo/db/market-scenario";
 import "@repo/ui/market-event.css";
+import MarketMoodIllustration from "./MarketMoodIllustration";
 
 export default function MarketEventPanel() {
   const query = useQuery({
@@ -87,12 +88,17 @@ export function MarketEventView({
         <p className="event-kicker">가상 시장 속보 · DAY {data.day}</p>
         <span className="event-tag">금융 위기 체험</span>
       </div>
-      <h2 id={`${id}-heading`}>{data.bulletin.title}</h2>
-      <div className="event-stack">
-        <p>{data.bulletin.news}</p>
-        <p className="event-muted">
-          교육용 가상 시장입니다. 실제 기업의 전망이나 투자 권유가 아닙니다.
-        </p>
+      <div className="event-bulletin-layout">
+        <MarketMoodIllustration title={data.bulletin.title} />
+        <div className="event-bulletin-copy">
+          <h2 id={`${id}-heading`}>{data.bulletin.title}</h2>
+          <div className="event-stack">
+            <p>{data.bulletin.news}</p>
+            <p className="event-muted">
+              교육용 가상 시장입니다. 실제 기업의 전망이나 투자 권유가 아닙니다.
+            </p>
+          </div>
+        </div>
       </div>
       <details className="event-rule">
         <summary>이번 수업의 기업 특성</summary>

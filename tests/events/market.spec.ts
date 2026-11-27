@@ -102,8 +102,8 @@ test("hard mode is opt-in and shows its own news and retrospective", async ({
   await page.getByLabel("금융 위기 이벤트 · 10일 체험").check();
   await expect(page.getByLabel("보통 · 서로 다른 신호를 비교")).toBeChecked();
   await page.getByLabel("어려움 · 상반된 뉴스와 기업별 반응 비교").check();
-  await page.getByText("고급 설정 · 종목 직접 수정", {exact:true}).click();
-  await page.getByLabel("직접 구성 사용", {exact:true}).check();
+  await page.getByText("고급 설정 · 종목 직접 수정", { exact: true }).click();
+  await page.getByLabel("직접 구성 사용", { exact: true }).check();
   await page.getByLabel("새싹테크", { exact: true }).check();
   await page.getByLabel("온기생활", { exact: true }).check();
   await page.getByLabel("가상 기업 특성").nth(1).selectOption("defensive");
@@ -156,4 +156,72 @@ test("untouched defaults save directly", async ({ page }) => {
   await page.getByLabel("금융 위기 이벤트 · 10일 체험").check();
   await page.getByRole("button", { name: "금융 위기 모드로 확정" }).click();
   await expect(page.getByText("시나리오 확정", { exact: true })).toBeVisible();
+});
+
+test("public bulletin moods change without revealing a price direction", async ({
+  page,
+}) => {
+  const mood = page.locator(".event-mood");
+  await expect(mood).toHaveAttribute("data-mood", "crisis");
+  await page.getByLabel("진행 Day").selectOption("5");
+  await expect(mood).toHaveAttribute("data-mood", "response");
+  await page.getByLabel("진행 Day").selectOption("6");
+  await expect(mood).toHaveAttribute("data-mood", "caution");
+  await page.getByLabel("진행 Day").selectOption("7");
+  await expect(mood).toHaveAttribute("data-mood", "review");
+  await page.getByLabel("진행 Day").selectOption("1");
+  await expect(mood).toHaveAttribute("data-mood", "observe");
+  await expect(mood).not.toContainText(/매수|매도|상승|하락/);
+});
+test("illustration stops after one short animation and stays visible with reduced motion", async ({
+  page,
+}) => {
+  await expect(page.locator(".event-mood")).toBeVisible();
+  const sprout = page.locator(".event-mood-sprout");
+  const motion = await sprout.evaluate((el) => ({
+    name: getComputedStyle(el).animationName,
+    iterations: getComputedStyle(el).animationIterationCount,
+    duration: getComputedStyle(el).animationDuration,
+    staticExpected: matchMedia(
+      "(max-width:767px), (pointer:coarse), (prefers-reduced-motion:reduce)",
+    ).matches,
+  }));
+  if (motion.staticExpected) expect(motion.name).toBe("none");
+  else {
+    expect(motion.iterations).toBe("1");
+    expect(parseFloat(motion.duration)).toBeLessThanOrEqual(2);
+  }
+  await expect
+    .poll(() =>
+      page
+        .locator(".event-mood-scene")
+        .evaluate(
+          (el) =>
+            el
+              .getAnimations({ subtree: true })
+              .filter((a) => a.playState === "running").length,
+        ),
+    )
+    .toBe(0);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.getByLabel("진행 Day").selectOption("5");
+  await expect(page.locator(".event-mood")).toHaveAttribute(
+    "data-mood",
+    "response",
+  );
+  expect(
+    await sprout.evaluate((el) => getComputedStyle(el).animationName),
+  ).toBe("none");
+  await expect(page.locator(".event-mood-scene")).toBeVisible();
+  expect(
+    await page
+      .locator(".event-mood-document")
+      .evaluate((el) => getComputedStyle(el).opacity),
+  ).toBe("1");
+  await page.setViewportSize({ width: 360, height: 780 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+  ).toBe(false);
 });
