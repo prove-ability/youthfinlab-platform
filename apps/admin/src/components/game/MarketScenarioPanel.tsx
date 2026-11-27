@@ -255,7 +255,7 @@ export default function MarketScenarioPanel({
                         checked={difficulty === "normal"}
                         onChange={() => setDifficulty("normal")}
                       />
-                      보통 · 서로 다른 신호를 비교
+                      보통 · 뚜렷한 위기와 반등 체험
                     </label>
                     <label className="event-choice">
                       <input
@@ -264,7 +264,7 @@ export default function MarketScenarioPanel({
                         checked={difficulty === "easy"}
                         onChange={() => setDifficulty("easy")}
                       />
-                      쉬움 · 쉬운 표현과 절반 수준의 가격 변동
+                      쉬움 · 쉬운 표현과 완만한 가격 변동
                     </label>
                     <label className="event-choice">
                       <input
@@ -273,12 +273,12 @@ export default function MarketScenarioPanel({
                         checked={difficulty === "hard"}
                         onChange={() => setDifficulty("hard")}
                       />
-                      어려움 · 상반된 뉴스와 기업별 반응 비교
+                      어려움 · 복합 정보와 큰 충격·재하락
                     </label>
                     {difficulty === "hard" && (
                       <p className="event-muted">
                         좋은 소식과 나쁜 소식이 함께 제시됩니다. 기업마다 다른
-                        가격 반응과 재하락을 살피고 선택 이유를 남깁니다. 기본
+                        급락·반등·재하락을 살피고 선택 이유를 남깁니다. 기본
                         거래·지원금 규칙은 보통과 같습니다.
                       </p>
                     )}

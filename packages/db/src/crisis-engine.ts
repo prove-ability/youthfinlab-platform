@@ -41,13 +41,20 @@ const explanations = [
   "회복 기대 속에서도 기업별 상승 폭은 달랐습니다. 이미 오른 가격을 보고 앞으로도 계속 오를 것이라고 확신하기는 어렵습니다.",
   "대책 이후에도 회복 속도는 달랐습니다. 이 결과는 학습용으로 정한 한 가지 경로입니다. 실제 위기에서 같은 순서나 수익이 보장되지 않습니다.",
 ];
-const paths = {
+// Preserve the original easy curve independently of stronger normal/hard modes.
+const easyBasePaths = {
   sensitive: [100, 104, 98, 73, 79, 70, 74, 82, 88, 86],
   balanced: [100, 102, 100, 84, 89, 83, 87, 91, 94, 95],
   defensive: [100, 101, 102, 94, 95, 93, 95, 97, 99, 98],
 };
 
-// Hard mode changes information complexity and relative reactions, not only amplitude.
+const paths = {
+  sensitive: [100, 104, 98, 65, 82, 70, 76, 82, 88, 86],
+  balanced: [100, 102, 100, 78, 88, 80, 87, 91, 94, 95],
+  defensive: [100, 101, 102, 92, 95, 91, 95, 97, 99, 98],
+};
+
+// Hard mode combines conflicting information with stronger, uneven shocks.
 const hardHeadlines = [
   "성장 전망과 차입 부담이 공존하는 시장",
   "수주 증가, 그러나 대금 회수는 지연",
@@ -84,9 +91,9 @@ const hardExplanations = [
   "상환 부담·주문·원가 변화가 서로 다르게 반영됐습니다. 어떤 기업 특성도 매번 유리하지 않았습니다. 이 가격 경로는 가상 사례 하나이며 실제 수익이나 반응을 보장하지 않습니다.",
 ];
 const hardPaths = {
-  sensitive: [100, 104, 97, 75, 84, 72, 81, 76, 88, 86],
-  balanced: [100, 101, 102, 85, 89, 84, 88, 92, 87, 91],
-  defensive: [100, 99, 101, 94, 91, 96, 92, 97, 95, 98],
+  sensitive: [100, 104, 97, 59, 75, 55, 72, 61, 80, 74],
+  balanced: [100, 101, 102, 76, 85, 70, 82, 90, 79, 86],
+  defensive: [100, 99, 101, 90, 84, 94, 86, 96, 91, 98],
 };
 
 export function buildCrisisScenario(
@@ -109,7 +116,12 @@ export function buildCrisisScenario(
       s.initialPrice > 1000000
     )
       throw new Error("시작 가격은 1,000~1,000,000원 범위의 정수여야 합니다.");
-  const pricePaths = difficulty === "hard" ? hardPaths : paths;
+  const pricePaths =
+    difficulty === "hard"
+      ? hardPaths
+      : difficulty === "easy"
+        ? easyBasePaths
+        : paths;
   const titles = difficulty === "hard" ? hardHeadlines : headlines;
   const stories = difficulty === "hard" ? hardNews : news;
   const reviews = difficulty === "hard" ? hardExplanations : explanations;

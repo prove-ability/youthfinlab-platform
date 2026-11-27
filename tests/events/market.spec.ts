@@ -65,7 +65,7 @@ test("admin config validates selection and displays the actual materialized sche
   await page.getByRole("button", { name: "금융 위기 모드로 확정" }).click();
   await expect(page.getByText("시나리오 확정", { exact: true })).toBeVisible();
   await page.getByText("교사용 시나리오·가격 확인", { exact: true }).click();
-  await expect(page.getByRole("table")).toContainText("7,300원");
+  await expect(page.getByRole("table")).toContainText("6,500원");
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > window.innerWidth,
   );
@@ -100,8 +100,8 @@ test("hard mode is opt-in and shows its own news and retrospective", async ({
   await page.getByRole("button", { name: "새 수업 설정 체험" }).click();
   await expect(page.getByLabel("기본 모드 · 기존 뉴스와 거래")).toBeChecked();
   await page.getByLabel("금융 위기 이벤트 · 10일 체험").check();
-  await expect(page.getByLabel("보통 · 서로 다른 신호를 비교")).toBeChecked();
-  await page.getByLabel("어려움 · 상반된 뉴스와 기업별 반응 비교").check();
+  await expect(page.getByLabel("보통 · 뚜렷한 위기와 반등 체험")).toBeChecked();
+  await page.getByLabel("어려움 · 복합 정보와 큰 충격·재하락").check();
   await page.getByText("고급 설정 · 종목 직접 수정", { exact: true }).click();
   await page.getByLabel("직접 구성 사용", { exact: true }).check();
   await page.getByLabel("새싹테크", { exact: true }).check();
@@ -144,7 +144,7 @@ test("default setup needs only mode and difficulty and can recover from custom s
   await page.getByRole("button", { name: "금융 위기 모드로 확정" }).click();
   await expect(page.getByRole("alert")).toContainText("2~12개");
   await page.getByLabel("직접 구성 사용", { exact: true }).uncheck();
-  await page.getByLabel("어려움 · 상반된 뉴스와 기업별 반응 비교").check();
+  await page.getByLabel("어려움 · 복합 정보와 큰 충격·재하락").check();
   await page.getByRole("button", { name: "금융 위기 모드로 확정" }).click();
   await expect(page.getByText("시나리오 확정", { exact: true })).toBeVisible();
   await page.getByText("교사용 시나리오·가격 확인", { exact: true }).click();
