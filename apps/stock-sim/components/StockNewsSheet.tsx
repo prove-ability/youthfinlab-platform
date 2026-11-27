@@ -108,9 +108,9 @@ export default function StockNewsSheet({
       <div className="px-2">
         {loading && (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#19391f]"></div>
             <p className="mt-4 text-gray-600 text-sm">
-              가격 정보를 불러오는 중...
+              종목 뉴스와 가격을 불러오는 중…
             </p>
           </div>
         )}

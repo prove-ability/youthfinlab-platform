@@ -160,7 +160,7 @@ export function EditClassModal({
       size="md"
     >
       {isLoading ? (
-        <div className="text-center py-4">데이터를 불러오는 중...</div>
+        <div className="text-center py-4">수업 설정 정보를 불러오는 중…</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 프로그램 유형 보존 (수정 시 기존 값 유지) */}

@@ -57,7 +57,7 @@ export default function RankingPage() {
   if (isError && !rankingData) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   if (isLoading) {
-    return <PageLoading />;
+    return <PageLoading label="순위를 불러오는 중…" />;
   }
 
   const top10 = rankings.slice(0, 10);

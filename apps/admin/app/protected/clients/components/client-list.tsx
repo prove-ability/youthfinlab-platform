@@ -172,7 +172,7 @@ export function ClientList() {
                   className="text-xs text-red-500 hover:bg-red-50 h-7 px-2.5"
                   variant="ghost"
                 >
-                  {deletingClientId === client.id ? "삭제 중..." : "삭제"}
+                  {deletingClientId === client.id ? "삭제 중…" : "삭제"}
                 </Button>
                 </details>
                 <button type="button" onClick={() => toggleManagers(client.id)} aria-label={`${client.name} 매니저 ${isOpen ? "접기" : "보기"}`} aria-expanded={isOpen} className={`w-6 h-6 rounded-md flex items-center justify-center text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}>

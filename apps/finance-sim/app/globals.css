@@ -11,7 +11,7 @@
   --color-forest-300: #CDDDAB;
   --color-forest-200: #C1DCC9;
   --color-forest-100: #EBEED7;
-  --color-forest-50: #FFF8E9;
+  --color-forest-50: #f3f6f5;
 }
 
 html {
@@ -73,6 +73,6 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @theme {
- --color-yfl-canvas: #fff8e9;
+ --color-yfl-canvas: #ffffff;
  --color-yfl-divider: #d5d5bb;
 }

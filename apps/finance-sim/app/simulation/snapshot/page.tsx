@@ -29,7 +29,7 @@ export default function SnapshotPage() {
   if (isLoading) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
-        <LoadingState label="불러오는 중..." />
+        <LoadingState label="재무 현황을 불러오는 중…" />
       </div>
     );
   }

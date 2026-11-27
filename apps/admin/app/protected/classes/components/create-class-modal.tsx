@@ -315,7 +315,7 @@ export function CreateClassModal({
       size="md"
     >
       {isLoading ? (
-        <div className="text-center py-4">데이터를 불러오는 중...</div>
+        <div className="text-center py-4">수업 설정 정보를 불러오는 중…</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <fieldset disabled={isSubmitting || !!lastGenerationParams} className="space-y-4">
@@ -786,8 +786,8 @@ export function CreateClassModal({
                     />
                   </svg>
                   {isGeneratingGameData
-                    ? "AI 게임 데이터 생성 중..."
-                    : "수업 생성 중..."}
+                    ? "AI 게임 데이터 생성 중…"
+                    : "수업 생성 중…"}
                 </span>
               ) : (
                 "생성"

@@ -179,7 +179,7 @@ function ProfilePageContent() {
       <div className="min-h-dvh flex flex-col">
         <StepProgress currentStep={1} />
         <div className="flex-1 flex items-center justify-center">
-          <LoadingState label="불러오는 중..." />
+          <LoadingState label="재무 정보를 불러오는 중…" />
         </div>
       </div>
     );
@@ -382,7 +382,7 @@ function ProfilePageContent() {
             disabled={saving}
             className="w-full py-3.5 rounded-xl bg-forest-700 text-white font-semibold text-sm hover:bg-forest-800 disabled:opacity-50 transition-colors"
           >
-            {saving ? "저장 중..." : "다음 단계로"}
+            {saving ? "저장 중…" : "다음 단계로"}
           </button>
         </form>
       </div>
@@ -397,7 +397,7 @@ export default function ProfilePage() {
         <div className="min-h-dvh flex flex-col">
           <StepProgress currentStep={1} />
           <div className="flex-1 flex items-center justify-center">
-            <LoadingState label="불러오는 중..." />
+            <LoadingState label="재무 정보를 불러오는 중…" />
           </div>
         </div>
       }

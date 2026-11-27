@@ -96,10 +96,10 @@ function QRLoginContent() {
 
   if (status === "verifying") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 px-4">
+      <div className="flex min-h-screen items-center justify-center bg-white px-4">
         <div className="w-full max-w-md space-y-6 text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-emerald-600 mx-auto"></div>
-          <p className="text-lg text-gray-700">QR 코드 확인 중...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#19391f] mx-auto"></div>
+          <p className="text-lg text-gray-700">QR 코드 확인 중…</p>
         </div>
       </div>
     );
@@ -202,10 +202,10 @@ function QRLoginContent() {
 export default function QRLoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 px-4">
+      <div className="flex min-h-screen items-center justify-center bg-white px-4">
         <div className="w-full max-w-md space-y-6 text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-emerald-600 mx-auto"></div>
-          <p className="text-lg text-gray-700">페이지 로딩 중...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#19391f] mx-auto"></div>
+          <p className="text-lg text-gray-700">화면을 준비하는 중…</p>
         </div>
       </div>
     }>

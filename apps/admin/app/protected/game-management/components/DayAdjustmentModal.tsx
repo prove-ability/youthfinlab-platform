@@ -148,7 +148,7 @@ export function DayAdjustmentModal({
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="text-lg">데이터를 불러오는 중...</div>
+            <div className="text-lg">수업 진행 정보를 불러오는 중…</div>
           </div>
         ) : (
           <div className="space-y-6">

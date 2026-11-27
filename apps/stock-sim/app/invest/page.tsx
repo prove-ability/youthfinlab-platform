@@ -138,7 +138,7 @@ export default function InvestPage() {
   if (stocksError && !stockData) return <LoadError onRetry={() => refetchStocks()} retrying={fetchingStocks} />;
 
   if (isInitialLoading) {
-    return <PageLoading />;
+    return <PageLoading label="투자 정보를 불러오는 중…" />;
   }
 
   return (

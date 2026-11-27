@@ -43,7 +43,7 @@ export default function NewsPage() {
   if (isError && !newsData) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   if (isLoading) {
-    return <PageLoading />;
+    return <PageLoading label="뉴스를 불러오는 중…" />;
   }
 
   const allNews = newsData?.news || [];

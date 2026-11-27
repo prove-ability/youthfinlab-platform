@@ -67,7 +67,7 @@ export default function AnalysisPage() {
   useEffect(() => { if (shouldGoHome) router.replace("/"); }, [shouldGoHome, router]);
   const retry = () => Promise.all([retryDashboard(), retryNews()]);
   if (dashboardError && !dashboardData || newsError && !allNewsData) return <LoadError onRetry={retry} retrying={dashboardFetching || newsFetching} />;
-  if (isLoading || shouldGoHome) return <PageLoading />;
+  if (isLoading || shouldGoHome) return <PageLoading label={shouldGoHome ? "게임 홈으로 이동하는 중…" : "투자 분석 정보를 불러오는 중…"} />;
   if (!dashboardData) return <LoadError onRetry={retry} retrying={dashboardFetching || newsFetching} />;
 
   return (

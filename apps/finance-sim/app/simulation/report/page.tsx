@@ -57,7 +57,7 @@ export default function ReportPage() {
   if (isLoading) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
-        <LoadingState label="리포트 생성 중..." />
+        <LoadingState label="재무 보고서를 불러오는 중…" />
       </div>
     );
   }

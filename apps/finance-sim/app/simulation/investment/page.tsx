@@ -285,7 +285,7 @@ export default function InvestmentPage() {
             disabled={saving}
             className="flex-[2] py-3.5 rounded-xl bg-forest-700 text-white font-semibold text-sm hover:bg-forest-800 disabled:opacity-50 transition-colors"
           >
-            {saving ? "저장 중..." : "다음 단계로"}
+            {saving ? "저장 중…" : "다음 단계로"}
           </button>
         </div>
       </div>

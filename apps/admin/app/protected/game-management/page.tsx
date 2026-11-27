@@ -224,13 +224,13 @@ export default function GameManagementPage() {
               </select>
               {isDayOperationLoading && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <span className="animate-spin inline-block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+                  <span className="animate-spin inline-block w-4 h-4 border-2 border-[#19391f] border-t-transparent rounded-full" />
                 </div>
               )}
             </div>
             {isDayOperationLoading && (
               <p className="text-xs text-blue-600 flex items-center gap-1">
-                <span className="animate-spin inline-block w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full" />
+                <span className="animate-spin inline-block w-3 h-3 border-2 border-[#19391f] border-t-transparent rounded-full" />
                 Day 업데이트 중... 잠시만 기다려주세요
               </p>
             )}

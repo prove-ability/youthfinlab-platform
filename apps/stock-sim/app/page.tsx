@@ -53,7 +53,7 @@ export default function Home() {
   if (isError && !dashboardData) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   if (isLoading) {
-    return <PageLoading />;
+    return <PageLoading label="게임 현황을 불러오는 중…" />;
   }
 
   if (!dashboardData) {

@@ -127,3 +127,40 @@ test("profile draft survives a failed refresh and recovery", async ({
   await expect(page.getByRole("alert")).toHaveCount(0);
   await expect(age).toHaveValue("28");
 });
+
+for (const screen of [
+  "clients",
+  "dashboard",
+  "classes",
+  "game",
+  "stocks",
+  "profile",
+  "snapshot",
+  "report",
+  "analysis",
+  "home",
+  "news",
+  "ranking",
+  "invest",
+]) {
+  test(`${screen}: loading surface is white with a green indicator and specific status`, async ({
+    page,
+  }) => {
+    await page.goto(`/${screen}.html?mode=slow`);
+    const progress = page.getByRole("progressbar", { name: /불러오는 중/ });
+    await expect(progress).toBeVisible();
+    await expect(progress).toHaveCSS("border-top-color", "rgb(25, 57, 31)");
+    await expect(page.locator(".yfl-async-state")).toHaveCSS(
+      "background-color",
+      "rgb(255, 255, 255)",
+    );
+    await expect(progress).toHaveAccessibleName(/.+불러오는 중…/);
+    if (screen === "invest") {
+      await expect(progress).toHaveAccessibleName("투자 정보를 불러오는 중…");
+      await expect(page.locator("#root > div")).toHaveCSS(
+        "background-color",
+        "rgb(255, 255, 255)",
+      );
+    }
+  });
+}
