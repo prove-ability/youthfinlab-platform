@@ -14,7 +14,9 @@ import {
 import "@repo/ui/market-event.css";
 import MarketMoodIllustration from "./MarketMoodIllustration";
 
+type Draft = { reason: DecisionReason | ""; note: string };
 export default function MarketEventPanel() {
+  const [drafts, setDrafts] = useState<Record<number, Draft>>({});
   const query = useQuery({
     queryKey: ["student-market-scenario"],
     queryFn: getStudentMarketScenario,
@@ -51,9 +53,49 @@ export default function MarketEventPanel() {
           </button>
         </div>
       )}
+      {Object.entries(drafts)
+        .filter(([day]) => Number(day) < query.data!.day)
+        .map(([day, draft]) => (
+          <section
+            className="market-event"
+            key={day}
+            aria-label={"Day " + day + " 미제출 초안"}
+          >
+            <p role="status">
+              Day가 변경되어 제출이 마감됐습니다. Day {day}의 미저장 초안은
+              아래에 보관했습니다.
+            </p>
+            <p>{draft.reason ? reasonLabels[draft.reason] : "이유 미선택"}</p>
+            <p style={{ whiteSpace: "pre-wrap" }}>{draft.note}</p>
+            <p className="event-muted">
+              제출된 기록은 아닙니다. 이 화면을 떠나기 전에 필요한 내용을
+              복사하세요.
+            </p>
+            <button
+              type="button"
+              onClick={() =>
+                setDrafts((prev) => {
+                  const next = { ...prev };
+                  delete next[Number(day)];
+                  return next;
+                })
+              }
+            >
+              초안 닫기
+            </button>
+          </section>
+        ))}
       <MarketEventView
         key={query.data.day}
         data={query.data}
+        onDraft={(draft) =>
+          setDrafts((prev) => {
+            const next = { ...prev };
+            if (draft) next[query.data!.day] = draft;
+            else delete next[query.data!.day];
+            return next;
+          })
+        }
         onSave={saveMarketDecision}
         onRefresh={() => query.refetch()}
       />
@@ -65,8 +107,10 @@ export function MarketEventView({
   data,
   onSave,
   onRefresh,
+  onDraft,
 }: {
   data: StudentMarketView;
+  onDraft?: (draft: Draft | null) => void;
   onSave: (input: {
     day: number;
     reason: DecisionReason;
@@ -128,6 +172,7 @@ export function MarketEventView({
             try {
               await onSave({ day: data.day, reason, note });
               setSaved(true);
+              onDraft?.(null);
               await onRefresh();
             } catch (e) {
               setError(
@@ -159,6 +204,7 @@ export function MarketEventView({
                     checked={reason === value}
                     onChange={() => {
                       setReason(value as DecisionReason);
+                      onDraft?.({ reason: value as DecisionReason, note });
                       setSaved(false);
                     }}
                   />
@@ -175,6 +221,7 @@ export function MarketEventView({
                 value={note}
                 onChange={(e) => {
                   setNote(e.target.value);
+                  onDraft?.({ reason, note: e.target.value });
                   setSaved(false);
                 }}
                 aria-describedby={`${id}-privacy`}

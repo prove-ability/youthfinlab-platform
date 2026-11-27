@@ -1,4 +1,5 @@
 "use server";
+import { prepareMarketScenario } from "../lib/prepare-market-scenario";
 
 import {
   db,
@@ -77,7 +78,29 @@ async function generateUniqueClassCode(): Promise<string> {
 // CREATE: 새로운 클래스 생성
 export const createClass = withAuth(async (user, formData: FormData) => {
   const rawData = Object.fromEntries(formData.entries());
-  const validation = classSchema.safeParse(rawData);
+  const eventSettings = z
+    .object({
+      eventMode: z.enum(["basic", "crisis"]).default("basic"),
+      eventDifficulty: z.enum(["easy", "normal", "hard"]).default("normal"),
+    })
+    .safeParse(rawData);
+  if (!eventSettings.success)
+    return { error: { _form: ["게임 모드와 난이도를 확인해 주세요."] } };
+  const { eventMode, eventDifficulty } = eventSettings.data;
+  if (eventMode === "crisis" && rawData.programType !== "stock_game")
+    return {
+      error: { _form: ["이벤트는 주식 게임에서만 사용할 수 있습니다."] },
+    };
+  const validation = classSchema.safeParse(
+    eventMode === "crisis"
+      ? {
+          ...rawData,
+          totalDays: 10,
+          currentDay: 1,
+          difficulty: eventDifficulty === "hard" ? "normal" : eventDifficulty,
+        }
+      : rawData,
+  );
 
   if (!validation.success) {
     return { error: validation.error.flatten().fieldErrors };
@@ -87,21 +110,30 @@ export const createClass = withAuth(async (user, formData: FormData) => {
     // 고유한 클래스 코드 생성
     const classCode = await generateUniqueClassCode();
 
-    const [newClass] = await db
-      .insert(classes)
-      .values({
-        name: validation.data.name,
-        code: classCode,
-        totalDays: validation.data.totalDays,
-        managerId: validation.data.managerId,
-        clientId: validation.data.clientId,
-        loginMethod: validation.data.loginMethod,
-        programType: validation.data.programType,
-        difficulty: validation.data.difficulty,
-        currentDay: validation.data.currentDay,
-        createdBy: user.id,
-      })
-      .returning({ id: classes.id, code: classes.code });
+    const newClass = await dbWithTransaction.transaction(async (tx) => {
+      const [created] = await tx
+        .insert(classes)
+        .values({
+          name: validation.data.name,
+          code: classCode,
+          totalDays: validation.data.totalDays,
+          managerId: validation.data.managerId,
+          clientId: validation.data.clientId,
+          loginMethod: validation.data.loginMethod,
+          programType: validation.data.programType,
+          difficulty: validation.data.difficulty,
+          currentDay: validation.data.currentDay,
+          createdBy: user.id,
+        })
+        .returning({ id: classes.id, code: classes.code });
+      if (!created) throw new Error("수업 생성에 실패했습니다.");
+      if (eventMode === "crisis")
+        await prepareMarketScenario(tx, user.id, {
+          classId: created.id,
+          difficulty: eventDifficulty,
+        });
+      return created;
+    });
 
     if (!newClass) {
       throw new Error("클래스 생성 후 ID를 반환받지 못했습니다.");
@@ -530,7 +562,7 @@ export const incrementDayAndPayAllowance = withAuth(
           const today = event.scenario.days[classInfo.currentDay - 1]!;
           const tomorrow = event.scenario.days[classInfo.currentDay]!;
           const round = (v: number) => Math.round(v * 100) / 100;
-          for (const wallet of classWallets) {
+          const reviews = classWallets.map((wallet) => {
             const cash = Number(wallet.balance);
             const assets = positions
               .filter((p) => p.guestId === wallet.guestId && p.quantity > 0)
@@ -562,23 +594,23 @@ export const incrementDayAndPayAllowance = withAuth(
               ...a,
               percent: before > 0 ? round((a.value / before) * 100) : 0,
             }));
-            await tx
-              .insert(marketPortfolioReviews)
-              .values({
-                classId,
-                guestId: wallet.guestId,
+            return {
+              classId,
+              guestId: wallet.guestId,
+              day: classInfo.currentDay,
+              snapshot: {
                 day: classInfo.currentDay,
-                snapshot: {
-                  day: classInfo.currentDay,
-                  cash,
-                  before,
-                  after,
-                  marketChange: round(after - before),
-                  allowance: 100000,
-                  allocation,
-                },
-              });
-          }
+                cash,
+                before,
+                after,
+                marketChange: round(after - before),
+                allowance: 100000,
+                allocation,
+              },
+            };
+          });
+          if (reviews.length)
+            await tx.insert(marketPortfolioReviews).values(reviews);
         }
         const newDay = (classInfo.currentDay || 0) + 1;
 

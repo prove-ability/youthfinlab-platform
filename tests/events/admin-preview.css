@@ -1,0 +1,4 @@
+@import '../../apps/admin/app/globals.css';
+@import '../../packages/ui/src/brand.css';
+@import '../../packages/ui/src/editorial.css';
+@import '../../apps/admin/app/protected/workspace.css';

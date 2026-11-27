@@ -145,6 +145,12 @@ export default function GameManagementPage() {
       alert(`Day ${newDay}로 진행되었으며, 용돈이 지급되었습니다.`);
     } catch (error) {
       console.error("Day 증가 실패:", error);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["game-management"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["market-scenario-admin", selectedClass],
+        }),
+      ]);
       alert(
         error instanceof Error ? error.message : "Day 증가에 실패했습니다.",
       );
@@ -326,7 +332,9 @@ export default function GameManagementPage() {
                     isFetching ||
                     isError ||
                     (data?.eventMode &&
-                      (getCurrentDay() >= 6 ||
+                      (getCurrentDay() >=
+                        (classes.find((c) => c.id === selectedClass)
+                          ?.totalDays ?? 1) ||
                         classes.find((c) => c.id === selectedClass)?.status !==
                           "active"))
                   }

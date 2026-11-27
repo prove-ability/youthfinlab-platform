@@ -276,3 +276,98 @@ test("additional reasons save and retrospective separates allowance from market 
     ),
   ).toBe(false);
 });
+test("unsaved draft survives Day transition without allowing late submission", async ({
+  page,
+}) => {
+  await page.getByLabel("다른 이유가 있어요").check();
+  await page.getByLabel("조금 더 설명하기").fill("이 메모는 제출 전입니다");
+  await page.getByLabel("진행 Day").selectOption("5");
+  const draft = page.getByRole("region", { name: "Day 4 미제출 초안" });
+  await expect(draft).toContainText("이 메모는 제출 전입니다");
+  await expect(draft).toContainText("제출이 마감");
+  await expect(page.getByLabel("조금 더 설명하기")).toHaveValue("");
+  await expect(
+    draft.getByRole("button", { name: "선택 이유 저장" }),
+  ).toHaveCount(0);
+});
+test("actual management page cancels, retries and advances through Day 6 to the final day", async ({
+  page,
+}) => {
+  await page.goto("/tests/events/index.html?view=manage");
+  const next = page.getByRole("button", { name: "Day +1 · 용돈 지급" });
+  await expect(next).toBeEnabled();
+  page.once("dialog", (d) => d.dismiss());
+  await next.click();
+  expect(await page.evaluate(() => (window as any).eventAudit.payments)).toBe(
+    0,
+  );
+  await page.evaluate(() => {
+    (window as any).eventAudit.failNext = true;
+  });
+  page.once("dialog", (d) => d.accept());
+  await next.click();
+  await expect(next).toBeEnabled();
+  expect(await page.evaluate(() => (window as any).eventAudit.payments)).toBe(
+    0,
+  );
+  page.on("dialog", (d) => d.accept());
+  await next.click();
+  await expect
+    .poll(() => page.evaluate(() => (window as any).eventAudit.payments))
+    .toBe(1);
+  for (let day = 5; day < 10; day++) {
+    await expect(next).toBeEnabled();
+    await next.click();
+    await expect
+      .poll(() => page.evaluate(() => (window as any).eventAudit.payments))
+      .toBe(day - 3);
+  }
+  await expect(next).toBeDisabled();
+});
+test("lost advance response refreshes current Day without paying the same Day twice", async ({
+  page,
+}) => {
+  await page.goto("/tests/events/index.html?view=manage");
+  page.on("dialog", (d) => d.accept());
+  const next = page.getByRole("button", { name: "Day +1 · 용돈 지급" });
+  await expect(next).toBeEnabled();
+  await page.evaluate(() => {
+    (window as any).eventAudit.loseResponse = true;
+  });
+  await next.click();
+  await expect(next).toBeEnabled();
+  await expect(
+    page.getByText("Day 5 · 이유 기록 현황", { exact: false }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => (window as any).eventAudit.payments)).toBe(
+    1,
+  );
+});
+test("create form defaults to basic and submits an event without AI or separate stock setup", async ({
+  page,
+}) => {
+  await page.goto("/tests/events/index.html?view=create");
+  page.on("dialog", (d) => d.accept());
+  await expect(page.getByLabel("기본 모드", { exact: true })).toBeChecked();
+  await page.getByLabel("금융 위기 이벤트", { exact: true }).check();
+  await page.getByLabel("어려움", { exact: true }).check();
+  await expect(
+    page.getByText("게임 데이터 자동 생성 (AI)", { exact: true }),
+  ).toHaveCount(0);
+  await page.getByLabel("수업명 *", { exact: true }).fill("새 이벤트 수업");
+  await page.locator("#clientId").selectOption("client");
+  await page.locator("#managerId").selectOption("manager");
+  await page.locator("#start_date").fill("2026-11-27");
+  await page.locator("button[type=submit]").click();
+  await expect
+    .poll(() => page.evaluate(() => (window as any).eventAudit.creates.length))
+    .toBe(1);
+  expect(await page.evaluate(() => (window as any).eventAudit.aiCalls)).toBe(0);
+  expect(
+    await page.evaluate(() => (window as any).eventAudit.creates[0]),
+  ).toMatchObject({
+    eventMode: "crisis",
+    eventDifficulty: "hard",
+    totalDays: "10",
+  });
+});

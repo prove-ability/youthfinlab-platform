@@ -18,6 +18,7 @@ import {
   saveMarketDecision,
 } from "../apps/stock-sim/actions/marketScenario";
 import {
+  createClass,
   incrementDayAndPayAllowance,
   updateClassCurrentDay,
   updateClass,
@@ -634,4 +635,92 @@ it("does not invent portfolio history for an existing past Day", async () => {
   expect(
     (await getStudentMarketScenario()).history.map((h) => h.portfolio),
   ).toEqual([null, null]);
+});
+it("creates an event class with its default scenario in one action and preserves basic creation", async () => {
+  const f = await fixture(false);
+  const data = new FormData();
+  for (const [key, value] of Object.entries({
+    name: "통합 생성",
+    clientId: f.course.clientId,
+    managerId: f.course.managerId,
+    programType: "stock_game",
+    totalDays: "8",
+    difficulty: "normal",
+    eventMode: "crisis",
+    eventDifficulty: "hard",
+  }))
+    data.set(key, String(value));
+  const result = await createClass(data);
+  expect(result.error).toBeUndefined();
+  const created = await getMarketScenarioAdmin(result.data.id);
+  expect(created.scenario.difficulty).toBe("hard");
+  expect(created.scenario.days).toHaveLength(10);
+  expect(created.scenario.stocks).toHaveLength(3);
+  data.set("eventMode", "basic");
+  const basic = await createClass(data);
+  expect((await getMarketScenarioAdmin(basic.data.id)).scenario).toBeNull();
+  expect(basic.data.totalDays).toBe(8);
+});
+it("rolls back a class if preparing the event fails", async () => {
+  const f = await fixture(false);
+  const before = await db.select().from(schema.classes);
+  await engine.exec(
+    `CREATE FUNCTION reject_test_news() RETURNS trigger AS $$ BEGIN RAISE EXCEPTION 'isolated failure'; END; $$ LANGUAGE plpgsql; CREATE TRIGGER reject_test_news BEFORE INSERT ON news FOR EACH ROW EXECUTE FUNCTION reject_test_news();`,
+  );
+  try {
+    const data = new FormData();
+    for (const [key, value] of Object.entries({
+      name: "롤백 생성",
+      clientId: f.course.clientId,
+      managerId: f.course.managerId,
+      programType: "stock_game",
+      totalDays: "10",
+      difficulty: "normal",
+      eventMode: "crisis",
+    }))
+      data.set(key, String(value));
+    expect((await createClass(data)).error._form).toBeDefined();
+    expect((await db.select().from(schema.classes)).length).toBe(before.length);
+  } finally {
+    await engine.exec(
+      "DROP TRIGGER reject_test_news ON news; DROP FUNCTION reject_test_news();",
+    );
+  }
+});
+it("rolls back Day and allowance when batch portfolio persistence fails", async () => {
+  const f = await fixture();
+  const { wallet } = await studentFor(f.course.id);
+  await db
+    .update(schema.classes)
+    .set({ status: "active" })
+    .where(eq(schema.classes.id, f.course.id));
+  await engine.exec(
+    `CREATE FUNCTION reject_test_review() RETURNS trigger AS $$ BEGIN RAISE EXCEPTION 'isolated failure'; END; $$ LANGUAGE plpgsql; CREATE TRIGGER reject_test_review BEFORE INSERT ON market_portfolio_reviews FOR EACH ROW EXECUTE FUNCTION reject_test_review();`,
+  );
+  try {
+    expect(
+      (await incrementDayAndPayAllowance(f.course.id, 1, true)).success,
+    ).toBe(false);
+    expect(
+      (
+        await db.query.classes.findFirst({
+          where: eq(schema.classes.id, f.course.id),
+        })
+      ).currentDay,
+    ).toBe(1);
+    expect(
+      (
+        await db.query.wallets.findFirst({
+          where: eq(schema.wallets.id, wallet.id),
+        })
+      ).balance,
+    ).toBe("100000");
+  } finally {
+    await engine.exec(
+      "DROP TRIGGER reject_test_review ON market_portfolio_reviews; DROP FUNCTION reject_test_review();",
+    );
+  }
+  expect(
+    (await incrementDayAndPayAllowance(f.course.id, 1, true)).success,
+  ).toBe(true);
 });

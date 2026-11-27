@@ -1,3 +1,5 @@
+import GameManagementPage from "../../apps/admin/app/protected/game-management/page";
+import { CreateClassModal } from "../../apps/admin/app/protected/classes/components/create-class-modal";
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -6,10 +8,17 @@ import MarketEventPanel from "../../apps/stock-sim/components/MarketEventPanel";
 import { state, stocks, scenario } from "./fixtures";
 import sprout from "../../packages/ui/src/sprout-felt-web.webp";
 import "./preview.css";
+if (
+  ["create", "manage"].includes(
+    new URLSearchParams(location.search).get("view") || "",
+  )
+)
+  void import("./admin-preview.css");
 const client = new QueryClient({
   defaultOptions: { queries: { retry: false } },
 });
 function Preview() {
+  const [createOpen, setCreateOpen] = useState(true);
   const [view, setView] = useState(
     new URLSearchParams(location.search).get("view") || "student",
   );
@@ -98,27 +107,44 @@ function Preview() {
       <main
         className={view === "student" ? "preview-main student" : "preview-main"}
       >
-        <p className="preview-eyebrow">
-          {view === "student"
-            ? "오늘의 시장을 읽고, 나의 판단을 남겨요"
-            : "수업의 흐름을 먼저 준비하세요"}
-        </p>
-        <h1>{view === "student" ? "뉴스 너머의 선택" : "게임 관리"}</h1>
-        {view === "admin" ? (
-          <MarketScenarioPanel
-            key={fresh}
-            classId="preview-course"
-            stocks={stocks}
-            onConfigured={refresh}
-          />
+        {view === "manage" ? (
+          <GameManagementPage />
+        ) : view === "create" ? (
+          <>
+            <button onClick={() => setCreateOpen(true)}>새 수업 추가</button>
+            <CreateClassModal
+              isOpen={createOpen}
+              setIsOpen={setCreateOpen}
+              onClassCreated={() => {}}
+            />
+          </>
         ) : (
           <>
-            <MarketEventPanel />
-            <div className="preview-assets">
-              <span>내 자산 · 예시</span>
-              <strong>1,024,600원</strong>
-              <p>실제 앱에서는 이 아래에 기존 자산·거래 화면이 이어집니다.</p>
-            </div>
+            <p className="preview-eyebrow">
+              {view === "student"
+                ? "오늘의 시장을 읽고, 나의 판단을 남겨요"
+                : "수업의 흐름을 먼저 준비하세요"}
+            </p>
+            <h1>{view === "student" ? "뉴스 너머의 선택" : "게임 관리"}</h1>
+            {view === "admin" ? (
+              <MarketScenarioPanel
+                key={fresh}
+                classId="preview-course"
+                stocks={stocks}
+                onConfigured={refresh}
+              />
+            ) : (
+              <>
+                <MarketEventPanel />
+                <div className="preview-assets">
+                  <span>내 자산 · 예시</span>
+                  <strong>1,024,600원</strong>
+                  <p>
+                    실제 앱에서는 이 아래에 기존 자산·거래 화면이 이어집니다.
+                  </p>
+                </div>
+              </>
+            )}
           </>
         )}
       </main>
