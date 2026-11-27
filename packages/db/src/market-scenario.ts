@@ -33,6 +33,7 @@ export type CrisisScenario = {
 };
 export type Decision = { day: number; reason: DecisionReason; note: string };
 export type StudentMarketView = {
+  totalDays: number;
   day: number;
   ended: boolean;
   canDecide: boolean;

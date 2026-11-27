@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import MarketScenarioPanel from "../../apps/admin/src/components/game/MarketScenarioPanel";
 import MarketEventPanel from "../../apps/stock-sim/components/MarketEventPanel";
-import { state, stocks } from "./fixtures";
+import { state, stocks, scenario } from "./fixtures";
 import sprout from "../../packages/ui/src/sprout-felt-web.webp";
 import "./preview.css";
 const client = new QueryClient({
@@ -48,7 +48,7 @@ function Preview() {
                 refresh();
               }}
             >
-              {[1, 2, 3, 4, 5, 6].map((d) => (
+              {scenario.days.map(({ day: d }) => (
                 <option key={d} value={d}>
                   Day {d}
                 </option>

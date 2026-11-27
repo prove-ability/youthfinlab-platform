@@ -111,7 +111,7 @@ async function studentFor(classId: string, name = "학생") {
   });
   return { guest, wallet };
 }
-it("materializes the same six-day path for everyone, with bounded easy mode", () => {
+it("materializes the same ten-day path for everyone, with bounded easy mode", () => {
   const stocks = [
     {
       stockId: "a",
@@ -154,20 +154,20 @@ it("configures atomically and retries without duplicate prices or news", async (
       .select()
       .from(schema.classStockPrices)
       .where(eq(schema.classStockPrices.classId, f.course.id)),
-  ).toHaveLength(12);
+  ).toHaveLength(20);
   expect(
     await db
       .select()
       .from(schema.news)
       .where(eq(schema.news.classId, f.course.id)),
-  ).toHaveLength(6);
+  ).toHaveLength(10);
   expect(
     (
       await db.query.classes.findFirst({
         where: eq(schema.classes.id, f.course.id),
       })
     ).totalDays,
-  ).toBe(6);
+  ).toBe(10);
 });
 it("leaves basic mode and existing class data intact", async () => {
   const f = await fixture(false);
@@ -335,10 +335,10 @@ it("uses materialized event prices for trading and stops trades and reasons on t
   expect((await buyStock(f.stocks[0].id, 1, "7300", 3)).dayMismatch).toBe(true);
   await db
     .update(schema.classes)
-    .set({ currentDay: 6 })
+    .set({ currentDay: 10 })
     .where(eq(schema.classes.id, f.course.id));
-  expect((await buyStock(f.stocks[0].id, 1, "8600", 6)).success).toBe(false);
-  expect((await incrementDayAndPayAllowance(f.course.id, 6)).success).toBe(
+  expect((await buyStock(f.stocks[0].id, 1, "8600", 10)).success).toBe(false);
+  expect((await incrementDayAndPayAllowance(f.course.id, 10)).success).toBe(
     false,
   );
   await expect(
@@ -346,5 +346,51 @@ it("uses materialized event prices for trading and stops trades and reasons on t
   ).rejects.toThrow();
   const final = await getStudentMarketScenario();
   expect(final.canDecide).toBe(false);
-  expect(final.history).toHaveLength(5);
+  expect(final.history).toHaveLength(9);
+});
+
+it("keeps day 9 writable, ends day 10, and preserves stored six-day boundaries", async () => {
+  const f = await fixture();
+  await studentFor(f.course.id);
+  await db
+    .update(schema.classes)
+    .set({ status: "active", currentDay: 9 })
+    .where(eq(schema.classes.id, f.course.id));
+  await saveMarketDecision({ day: 9, reason: "wait", note: "마지막 판단" });
+  expect((await getStudentMarketScenario()).canDecide).toBe(true);
+  expect((await buyStock(f.stocks[0].id, 1, "8800", 9)).success).toBe(true);
+  expect((await incrementDayAndPayAllowance(f.course.id, 9)).success).toBe(
+    true,
+  );
+  await expect(
+    saveMarketDecision({ day: 10, reason: "wait", note: "" }),
+  ).rejects.toThrow("마지막 Day");
+  expect((await getStudentMarketScenario()).history).toHaveLength(9);
+  const stored = await db.query.classMarketScenarios.findFirst({
+    where: eq(schema.classMarketScenarios.classId, f.course.id),
+  });
+  const legacy = { ...stored.scenario, days: stored.scenario.days.slice(0, 6) };
+  await db
+    .update(schema.classMarketScenarios)
+    .set({ scenario: legacy })
+    .where(eq(schema.classMarketScenarios.classId, f.course.id));
+  await db
+    .update(schema.classes)
+    .set({ currentDay: 6, totalDays: 6 })
+    .where(eq(schema.classes.id, f.course.id));
+  const view = await getStudentMarketScenario();
+  expect(view.totalDays).toBe(6);
+  expect(view.canDecide).toBe(false);
+  expect(view.history).toHaveLength(5);
+  await expect(
+    saveMarketDecision({ day: 6, reason: "wait", note: "" }),
+  ).rejects.toThrow("마지막 Day");
+  expect((await buyStock(f.stocks[0].id, 1, "7000", 6)).success).toBe(false);
+  expect((await incrementDayAndPayAllowance(f.course.id, 6)).success).toBe(
+    false,
+  );
+  await configureMarketScenario(f.config);
+  expect(
+    (await getMarketScenarioAdmin(f.course.id)).scenario.days,
+  ).toHaveLength(6);
 });

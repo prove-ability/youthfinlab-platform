@@ -63,7 +63,7 @@ export const buyStock = withAuth(
             !guest ||
             !course ||
             course.status !== "active" ||
-            course.currentDay >= 6
+            course.currentDay >= event.scenario.days.length
           )
             throw new Error("현재 이벤트 수업에서는 거래할 수 없습니다.");
           if (course.currentDay !== clientCurrentDay)
@@ -265,7 +265,7 @@ export const sellStock = withAuth(
             !guest ||
             !course ||
             course.status !== "active" ||
-            course.currentDay >= 6
+            course.currentDay >= event.scenario.days.length
           )
             throw new Error("현재 이벤트 수업에서는 거래할 수 없습니다.");
           if (course.currentDay !== clientCurrentDay)

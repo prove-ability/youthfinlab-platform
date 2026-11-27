@@ -63,7 +63,9 @@ export default function MarketScenarioPanel({
       {data?.scenario ? (
         <div className="event-stack">
           <div className="event-tags">
-            <span className="event-tag">금융 위기 · 6일</span>
+            <span className="event-tag">
+              금융 위기 · {data.scenario.days.length}일
+            </span>
             <span className="event-tag">
               {data.scenario.difficulty === "easy"
                 ? "쉬움 · 완만한 변동"
@@ -73,7 +75,8 @@ export default function MarketScenarioPanel({
           </div>
           <p>
             기존 Day +1 버튼으로 진행하세요. 확정된 가격·뉴스는 수정하거나
-            되돌릴 수 없습니다. Day 6은 거래 없이 결과를 돌아보는 날입니다.
+            되돌릴 수 없습니다. Day {data.scenario.days.length}은 거래 없이
+            결과를 돌아보는 날입니다.
           </p>
           <p className="event-muted">
             모든 수치는 교육용 가상 설정입니다. 실제 기업 평가나 미래 수익
@@ -127,7 +130,7 @@ export default function MarketScenarioPanel({
                   Day {d.day} · {d.title}
                 </h3>
                 <p>{d.news}</p>
-                {d.day < 6 && (
+                {d.day < data.scenario!.days.length && (
                   <p className="event-muted">
                     다음 Day에 공개할 해설: {d.explanation}
                   </p>
@@ -219,7 +222,7 @@ export default function MarketScenarioPanel({
                     checked={mode === "crisis"}
                     onChange={() => setMode("crisis")}
                   />
-                  금융 위기 이벤트 · 6일 체험
+                  금융 위기 이벤트 · 10일 체험
                 </label>
               </div>
             </fieldset>
@@ -227,12 +230,12 @@ export default function MarketScenarioPanel({
               <>
                 <p className="event-callout">
                   AI 자동 생성을 끈 새 수업에서 설정하세요. 학생·가격·뉴스가
-                  아직 없어야 하며, 저장하면 총 6일로 설정됩니다. 기존 수업의
+                  아직 없어야 하며, 저장하면 총 10일로 설정됩니다. 기존 수업의
                   데이터를 지우거나 덮어쓰지 않습니다.
                 </p>
                 <p>
                   Day 1~2 관찰 → Day 3 자금 조달 불안 → Day 4 위기 → Day 5 대응
-                  → Day 6 돌아보기
+                  → Day 6~9 추가 불안과 회복 → Day 10 돌아보기
                 </p>
                 <fieldset disabled={busy}>
                   <legend>난이도</legend>

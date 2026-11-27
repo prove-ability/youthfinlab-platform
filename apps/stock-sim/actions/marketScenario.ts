@@ -48,7 +48,7 @@ export const getStudentMarketScenario = withAuth(async (user) => {
 });
 
 const decisionSchema = z.object({
-  day: z.number().int().min(1).max(5),
+  day: z.number().int().min(1),
   reason: z.enum(["cash", "spread", "value", "wait"]),
   note: z.string().trim().max(500),
 });
@@ -70,6 +70,8 @@ export const saveMarketDecision = withAuth(
       });
       if (!guest || !mode || !course || course.status !== "active")
         throw new Error("진행 중인 이벤트 수업에서만 기록할 수 있습니다.");
+      if (value.day >= mode.scenario.days.length)
+        throw new Error("마지막 Day에는 이유 기록을 마감합니다.");
       if (course.currentDay !== value.day)
         throw new Error(
           "수업 Day가 바뀌었습니다. 새로고침 후 현재 속보를 확인해 주세요.",

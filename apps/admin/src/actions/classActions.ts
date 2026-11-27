@@ -148,7 +148,7 @@ export const updateClass = withAuth(
         });
         if (
           event &&
-          (validation.data.totalDays !== 6 ||
+          (validation.data.totalDays !== event.scenario.days.length ||
             validation.data.programType !== "stock_game" ||
             validation.data.difficulty !== course.difficulty ||
             (validation.data.currentDay !== undefined &&
@@ -472,10 +472,10 @@ export const incrementDayAndPayAllowance = withAuth(
           event &&
           (!classInfo ||
             classInfo.status !== "active" ||
-            classInfo.currentDay >= 6)
+            classInfo.currentDay >= event.scenario.days.length)
         )
           throw new Error(
-            "진행 중인 이벤트 수업의 Day 1~5에서만 다음 Day로 이동할 수 있습니다.",
+            "진행 중인 이벤트 수업의 마지막 Day 전까지만 다음 Day로 이동할 수 있습니다.",
           );
 
         if (!classInfo) {

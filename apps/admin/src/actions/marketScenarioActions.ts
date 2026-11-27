@@ -117,7 +117,7 @@ export const configureMarketScenario = withAuth(
         );
       await tx
         .update(classes)
-        .set({ totalDays: 6, difficulty: parsed.difficulty })
+        .set({ totalDays: scenario.days.length, difficulty: parsed.difficulty })
         .where(eq(classes.id, course.id));
     });
     revalidatePath("/protected/game-management");

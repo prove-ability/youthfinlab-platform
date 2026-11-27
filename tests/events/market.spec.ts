@@ -30,7 +30,11 @@ test("student saves a reason, recovers a failed save, and sees it after the Day 
       exact: false,
     }),
   ).toBeVisible();
-  await page.getByLabel("진행 Day").selectOption("6");
+  await page.getByLabel("진행 Day").selectOption("9");
+  await expect(
+    page.getByRole("button", { name: "선택 이유 저장" }),
+  ).toBeVisible();
+  await page.getByLabel("진행 Day").selectOption("10");
   await expect(
     page.getByText("거래를 마쳤습니다.", { exact: false }),
   ).toBeVisible();
@@ -50,7 +54,7 @@ test("admin config validates selection and displays the actual materialized sche
   page,
 }) => {
   await page.getByRole("button", { name: "새 수업 설정 체험" }).click();
-  await page.getByLabel("금융 위기 이벤트 · 6일 체험").check();
+  await page.getByLabel("금융 위기 이벤트 · 10일 체험").check();
   await page.getByRole("button", { name: "금융 위기 모드로 확정" }).click();
   await expect(page.getByRole("alert")).toContainText("2~12개");
   await page.getByLabel("새싹테크", { exact: true }).check();

@@ -198,7 +198,7 @@ export function MarketEventView({
         </form>
       ) : (
         <p className="event-rule">
-          {data.day === 6
+          {data.day === data.totalDays
             ? "거래를 마쳤습니다. 수익률과 함께 선택의 과정을 돌아보세요."
             : "수업이 종료되어 이유 기록을 마감했습니다."}
         </p>
