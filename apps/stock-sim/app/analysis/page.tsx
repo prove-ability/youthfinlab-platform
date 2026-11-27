@@ -1,6 +1,7 @@
 "use client";
+import { LoadError, RefreshStatus } from "@repo/ui/async-state";
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { getDashboardData } from "@/actions/dashboard";
 import { getAllNews } from "@/actions/news";
 import { useRouter } from "next/navigation";
@@ -27,13 +28,13 @@ export default function AnalysisPage() {
   const router = useRouter();
 
   // 대시보드 데이터 (cache에서 재사용)
-  const { data: dashboardData, isLoading: isDashboardLoading } = useQuery({
+  const { data: dashboardData, isLoading: isDashboardLoading, isError: dashboardError, isSuccess: dashboardSuccess, isFetching: dashboardFetching, refetch: retryDashboard } = useQuery({
     queryKey: ["dashboard"],
     queryFn: getDashboardData,
   });
 
   // 뉴스 데이터
-  const { data: allNewsData, isLoading: isNewsLoading } = useQuery({
+  const { data: allNewsData, isLoading: isNewsLoading, isError: newsError, isFetching: newsFetching, refetch: retryNews } = useQuery({
     queryKey: ["news"],
     queryFn: getAllNews,
     staleTime: 60 * 1000, // 1분 (뉴스는 자주 변하지 않음)
@@ -62,21 +63,16 @@ export default function AnalysisPage() {
     return yesterdayNews;
   }, [dashboardData, allNewsData]);
 
-  if (isLoading || !dashboardData) {
-    return <PageLoading />;
-  }
-
-  // Day 2 미만이거나 보유 주식이 없으면 홈으로
-  if (
-    dashboardData.currentDay < 2 ||
-    dashboardData.holdingStocks.length === 0
-  ) {
-    router.push("/");
-    return <PageLoading />;
-  }
+  const shouldGoHome = dashboardSuccess && !!dashboardData && (dashboardData.currentDay < 2 || dashboardData.holdingStocks.length === 0);
+  useEffect(() => { if (shouldGoHome) router.replace("/"); }, [shouldGoHome, router]);
+  const retry = () => Promise.all([retryDashboard(), retryNews()]);
+  if (dashboardError && !dashboardData || newsError && !allNewsData) return <LoadError onRetry={retry} retrying={dashboardFetching || newsFetching} />;
+  if (isLoading || shouldGoHome) return <PageLoading />;
+  if (!dashboardData) return <LoadError onRetry={retry} retrying={dashboardFetching || newsFetching} />;
 
   return (
     <div className="min-h-screen bg-yfl-canvas pb-20">
+      {dashboardError || newsError ? <LoadError onRetry={retry} retrying={dashboardFetching || newsFetching} hasData /> : <RefreshStatus active={dashboardFetching || newsFetching} />}
       <div className="max-w-4xl mx-auto p-4">
         <PageHeader
           title="투자 결과 분석"
@@ -89,7 +85,7 @@ export default function AnalysisPage() {
           </h2>
 
           {/* 뉴스 있는 종목 우선 정렬 */}
-          {dashboardData.holdingStocks
+          {[...dashboardData.holdingStocks]
             .sort((a, b) => {
               const aHasNews = newsData[a.stockId]?.length ?? 0 > 0;
               const bHasNews = newsData[b.stockId]?.length ?? 0 > 0;

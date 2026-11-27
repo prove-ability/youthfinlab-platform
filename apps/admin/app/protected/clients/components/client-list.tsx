@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState, LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import "../../list-refinement.css";
 
@@ -20,12 +21,12 @@ type ClientWithManagers = Client & {
 
 export function ClientList() {
   const queryClient = useQueryClient();
-  const { data, isLoading, error } = useQuery<ClientWithManagers[]>({
+  const { data, isLoading, error, isFetching, refetch } = useQuery<ClientWithManagers[]>({
     queryKey: ["clients", "list"],
     queryFn: async () => {
       const res = await getClients();
-      if ("data" in res) return res.data as ClientWithManagers[];
-      return [];
+      if (!res.success || !("data" in res)) throw new Error("고객사 조회 실패");
+      return res.data as ClientWithManagers[];
     },
   });
   const clients = data ?? [];
@@ -107,19 +108,12 @@ export function ClientList() {
     }
   };
 
-  if (isLoading && clients.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-500 text-lg">고객사 목록을 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading && !data) return <LoadingState label="고객사 목록을 불러오는 중…" />;
+  if (error && !data) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   return (
     <div className="yfl-client-list yfl-client-refined space-y-4">
+      {error ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData /> : <RefreshStatus active={isFetching} />}
       <div className="yfl-list-toolbar">
         <p>고객사 <strong>{clients.length}</strong>곳</p>
         <Button

@@ -14,6 +14,7 @@ export default defineConfig({
         "apps/admin/node_modules/@tanstack/react-query",
       ),
       "@repo/ui/brand-intro": resolve("packages/ui/src/brand-intro.tsx"),
+      "@repo/ui/async-state": resolve("packages/ui/src/async-state.tsx"),
       "@repo/ui": resolve("tests/browser/ui.ts"),
       "@repo/utils": resolve("packages/utils/src/cn.ts"),
       "@/components/common/modal": resolve(

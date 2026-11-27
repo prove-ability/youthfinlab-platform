@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState, LoadError } from "@repo/ui/async-state";
 
 import { useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -23,7 +24,7 @@ export default function ReportPage() {
   const router = useRouter();
   const printRef = useRef<HTMLDivElement>(null);
 
-  const { data: simulation, isLoading } = useQuery({
+  const { data: simulation, isLoading, isSuccess, isError, isFetching, refetch } = useQuery({
     queryKey: ["simulation"],
     queryFn: () => getOrCreateSimulation(),
   });
@@ -34,10 +35,10 @@ export default function ReportPage() {
   const tendency = simulation?.investmentTendency;
 
   useEffect(() => {
-    if (!isLoading && !profile) {
+    if (isSuccess && !profile) {
       router.push("/simulation/profile");
     }
-  }, [isLoading, profile, router]);
+  }, [isSuccess, profile, router]);
 
   const handlePrint = useCallback(() => {
     if (!printRef.current) return;
@@ -51,10 +52,12 @@ export default function ReportPage() {
     window.print();
   }, []);
 
+  if (isError && !simulation) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
+
   if (isLoading) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">리포트 생성 중...</div>
+        <LoadingState label="리포트 생성 중..." />
       </div>
     );
   }

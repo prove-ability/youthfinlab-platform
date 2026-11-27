@@ -1,4 +1,5 @@
 "use client";
+import { LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -26,6 +27,8 @@ export default function NewsPage() {
   const {
     data: newsData,
     isLoading,
+    isError,
+    isFetching,
     refetch,
   } = useQuery({
     queryKey: ["news"],
@@ -36,6 +39,8 @@ export default function NewsPage() {
   const { isRefreshing } = usePullToRefresh(async () => {
     await refetch();
   });
+
+  if (isError && !newsData) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   if (isLoading) {
     return <PageLoading />;
@@ -60,7 +65,8 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen bg-yfl-canvas pb-20">
-      {isRefreshing && <PageLoading />}
+      {isError ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData /> : <RefreshStatus active={isFetching} />}
+
       <div className="max-w-4xl mx-auto p-4">
         <PageHeader
           title="뉴스"

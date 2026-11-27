@@ -6,7 +6,8 @@
     ".": "./src/index.ts",
     "./brand-intro": "./src/brand-intro.tsx",
     "./brand.css": "./src/brand.css",
-    "./editorial.css": "./src/editorial.css"
+    "./editorial.css": "./src/editorial.css",
+    "./async-state": "./src/async-state.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

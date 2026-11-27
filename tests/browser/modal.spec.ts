@@ -63,7 +63,7 @@ test("keeps failed generation silent and retries the same class after list refre
   await expect(
     dialog.getByText("응답 연결 끊김", { exact: true }),
   ).toBeVisible();
-  await expect(page.getByText("목록 조회 오류: offline")).toBeAttached();
+  await expect(page.getByText("최신 정보를 불러오지 못했습니다. 이전 내용을 표시하고 있습니다.")).toBeAttached();
   expect(alerts).toEqual([]);
   await expect(dialog.getByRole("alert")).toContainText("수업은 만들어졌습니다");
   const state = () =>

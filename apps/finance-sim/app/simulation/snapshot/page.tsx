@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState, LoadError, RefreshStatus } from "@repo/ui/async-state";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +11,7 @@ import { calculateFinancialSnapshot, formatMoney } from "@/lib/calculations";
 export default function SnapshotPage() {
   const router = useRouter();
 
-  const { data: simulation, isLoading } = useQuery({
+  const { data: simulation, isLoading, isSuccess, isError, isFetching, refetch } = useQuery({
     queryKey: ["simulation"],
     queryFn: () => getOrCreateSimulation(),
   });
@@ -18,15 +19,17 @@ export default function SnapshotPage() {
   const profile = simulation?.profile;
 
   useEffect(() => {
-    if (!isLoading && !profile) {
+    if (isSuccess && !profile) {
       router.push("/simulation/profile");
     }
-  }, [isLoading, profile, router]);
+  }, [isSuccess, profile, router]);
+
+  if (isError && !simulation) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   if (isLoading) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">불러오는 중...</div>
+        <LoadingState label="불러오는 중..." />
       </div>
     );
   }
@@ -46,6 +49,7 @@ export default function SnapshotPage() {
 
   return (
     <div className="min-h-dvh flex flex-col bg-white">
+      {isError ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData /> : <RefreshStatus active={isFetching} />}
       <StepProgress currentStep={2} />
 
       <div className="flex-1 px-5 py-6">
