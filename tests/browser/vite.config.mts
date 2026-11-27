@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import { resolve } from "node:path";
 export default defineConfig({
+  optimizeDeps: { entries: ["tests/browser/*.html"] },
   esbuild: { jsx: "automatic" },
   resolve: {
     dedupe: ["react", "react-dom"],

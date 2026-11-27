@@ -10,9 +10,9 @@ import Link from "next/link";
 import BenefitNotificationBanner from "@/components/BenefitNotificationBanner";
 import AnimatedBalance from "@/components/AnimatedBalance";
 import PageLoading from "@/components/PageLoading";
+import MarketEventPanel from "@/components/MarketEventPanel";
 import PageHeader from "@/components/PageHeader";
-import Day1GuideBanner from "@/components/Day1GuideBanner";
-import Day2GuideBanner from "@/components/Day2GuideBanner";
+import { HomeGuidance } from "@/components/ClassGuidance";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useTour } from "@/hooks/useTour";
 
@@ -72,10 +72,7 @@ export default function Home() {
         />
         {/* 지원금 알림 배너 */}
         <BenefitNotificationBanner benefit={dashboardData.latestBenefit} />
-        {/* Day 1 가이드 배너 */}
-        <Day1GuideBanner currentDay={dashboardData.currentDay} />
-        {/* Day 2 가이드 배너 */}
-        <Day2GuideBanner currentDay={dashboardData.currentDay} />
+        <HomeGuidance currentDay={dashboardData.currentDay} totalDays={dashboardData.totalDays} />
 
         {/* 진행 상황 */}
         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl p-5 shadow-sm border border-emerald-100">
@@ -132,6 +129,7 @@ export default function Home() {
           </div>
         </div>
 
+        <MarketEventPanel />
         {/* 내 자산 */}
         <div
           id="wallet-balance"

@@ -1,7 +1,11 @@
 "use server";
+import { prepareMarketScenario } from "../lib/prepare-market-scenario";
 
 import {
   db,
+  classMarketScenarios,
+  marketEventDecisions,
+  marketPortfolioReviews,
   dbWithTransaction,
   classes,
   clients,
@@ -13,7 +17,7 @@ import {
   transactions,
   holdings,
 } from "@repo/db";
-import { eq, inArray, sql } from "drizzle-orm";
+import { eq, and, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { withAuth } from "@/lib/safe-action";
@@ -55,7 +59,7 @@ async function generateUniqueClassCode(): Promise<string> {
   while (!isUnique) {
     // 6자리 랜덤 코드 생성
     code = Array.from({ length: 6 }, () =>
-      characters.charAt(Math.floor(Math.random() * characters.length))
+      characters.charAt(Math.floor(Math.random() * characters.length)),
     ).join("");
 
     // 중복 체크
@@ -74,7 +78,29 @@ async function generateUniqueClassCode(): Promise<string> {
 // CREATE: 새로운 클래스 생성
 export const createClass = withAuth(async (user, formData: FormData) => {
   const rawData = Object.fromEntries(formData.entries());
-  const validation = classSchema.safeParse(rawData);
+  const eventSettings = z
+    .object({
+      eventMode: z.enum(["basic", "crisis"]).default("basic"),
+      eventDifficulty: z.enum(["easy", "normal", "hard"]).default("normal"),
+    })
+    .safeParse(rawData);
+  if (!eventSettings.success)
+    return { error: { _form: ["게임 모드와 난이도를 확인해 주세요."] } };
+  const { eventMode, eventDifficulty } = eventSettings.data;
+  if (eventMode === "crisis" && rawData.programType !== "stock_game")
+    return {
+      error: { _form: ["이벤트는 주식 게임에서만 사용할 수 있습니다."] },
+    };
+  const validation = classSchema.safeParse(
+    eventMode === "crisis"
+      ? {
+          ...rawData,
+          totalDays: 10,
+          currentDay: 1,
+          difficulty: eventDifficulty === "hard" ? "normal" : eventDifficulty,
+        }
+      : rawData,
+  );
 
   if (!validation.success) {
     return { error: validation.error.flatten().fieldErrors };
@@ -84,21 +110,30 @@ export const createClass = withAuth(async (user, formData: FormData) => {
     // 고유한 클래스 코드 생성
     const classCode = await generateUniqueClassCode();
 
-    const [newClass] = await db
-      .insert(classes)
-      .values({
-        name: validation.data.name,
-        code: classCode,
-        totalDays: validation.data.totalDays,
-        managerId: validation.data.managerId,
-        clientId: validation.data.clientId,
-        loginMethod: validation.data.loginMethod,
-        programType: validation.data.programType,
-        difficulty: validation.data.difficulty,
-        currentDay: validation.data.currentDay,
-        createdBy: user.id,
-      })
-      .returning({ id: classes.id, code: classes.code });
+    const newClass = await dbWithTransaction.transaction(async (tx) => {
+      const [created] = await tx
+        .insert(classes)
+        .values({
+          name: validation.data.name,
+          code: classCode,
+          totalDays: validation.data.totalDays,
+          managerId: validation.data.managerId,
+          clientId: validation.data.clientId,
+          loginMethod: validation.data.loginMethod,
+          programType: validation.data.programType,
+          difficulty: validation.data.difficulty,
+          currentDay: validation.data.currentDay,
+          createdBy: user.id,
+        })
+        .returning({ id: classes.id, code: classes.code });
+      if (!created) throw new Error("수업 생성에 실패했습니다.");
+      if (eventMode === "crisis")
+        await prepareMarketScenario(tx, user.id, {
+          classId: created.id,
+          difficulty: eventDifficulty,
+        });
+      return created;
+    });
 
     if (!newClass) {
       throw new Error("클래스 생성 후 ID를 반환받지 못했습니다.");
@@ -135,10 +170,30 @@ export const updateClass = withAuth(
     }
 
     try {
-      await db
-        .update(classes)
-        .set(validation.data)
-        .where(eq(classes.id, classId));
+      await dbWithTransaction.transaction(async (tx) => {
+        const [course] = await tx
+          .select()
+          .from(classes)
+          .where(and(eq(classes.id, classId), eq(classes.createdBy, user.id)))
+          .for("update");
+        if (!course) throw new Error("수업 접근 권한이 없습니다.");
+        const event = await tx.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, classId),
+        });
+        if (
+          event &&
+          (validation.data.totalDays !== event.scenario.days.length ||
+            validation.data.programType !== "stock_game" ||
+            validation.data.difficulty !== course.difficulty ||
+            (validation.data.currentDay !== undefined &&
+              validation.data.currentDay !== course.currentDay))
+        )
+          throw new Error("이벤트의 일수·난이도·진행일은 수정할 수 없습니다.");
+        await tx
+          .update(classes)
+          .set(validation.data)
+          .where(eq(classes.id, classId));
+      });
 
       const data = await db.query.classes.findFirst({
         where: eq(classes.id, classId),
@@ -155,7 +210,7 @@ export const updateClass = withAuth(
         e instanceof Error ? e : new Error("An unknown error occurred");
       return { error: { _form: [error.message] } };
     }
-  }
+  },
 );
 
 // DELETE: 클래스 삭제
@@ -236,7 +291,7 @@ export const getClientsAndManagers = withAuth(async (user) => {
       e instanceof Error ? e : new Error("An unknown error occurred");
     console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
     throw new Error(
-      `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`
+      `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`,
     );
   }
 });
@@ -276,7 +331,7 @@ export const getClasses = withAuth(async (user) => {
 
     // 맵으로 변환
     const maxDayMap = new Map(
-      maxDaysResult.map((r) => [r.classId, r.maxDay || 0])
+      maxDaysResult.map((r) => [r.classId, r.maxDay || 0]),
     );
 
     // 클래스 데이터에 totalDays 추가 (메모리에서 매칭)
@@ -342,10 +397,23 @@ export const getClassById = withAuth(async (user, classId: string) => {
 export const updateClassCurrentDay = withAuth(
   async (user, classId: string, currentDay: number) => {
     try {
-      await db
-        .update(classes)
-        .set({ currentDay })
-        .where(eq(classes.id, classId));
+      await dbWithTransaction.transaction(async (tx) => {
+        const [course] = await tx
+          .select()
+          .from(classes)
+          .where(and(eq(classes.id, classId), eq(classes.createdBy, user.id)))
+          .for("update");
+        if (!course) throw new Error("수업 접근 권한이 없습니다.");
+        const event = await tx.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, classId),
+        });
+        if (event)
+          throw new Error("이벤트 수업은 Day +1로만 진행할 수 있습니다.");
+        await tx
+          .update(classes)
+          .set({ currentDay })
+          .where(eq(classes.id, classId));
+      });
       revalidatePath("/game-management");
       return { message: `현재 Day가 ${currentDay}로 업데이트되었습니다.` };
     } catch (e) {
@@ -353,7 +421,7 @@ export const updateClassCurrentDay = withAuth(
         e instanceof Error ? e : new Error("An unknown error occurred");
       throw new Error(`현재 Day 업데이트 실패: ${error.message}`);
     }
-  }
+  },
 );
 
 // 클래스 상태 변경 (설정 -> 진행, 진행 -> 종료)
@@ -417,24 +485,133 @@ export const updateClassStatus = withAuth(
         error: error.message,
       };
     }
-  }
+  },
 );
 
 // Day 증가 + 모든 게스트에게 지원금 지급
 export const incrementDayAndPayAllowance = withAuth(
-  async (user, classId: string) => {
+  async (
+    user,
+    classId: string,
+    expectedCurrentDay?: number,
+    allowUnwritten = false,
+  ) => {
     try {
       return await dbWithTransaction.transaction(async (tx) => {
         // 1. 클래스 정보 조회
-        const classInfo = await tx.query.classes.findFirst({
-          where: eq(classes.id, classId),
-          columns: { currentDay: true },
+        const [classInfo] = await tx
+          .select()
+          .from(classes)
+          .where(and(eq(classes.id, classId), eq(classes.createdBy, user.id)))
+          .for("update");
+        const event = await tx.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, classId),
         });
+        if (
+          event &&
+          (!classInfo ||
+            classInfo.status !== "active" ||
+            classInfo.currentDay >= event.scenario.days.length)
+        )
+          throw new Error(
+            "진행 중인 이벤트 수업의 마지막 Day 전까지만 다음 Day로 이동할 수 있습니다.",
+          );
 
         if (!classInfo) {
           throw new Error("클래스 정보를 찾을 수 없습니다.");
         }
 
+        if (event && expectedCurrentDay !== classInfo.currentDay)
+          throw new Error("수업 Day가 이미 변경되었습니다. 새로고침해 주세요.");
+        if (event) {
+          const participants = await tx.query.guests.findMany({
+            where: eq(guests.classId, classId),
+          });
+          const recorded = await tx
+            .select({ guestId: marketEventDecisions.guestId })
+            .from(marketEventDecisions)
+            .where(
+              and(
+                eq(marketEventDecisions.classId, classId),
+                eq(marketEventDecisions.day, classInfo.currentDay),
+              ),
+            );
+          const done = new Set(recorded.map((r) => r.guestId));
+          const missing = participants.filter((g) => !done.has(g.id)).length;
+          if (missing > 0 && !allowUnwritten)
+            return {
+              success: false,
+              needsConfirmation: true,
+              missingCount: missing,
+              message:
+                "아직 " +
+                missing +
+                "명이 이유를 남기지 않았습니다. 그대로 다음 Day로 진행할까요?",
+            };
+          const classWallets = participants.length
+            ? await tx.query.wallets.findMany({
+                where: inArray(
+                  wallets.guestId,
+                  participants.map((g) => g.id),
+                ),
+              })
+            : [];
+          const positions = await tx.query.holdings.findMany({
+            where: eq(holdings.classId, classId),
+          });
+          const today = event.scenario.days[classInfo.currentDay - 1]!;
+          const tomorrow = event.scenario.days[classInfo.currentDay]!;
+          const round = (v: number) => Math.round(v * 100) / 100;
+          const reviews = classWallets.map((wallet) => {
+            const cash = Number(wallet.balance);
+            const assets = positions
+              .filter((p) => p.guestId === wallet.guestId && p.quantity > 0)
+              .map((p) => {
+                const now = today.prices.find((x) => x.stockId === p.stockId),
+                  next = tomorrow.prices.find((x) => x.stockId === p.stockId);
+                if (!now || !next)
+                  throw new Error(
+                    "보유 종목의 이벤트 가격을 확인할 수 없습니다.",
+                  );
+                return {
+                  name: event.scenario.stocks.find(
+                    (s) => s.stockId === p.stockId,
+                  )!.name,
+                  value: round(now.price * p.quantity),
+                  nextValue: round(next.price * p.quantity),
+                };
+              });
+            const before = round(
+              cash + assets.reduce((v, a) => v + a.value, 0),
+            );
+            const after = round(
+              cash + assets.reduce((v, a) => v + a.nextValue, 0),
+            );
+            const allocation = [
+              { name: "현금", value: cash },
+              ...assets.map(({ name, value }) => ({ name, value })),
+            ].map((a) => ({
+              ...a,
+              percent: before > 0 ? round((a.value / before) * 100) : 0,
+            }));
+            return {
+              classId,
+              guestId: wallet.guestId,
+              day: classInfo.currentDay,
+              snapshot: {
+                day: classInfo.currentDay,
+                cash,
+                before,
+                after,
+                marketChange: round(after - before),
+                allowance: 100000,
+                allocation,
+              },
+            };
+          });
+          if (reviews.length)
+            await tx.insert(marketPortfolioReviews).values(reviews);
+        }
         const newDay = (classInfo.currentDay || 0) + 1;
 
         // 2. 클래스의 currentDay +1
@@ -520,7 +697,7 @@ export const incrementDayAndPayAllowance = withAuth(
     } finally {
       revalidatePath("/game-management");
     }
-  }
+  },
 );
 
 // QR 코드 토큰 생성

@@ -11,12 +11,12 @@ import StockNewsSheet from "@/components/StockNewsSheet";
 import StockListSkeleton from "@/components/StockListSkeleton";
 import TransactionListSkeleton from "@/components/TransactionListSkeleton";
 import PageLoading from "@/components/PageLoading";
-import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useTour } from "@/hooks/useTour";
 import { ShoppingCart, Receipt } from "lucide-react";
 import InfoBanner from "@/components/InfoBanner";
+import { InvestGuidance, InvestPageHeader } from "@/components/ClassGuidance";
 
 interface Stock {
   id: string;
@@ -144,37 +144,9 @@ export default function InvestPage() {
   return (
     <div className="min-h-screen bg-yfl-canvas pb-20">
       <div className="max-w-4xl mx-auto p-4">
-        <PageHeader
-          title="투자"
-          description="뉴스를 읽고 주식을 사고팔아보세요"
-        />
+        <InvestPageHeader currentDay={currentDay} totalDays={totalDays} />
 
-        {/* 마지막 Day 안내 */}
-        {isLastDay && (
-          <InfoBanner
-            icon="⚠️"
-            title="마지막 Day에요!"
-            description="게임이 종료되어 더 이상 매수/매도할 수 없어요. 최종 결과를 확인하고 랭킹을 확인해보세요!"
-          />
-        )}
-
-        {/* 환율 안내 배너 */}
-        {!isLastDay && (
-          <InfoBanner
-            icon="💡"
-            title="모든 가격은 원화(₩)로 표시돼요"
-            description="해외 주식은 환율이 적용된 원화 가격이에요. 실제 투자와 동일한 환경에서 학습해보세요!"
-          />
-        )}
-
-        {/* 종목 클릭 안내 */}
-        {stocks.length > 0 && !isLastDay && (
-          <InfoBanner
-            icon="👆"
-            title="종목 카드를 눌러보세요!"
-            description="종목 카드를 클릭하면 주식을 사고팔 수 있어요. 뉴스를 읽고 현명하게 투자해보세요!"
-          />
-        )}
+        <InvestGuidance currentDay={currentDay} totalDays={totalDays} placement="top" hasStocks={stocks.length > 0} hasHoldings={holdingStocks.length > 0} />
 
         {/* Portfolio Summary */}
         <div className="mb-6">
@@ -299,23 +271,7 @@ export default function InvestPage() {
               )}
             </div>
 
-            {/* Day별 안내 배너 */}
-            {currentDay === 1 ? (
-              <InfoBanner
-                icon="🎉"
-                title="첫날입니다!"
-                description="뉴스를 읽고 주식을 사보세요. 내일 결과를 확인할 수 있어요!"
-              />
-            ) : (
-              currentDay >= 2 &&
-              holdingStocks.length > 0 && (
-                <InfoBanner
-                  icon="💡"
-                  title="투자 팁!"
-                  description="현금이 부족한가요? 내가 가진 주식을 체크해보세요! 오늘 뉴스를 읽고 불안한 종목은 정리하고, 유망한 주식에 투자해보세요!"
-                />
-              )
-            )}
+            <InvestGuidance currentDay={currentDay} totalDays={totalDays} placement="day" hasStocks={stocks.length > 0} hasHoldings={holdingStocks.length > 0} />
           </>
         )}
 

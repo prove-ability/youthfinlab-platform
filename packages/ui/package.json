@@ -7,7 +7,8 @@
     "./brand-intro": "./src/brand-intro.tsx",
     "./brand.css": "./src/brand.css",
     "./editorial.css": "./src/editorial.css",
-    "./async-state": "./src/async-state.tsx"
+    "./async-state": "./src/async-state.tsx",
+    "./market-event.css": "./src/market-event.css"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

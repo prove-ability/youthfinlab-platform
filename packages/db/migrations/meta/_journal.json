@@ -253,6 +253,20 @@
       "when": 1795608272184,
       "tag": "0035_game_data_generation",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795754339331,
+      "tag": "0036_financial_crisis_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1795767655849,
+      "tag": "0037_market_portfolio_reviews",
+      "breakpoints": true
     }
   ]
 }

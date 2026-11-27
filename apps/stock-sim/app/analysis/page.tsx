@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import PageLoading from "@/components/PageLoading";
+import MarketEventPanel from "@/components/MarketEventPanel";
 import PageHeader from "@/components/PageHeader";
 
 interface RelatedStock {
@@ -79,6 +80,7 @@ export default function AnalysisPage() {
           description="어제 뉴스가 내 투자에 어떤 영향을 줬는지 확인해보세요"
         />
 
+        <MarketEventPanel />
         <div className="space-y-4">
           <h2 className="text-sm font-bold text-gray-700 px-1">
             📈 보유 주식 상세 분석

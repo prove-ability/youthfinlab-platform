@@ -86,6 +86,8 @@ export const getCurrentDayNews = withAuth(async (user) => {
 
 export const getNewsByDay = withAuth(async (user, day: number) => {
   try {
+    const course = await db.query.classes.findFirst({ where: eq(classes.id, user.classId) });
+    if (!course || !Number.isInteger(day) || day < 1 || day > course.currentDay) return [];
     // 특정 Day의 뉴스만 조회
     const dayNews = await db.query.news.findMany({
       where: and(eq(news.classId, user.classId), eq(news.day, day)),

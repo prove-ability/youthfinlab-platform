@@ -6,6 +6,9 @@ import {
   holdings,
   transactions,
   classes,
+  classStockPrices,
+  classMarketScenarios,
+  guests,
 } from "@repo/db";
 import { eq, and } from "drizzle-orm";
 import { revalidateTag } from "next/cache";
@@ -33,7 +36,7 @@ export const buyStock = withAuth(
     stockId: string,
     quantity: number,
     price: string,
-    clientCurrentDay: number
+    clientCurrentDay: number,
   ): Promise<TradeResult> => {
     if (quantity <= 0) {
       return { success: false, message: "수량은 1 이상이어야 합니다." };
@@ -41,6 +44,56 @@ export const buyStock = withAuth(
 
     try {
       return await dbWithTransaction.transaction(async (tx) => {
+        const event = await tx.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, user.classId),
+        });
+        if (event) {
+          const [course] = await tx
+            .select()
+            .from(classes)
+            .where(eq(classes.id, user.classId))
+            .for("share");
+          const guest = await tx.query.guests.findFirst({
+            where: and(
+              eq(guests.id, user.id),
+              eq(guests.classId, user.classId),
+            ),
+          });
+          if (
+            !guest ||
+            !course ||
+            course.status !== "active" ||
+            course.currentDay >= event.scenario.days.length
+          )
+            throw new Error("현재 이벤트 수업에서는 거래할 수 없습니다.");
+          if (course.currentDay !== clientCurrentDay)
+            return {
+              success: false,
+              dayMismatch: true,
+              serverCurrentDay: course.currentDay,
+              message: "수업 Day가 바뀌었습니다. 새로고침해 주세요.",
+            };
+          const actual = await tx.query.classStockPrices.findFirst({
+            where: and(
+              eq(classStockPrices.classId, course.id),
+              eq(classStockPrices.stockId, stockId),
+              eq(classStockPrices.day, course.currentDay),
+            ),
+          });
+          if (
+            !actual ||
+            !Number.isSafeInteger(quantity) ||
+            quantity <= 0 ||
+            Number(price) !== Number(actual.price)
+          )
+            throw new Error("거래 수량 또는 현재 가격을 확인해 주세요.");
+          await tx
+            .select({ id: wallets.id })
+            .from(wallets)
+            .where(eq(wallets.guestId, user.id))
+            .for("update");
+          price = actual.price;
+        }
         // 1. 사용자의 지갑 조회
         const userWallet = await tx.query.wallets.findFirst({
           where: eq(wallets.guestId, user.id),
@@ -88,7 +141,7 @@ export const buyStock = withAuth(
           where: and(
             eq(holdings.guestId, user.id),
             eq(holdings.stockId, stockId),
-            eq(holdings.classId, user.classId)
+            eq(holdings.classId, user.classId),
           ),
         });
 
@@ -172,7 +225,7 @@ export const buyStock = withAuth(
             : "매수 중 오류가 발생했습니다.",
       };
     }
-  }
+  },
 );
 
 /**
@@ -185,7 +238,7 @@ export const sellStock = withAuth(
     stockId: string,
     quantity: number,
     price: string,
-    clientCurrentDay: number
+    clientCurrentDay: number,
   ): Promise<TradeResult> => {
     if (quantity <= 0) {
       return { success: false, message: "수량은 1 이상이어야 합니다." };
@@ -193,6 +246,56 @@ export const sellStock = withAuth(
 
     try {
       return await dbWithTransaction.transaction(async (tx) => {
+        const event = await tx.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, user.classId),
+        });
+        if (event) {
+          const [course] = await tx
+            .select()
+            .from(classes)
+            .where(eq(classes.id, user.classId))
+            .for("share");
+          const guest = await tx.query.guests.findFirst({
+            where: and(
+              eq(guests.id, user.id),
+              eq(guests.classId, user.classId),
+            ),
+          });
+          if (
+            !guest ||
+            !course ||
+            course.status !== "active" ||
+            course.currentDay >= event.scenario.days.length
+          )
+            throw new Error("현재 이벤트 수업에서는 거래할 수 없습니다.");
+          if (course.currentDay !== clientCurrentDay)
+            return {
+              success: false,
+              dayMismatch: true,
+              serverCurrentDay: course.currentDay,
+              message: "수업 Day가 바뀌었습니다. 새로고침해 주세요.",
+            };
+          const actual = await tx.query.classStockPrices.findFirst({
+            where: and(
+              eq(classStockPrices.classId, course.id),
+              eq(classStockPrices.stockId, stockId),
+              eq(classStockPrices.day, course.currentDay),
+            ),
+          });
+          if (
+            !actual ||
+            !Number.isSafeInteger(quantity) ||
+            quantity <= 0 ||
+            Number(price) !== Number(actual.price)
+          )
+            throw new Error("거래 수량 또는 현재 가격을 확인해 주세요.");
+          await tx
+            .select({ id: wallets.id })
+            .from(wallets)
+            .where(eq(wallets.guestId, user.id))
+            .for("update");
+          price = actual.price;
+        }
         // 1. 사용자의 지갑 조회
         const userWallet = await tx.query.wallets.findFirst({
           where: eq(wallets.guestId, user.id),
@@ -207,7 +310,7 @@ export const sellStock = withAuth(
           where: and(
             eq(holdings.guestId, user.id),
             eq(holdings.stockId, stockId),
-            eq(holdings.classId, user.classId)
+            eq(holdings.classId, user.classId),
           ),
         });
 
@@ -311,5 +414,5 @@ export const sellStock = withAuth(
             : "매도 중 오류가 발생했습니다.",
       };
     }
-  }
+  },
 );
