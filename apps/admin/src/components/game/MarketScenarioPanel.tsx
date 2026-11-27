@@ -6,6 +6,7 @@ import {
   getMarketScenarioAdmin,
 } from "@/actions/marketScenarioActions";
 import {
+  defaultEventStocks,
   exposureLabels,
   reasonLabels,
   type Exposure,
@@ -25,6 +26,7 @@ export default function MarketScenarioPanel({
   const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">(
     "normal",
   );
+  const [useCustom, setUseCustom] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -170,9 +172,9 @@ export default function MarketScenarioPanel({
             aria-labelledby="market-settings-title"
             onSubmit={async (e) => {
               e.preventDefault();
-              if (busy) return;
+              if (busy || mode !== "crisis") return;
               setError("");
-              if (selected.length < 2 || selected.length > 12) {
+              if (useCustom && (selected.length < 2 || selected.length > 12)) {
                 setError("종목을 2~12개 선택하세요.");
                 return;
               }
@@ -182,11 +184,13 @@ export default function MarketScenarioPanel({
                 const result = await configureMarketScenario({
                   classId,
                   difficulty,
-                  stocks: selected.map((stockId) => ({
-                    stockId,
-                    exposure: form.get(`exposure-${stockId}`) as Exposure,
-                    initialPrice: Number(form.get(`price-${stockId}`)),
-                  })),
+                  stocks: useCustom
+                    ? selected.map((stockId) => ({
+                        stockId,
+                        exposure: form.get(`exposure-${stockId}`) as Exposure,
+                        initialPrice: Number(form.get(`price-${stockId}`)),
+                      }))
+                    : undefined,
                 });
                 if (!result.success)
                   throw new Error(
@@ -280,67 +284,112 @@ export default function MarketScenarioPanel({
                     )}
                   </div>
                 </fieldset>
-                <fieldset disabled={busy}>
-                  <legend>종목과 가상 기업 특성 · 2~12개 선택</legend>
-                  <p className="event-muted">
-                    실제 기업의 특성이 아닌 이 수업에서의 역할입니다. 두 가지
-                    이상의 특성을 골라 주세요. 현금은 별도로 유지할 수 있습니다.
-                  </p>
-                  {stocks.map((s, i) => (
-                    <div className="event-stock" key={s.id}>
-                      <label className="event-choice">
-                        <input
-                          name="stock"
-                          value={s.id}
-                          type="checkbox"
-                          checked={selected.includes(s.id)}
-                          onChange={(e) =>
-                            setSelected((ids) =>
-                              e.target.checked
-                                ? [...ids, s.id]
-                                : ids.filter((id) => id !== s.id),
-                            )
-                          }
-                        />
-                        {s.name}
-                      </label>
-                      {selected.includes(s.id) && (
-                        <>
-                          <label>
-                            가상 기업 특성
-                            <select
-                              name={`exposure-${s.id}`}
-                              defaultValue={Object.keys(exposureLabels)[i % 3]}
-                            >
-                              {Object.entries(exposureLabels).map(
-                                ([value, label]) => (
-                                  <option key={value} value={value}>
-                                    {label}
-                                  </option>
-                                ),
-                              )}
-                            </select>
-                          </label>
-                          <label>
-                            시작 가격 (원)
-                            <input
-                              name={`price-${s.id}`}
-                              type="number"
-                              min={1000}
-                              max={1000000}
-                              step={1}
-                              required
-                              defaultValue={10000}
-                            />
-                          </label>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                  {stocks.length < 2 && (
-                    <p>주식 관리에서 종목을 2개 이상 등록해 주세요.</p>
+                <div className="event-callout">
+                  <strong>
+                    {useCustom ? "직접 구성 사용" : "기본 구성 자동 적용"}
+                  </strong>
+                  {!useCustom && (
+                    <>
+                      <p>가상 기업 3개 · 시작 가격 각각 10,000원</p>
+                      <ul>
+                        {defaultEventStocks.map((s) => (
+                          <li key={s.name}>
+                            {s.name} · {exposureLabels[s.exposure]}
+                          </li>
+                        ))}
+                      </ul>
+                      <p>확정할 때 이 수업용 종목을 자동으로 준비합니다.</p>
+                    </>
                   )}
-                </fieldset>
+                  {useCustom && (
+                    <p>
+                      고급 설정에서 선택한 {selected.length}개 종목을
+                      사용합니다.
+                    </p>
+                  )}
+                </div>
+                <details>
+                  <summary>
+                    고급 설정 · 종목 직접 수정{useCustom ? " (사용 중)" : ""}
+                  </summary>
+                  <label className="event-choice">
+                    <input
+                      type="checkbox"
+                      checked={useCustom}
+                      disabled={busy}
+                      onChange={(e) => setUseCustom(e.target.checked)}
+                    />
+                    직접 구성 사용
+                  </label>
+                  <p className="event-muted">
+                    직접 구성을 끄면 기본 기업 3개로 확정합니다. 고급 설정을
+                    접어도 직접 구성 선택은 유지됩니다.
+                  </p>
+                  <fieldset disabled={busy || !useCustom}>
+                    <legend>종목과 가상 기업 특성 · 2~12개 선택</legend>
+                    <p className="event-muted">
+                      실제 기업의 특성이 아닌 이 수업에서의 역할입니다. 두 가지
+                      이상의 특성을 골라 주세요. 현금은 별도로 유지할 수
+                      있습니다.
+                    </p>
+                    {stocks.map((s, i) => (
+                      <div className="event-stock" key={s.id}>
+                        <label className="event-choice">
+                          <input
+                            name="stock"
+                            value={s.id}
+                            type="checkbox"
+                            checked={selected.includes(s.id)}
+                            onChange={(e) =>
+                              setSelected((ids) =>
+                                e.target.checked
+                                  ? [...ids, s.id]
+                                  : ids.filter((id) => id !== s.id),
+                              )
+                            }
+                          />
+                          {s.name}
+                        </label>
+                        {selected.includes(s.id) && (
+                          <>
+                            <label>
+                              가상 기업 특성
+                              <select
+                                name={`exposure-${s.id}`}
+                                defaultValue={
+                                  Object.keys(exposureLabels)[i % 3]
+                                }
+                              >
+                                {Object.entries(exposureLabels).map(
+                                  ([value, label]) => (
+                                    <option key={value} value={value}>
+                                      {label}
+                                    </option>
+                                  ),
+                                )}
+                              </select>
+                            </label>
+                            <label>
+                              시작 가격 (원)
+                              <input
+                                name={`price-${s.id}`}
+                                type="number"
+                                min={1000}
+                                max={1000000}
+                                step={1}
+                                required
+                                defaultValue={10000}
+                              />
+                            </label>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                    {stocks.length < 2 && (
+                      <p>주식 관리에서 종목을 2개 이상 등록해 주세요.</p>
+                    )}
+                  </fieldset>
+                </details>
                 <p className="event-muted">
                   저장 후에는 모드·가격·뉴스를 변경할 수 없습니다. 다른 설정은
                   새 수업으로 만드세요.

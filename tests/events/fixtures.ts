@@ -3,6 +3,7 @@ import {
   buildCrisisScenario,
   studentMarketView,
 } from "../../packages/db/src/crisis-engine";
+import { defaultEventStocks } from "../../packages/db/src/market-scenario";
 import type { Decision } from "../../packages/db/src/market-scenario";
 export const stocks = [
   { id: "a", name: "새싹테크" },
@@ -47,10 +48,12 @@ export async function configureMarketScenario(input: any) {
   await delay();
   if (state.failSave) throw Error("저장하지 못했습니다. 다시 시도해 주세요.");
   const built = buildCrisisScenario(
-    input.stocks.map((s: any) => ({
-      ...s,
-      name: stocks.find((x) => x.id === s.stockId)?.name ?? s.stockId,
-    })),
+    input.stocks
+      ? input.stocks.map((s: any) => ({
+          ...s,
+          name: stocks.find((x) => x.id === s.stockId)?.name ?? s.stockId,
+        }))
+      : defaultEventStocks.map((s, i) => ({ ...s, stockId: `default-${i}` })),
     input.difficulty,
   );
   Object.assign(scenario, built);

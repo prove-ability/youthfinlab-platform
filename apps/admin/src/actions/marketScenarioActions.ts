@@ -15,6 +15,10 @@ import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { withAuth } from "@/lib/safe-action";
 import { buildCrisisScenario } from "@repo/db/crisis-engine";
+import {
+  defaultEventStocks,
+  type ScenarioStock,
+} from "@repo/db/market-scenario";
 import { revalidatePath } from "next/cache";
 
 const settings = z.object({
@@ -29,7 +33,8 @@ const settings = z.object({
       }),
     )
     .min(2)
-    .max(12),
+    .max(12)
+    .optional(),
 });
 
 export const configureMarketScenario = withAuth(
@@ -66,27 +71,44 @@ export const configureMarketScenario = withAuth(
         throw new Error(
           "기존 데이터가 있는 수업은 전환할 수 없습니다. AI 자동 생성을 끄고 새 수업을 만들어 주세요.",
         );
-      const selected = await tx
-        .select()
-        .from(stocks)
-        .where(
-          and(
-            eq(stocks.createdBy, user.id),
-            inArray(
-              stocks.id,
-              parsed.stocks.map((s) => s.stockId),
+      let configuredStocks: ScenarioStock[];
+      if (parsed.stocks) {
+        const selected = await tx
+          .select()
+          .from(stocks)
+          .where(
+            and(
+              eq(stocks.createdBy, user.id),
+              inArray(
+                stocks.id,
+                parsed.stocks.map((s) => s.stockId),
+              ),
             ),
-          ),
-        );
-      if (selected.length !== parsed.stocks.length)
-        throw new Error("직접 등록한 서로 다른 종목을 선택하세요.");
-      const scenario = buildCrisisScenario(
-        parsed.stocks.map((s) => ({
+          );
+        if (selected.length !== parsed.stocks.length)
+          throw new Error("직접 등록한 서로 다른 종목을 선택하세요.");
+        configuredStocks = parsed.stocks.map((s) => ({
           ...s,
           name: selected.find((x) => x.id === s.stockId)!.name,
-        })),
-        parsed.difficulty,
-      );
+        }));
+      } else {
+        // Create class-specific fictional stocks atomically; never repurpose existing stocks.
+        configuredStocks = [];
+        for (const preset of defaultEventStocks) {
+          const [created] = await tx
+            .insert(stocks)
+            .values({
+              name: preset.name,
+              industrySector: "교육용 가상 기업",
+              marketCountryCode: "KR",
+              createdBy: user.id,
+              remarks: `금융 위기 기본 구성 · 수업 ${course.id}`,
+            })
+            .returning();
+          configuredStocks.push({ ...preset, stockId: created!.id });
+        }
+      }
+      const scenario = buildCrisisScenario(configuredStocks, parsed.difficulty);
       await tx
         .insert(classMarketScenarios)
         .values({ classId: course.id, scenario });

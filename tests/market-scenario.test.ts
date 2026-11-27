@@ -472,3 +472,61 @@ it("persists hard scenarios while retaining normal base rules and trading actual
     "상반된",
   );
 });
+
+it("prepares three fictional defaults without stock input and retries without duplicates", async () => {
+  const f = await fixture(false);
+  const before = await db.select().from(schema.stocks);
+  await configureMarketScenario({ classId: f.course.id, difficulty: "hard" });
+  const first = await getMarketScenarioAdmin(f.course.id);
+  expect(first.scenario.stocks.map((s) => s.name)).toEqual([
+    "새싹테크",
+    "든든산업",
+    "온기생활",
+  ]);
+  expect(first.scenario.stocks.map((s) => s.exposure)).toEqual([
+    "sensitive",
+    "balanced",
+    "defensive",
+  ]);
+  expect(first.scenario.stocks.every((s) => s.initialPrice === 10000)).toBe(
+    true,
+  );
+  expect(first.scenario.difficulty).toBe("hard");
+  await configureMarketScenario({ classId: f.course.id, difficulty: "hard" });
+  expect((await db.select().from(schema.stocks)).length).toBe(
+    before.length + 3,
+  );
+  expect((await getMarketScenarioAdmin(f.course.id)).scenario).toEqual(
+    first.scenario,
+  );
+  expect(
+    await db
+      .select()
+      .from(schema.classStockPrices)
+      .where(eq(schema.classStockPrices.classId, f.course.id)),
+  ).toHaveLength(30);
+  await studentFor(f.course.id);
+  await db
+    .update(schema.classes)
+    .set({ status: "active" })
+    .where(eq(schema.classes.id, f.course.id));
+  expect(
+    (await buyStock(first.scenario.stocks[0].stockId, 1, "10000", 1)).success,
+  ).toBe(true);
+});
+it("does not create default stocks for a forbidden or nonempty class", async () => {
+  const f = await fixture(false);
+  await studentFor(f.course.id);
+  const before = await db.select().from(schema.stocks);
+  await expect(
+    configureMarketScenario({ classId: f.course.id, difficulty: "normal" }),
+  ).rejects.toThrow("기존 데이터");
+  await db
+    .update(schema.classes)
+    .set({ createdBy: randomUUID() })
+    .where(eq(schema.classes.id, f.course.id));
+  await expect(
+    configureMarketScenario({ classId: f.course.id, difficulty: "normal" }),
+  ).rejects.toThrow("접근");
+  expect(await db.select().from(schema.stocks)).toEqual(before);
+});

@@ -48,3 +48,10 @@ export type StudentMarketView = {
     changes: { name: string; percent: number }[];
   }[];
 };
+
+/** Shared preview and server defaults; prices are educational, not market data. */
+export const defaultEventStocks = [
+  { name: "새싹테크", exposure: "sensitive", initialPrice: 10000 },
+  { name: "든든산업", exposure: "balanced", initialPrice: 10000 },
+  { name: "온기생활", exposure: "defensive", initialPrice: 10000 },
+] as const;
