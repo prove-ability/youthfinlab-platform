@@ -20,6 +20,8 @@ window.loadingRequest = async (name, args) => {
       success: true,
       data: [{ id: "test-client", name: "검증용 교육기관", managers: [] }],
     };
+  if (name === "getStudentMarketScenario") return null;
+  if (name === "getMarketScenarioAdmin") return { scenario: null, decisions: [], status: "setting" };
   if (name === "getClasses") return { success: true, data: [] };
   if (name === "getStocks") return [];
   if (name === "getGameManagementData")

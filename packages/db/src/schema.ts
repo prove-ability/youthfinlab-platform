@@ -1,5 +1,7 @@
+import type { CrisisScenario, DecisionReason } from "./market-scenario";
 import {
   pgTable,
+  uniqueIndex,
   text,
   uuid,
   timestamp,
@@ -466,3 +468,19 @@ export const investmentTendenciesRelations = relations(
     }),
   }),
 );
+
+// Optional mode: existing classes have no row and retain their basic behavior.
+export const classMarketScenarios = pgTable("class_market_scenarios", {
+  classId: uuid("class_id").primaryKey().references(() => classes.id, { onDelete: "cascade" }),
+  scenario: jsonb("scenario").$type<CrisisScenario>().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+export const marketEventDecisions = pgTable("market_event_decisions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  classId: uuid("class_id").notNull().references(() => classes.id, { onDelete: "cascade" }),
+  guestId: uuid("guest_id").notNull().references(() => guests.id, { onDelete: "cascade" }),
+  day: integer("day").notNull(),
+  reason: text("reason").$type<DecisionReason>().notNull(),
+  note: text("note").notNull().default(""),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, table => [uniqueIndex("market_decision_guest_day").on(table.classId, table.guestId, table.day)]);

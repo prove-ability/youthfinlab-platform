@@ -13,7 +13,9 @@
     "test": "vitest run",
     "test:browser": "playwright test",
     "test:loading": "playwright test -c playwright.loading.config.ts",
-    "preview:loading": "node tests/loading/build.cjs && node tests/loading/serve.cjs"
+    "preview:loading": "node tests/loading/build.cjs && node tests/loading/serve.cjs",
+    "test:events": "playwright test -c playwright.events.config.ts",
+    "preview:events": "vite --config tests/events/vite.config.mts --host 127.0.0.1 --port 14313 --strictPort"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.16",

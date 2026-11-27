@@ -563,6 +563,7 @@ export function CreateClassModal({
           {/* 게임 데이터 자동 생성 옵션 (주식 게임 전용) */}
           {programType === "stock_game" && (
             <div className="border-t pt-4">
+              <p className="text-sm text-gray-600 mb-3">금융 위기 이벤트 수업은 아래 AI 자동 생성을 끄고 수업을 만든 뒤, 게임 관리의 수업 모드에서 설정하세요.</p>
               <div className="mb-3">
                 <div className="flex items-center gap-2 mb-2">
                   <input

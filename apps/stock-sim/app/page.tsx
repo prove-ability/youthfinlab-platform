@@ -10,6 +10,7 @@ import Link from "next/link";
 import BenefitNotificationBanner from "@/components/BenefitNotificationBanner";
 import AnimatedBalance from "@/components/AnimatedBalance";
 import PageLoading from "@/components/PageLoading";
+import MarketEventPanel from "@/components/MarketEventPanel";
 import PageHeader from "@/components/PageHeader";
 import Day1GuideBanner from "@/components/Day1GuideBanner";
 import Day2GuideBanner from "@/components/Day2GuideBanner";
@@ -132,6 +133,7 @@ export default function Home() {
           </div>
         </div>
 
+        <MarketEventPanel />
         {/* 내 자산 */}
         <div
           id="wallet-balance"

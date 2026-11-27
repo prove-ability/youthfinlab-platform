@@ -1,7 +1,14 @@
 "use server";
 
+import { lockEditableGame } from "../lib/market-scenario-guard";
 import { eq } from "drizzle-orm";
-import { db, dbWithTransaction, gameDataGenerations, classStockPrices, news } from "@repo/db";
+import {
+  db,
+  dbWithTransaction,
+  gameDataGenerations,
+  classStockPrices,
+  news,
+} from "@repo/db";
 import { withAuth } from "@/lib/safe-action";
 
 interface StockInfo {
@@ -29,7 +36,10 @@ interface GeneratedGameData {
 function gameDataResponseFormat(stockIds: string[]) {
   const stockId = { $ref: "#/$defs/stockId" };
   const object = (properties: Record<string, unknown>) => ({
-    type: "object", properties, required: Object.keys(properties), additionalProperties: false,
+    type: "object",
+    properties,
+    required: Object.keys(properties),
+    additionalProperties: false,
   });
   const array = (items: unknown) => ({ type: "array", items });
   const article = object({
@@ -60,10 +70,13 @@ function gameDataResponseFormat(stockIds: string[]) {
 function buildPrompt(
   difficulty: "normal" | "easy",
   totalDays: number,
-  stocks: StockInfo[]
+  stocks: StockInfo[],
 ): string {
   const stockList = stocks
-    .map((s) => `- "${s.id}" → ${s.name} (${s.marketCountryCode}/${s.industrySector})`)
+    .map(
+      (s) =>
+        `- "${s.id}" → ${s.name} (${s.marketCountryCode}/${s.industrySector})`,
+    )
     .join("\n");
 
   const commonJson = `
@@ -184,46 +197,71 @@ export const generateGameData = withAuth(
       totalDays: number;
       stocks: StockInfo[];
       difficulty?: "normal" | "easy";
-    }
-  ): Promise<{ success: boolean; message: string; data?: GeneratedGameData }> => {
+    },
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data?: GeneratedGameData;
+  }> => {
     try {
       const { classId, totalDays, stocks, difficulty = "normal" } = params;
 
-      const alreadySaved = { success: true, message: "이미 저장된 게임 데이터입니다." };
-      const [completed] = await db.select({ classId: gameDataGenerations.classId })
-        .from(gameDataGenerations).where(eq(gameDataGenerations.classId, classId));
+      const alreadySaved = {
+        success: true,
+        message: "이미 저장된 게임 데이터입니다.",
+      };
+      const [completed] = await db
+        .select({ classId: gameDataGenerations.classId })
+        .from(gameDataGenerations)
+        .where(eq(gameDataGenerations.classId, classId));
       if (completed) return alreadySaved;
 
       if (!process.env.OPENAI_API_KEY) {
         throw new Error("관리자 서버에 OPENAI_API_KEY를 설정해 주세요.");
       }
       const validStockIds = new Set(stocks.map((stock) => stock.id));
-      if (!validStockIds.size) throw new Error("게임에 사용할 종목을 선택해 주세요.");
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json",
+      if (!validStockIds.size)
+        throw new Error("게임에 사용할 종목을 선택해 주세요.");
+      const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: process.env.OPENAI_GAME_MODEL || "gpt-4.1-mini",
+            messages: [
+              {
+                role: "user",
+                content: buildPrompt(difficulty, totalDays, stocks),
+              },
+            ],
+            response_format: gameDataResponseFormat([...validStockIds]),
+            store: false,
+          }),
         },
-        body: JSON.stringify({
-          model: process.env.OPENAI_GAME_MODEL || "gpt-4.1-mini",
-          messages: [{ role: "user", content: buildPrompt(difficulty, totalDays, stocks) }],
-          response_format: gameDataResponseFormat([...validStockIds]),
-          store: false,
-        }),
-      });
+      );
       if (!response.ok) {
         const body = await response.json().catch(() => null);
         if (body?.error?.code === "insufficient_quota") {
           throw new Error("OpenAI API 사용 한도를 확인한 뒤 재시도해 주세요.");
         }
-        throw new Error(`OpenAI API 요청 실패 (HTTP ${response.status}). 서버 설정과 API 상태를 확인해 주세요.`);
+        throw new Error(
+          `OpenAI API 요청 실패 (HTTP ${response.status}). 서버 설정과 API 상태를 확인해 주세요.`,
+        );
       }
       const completion = (await response.json()).choices?.[0];
-      if (completion?.finish_reason !== "stop" || !completion.message?.content) {
+      if (
+        completion?.finish_reason !== "stop" ||
+        !completion.message?.content
+      ) {
         throw new Error("AI 응답이 완성되지 않았습니다. 다시 시도해 주세요.");
       }
-      const gameData: GeneratedGameData = JSON.parse(completion.message.content);
+      const gameData: GeneratedGameData = JSON.parse(
+        completion.message.content,
+      );
 
       // 데이터 검증
       if (!gameData.days || !Array.isArray(gameData.days)) {
@@ -234,14 +272,13 @@ export const generateGameData = withAuth(
         throw new Error(`${totalDays}일치 데이터가 생성되지 않았습니다.`);
       }
 
-
       // stockId 검증
       for (const dayData of gameData.days) {
         if (dayData.prices) {
           for (const priceItem of dayData.prices) {
             if (!validStockIds.has(priceItem.stockId)) {
               throw new Error(
-                "선택한 종목과 일치하지 않는 게임 데이터입니다. 다시 시도해 주세요."
+                "선택한 종목과 일치하지 않는 게임 데이터입니다. 다시 시도해 주세요.",
               );
             }
           }
@@ -252,7 +289,7 @@ export const generateGameData = withAuth(
               for (const stockId of newsItem.relatedStockIds) {
                 if (!validStockIds.has(stockId)) {
                   throw new Error(
-                    "선택한 종목과 일치하지 않는 게임 데이터입니다. 다시 시도해 주세요."
+                    "선택한 종목과 일치하지 않는 게임 데이터입니다. 다시 시도해 주세요.",
                   );
                 }
               }
@@ -269,8 +306,12 @@ export const generateGameData = withAuth(
 
       // DB에 저장 (선택된 주식만 필터링하여 저장)
       const saved = await dbWithTransaction.transaction(async (tx) => {
-        const [claimed] = await tx.insert(gameDataGenerations).values({ classId })
-          .onConflictDoNothing().returning({ classId: gameDataGenerations.classId });
+        await lockEditableGame(tx, classId, user.id);
+        const [claimed] = await tx
+          .insert(gameDataGenerations)
+          .values({ classId })
+          .onConflictDoNothing()
+          .returning({ classId: gameDataGenerations.classId });
         if (!claimed) return false;
 
         for (const dayData of gameData.days) {
@@ -279,14 +320,14 @@ export const generateGameData = withAuth(
             for (const newsItem of dayData.news) {
               // 뉴스의 relatedStockIds가 선택된 주식 중 하나라도 포함되어 있는지 확인
               const hasValidStock = newsItem.relatedStockIds?.some((stockId) =>
-                validStockIds.has(stockId)
+                validStockIds.has(stockId),
               );
 
               // 선택된 주식과 관련된 뉴스만 저장
               if (hasValidStock) {
                 // relatedStockIds를 선택된 주식만 필터링
                 const filteredRelatedStockIds = newsItem.relatedStockIds.filter(
-                  (stockId) => validStockIds.has(stockId)
+                  (stockId) => validStockIds.has(stockId),
                 );
 
                 await tx.insert(news).values({
@@ -335,5 +376,5 @@ export const generateGameData = withAuth(
             : "게임 데이터 생성 중 오류가 발생했습니다.",
       };
     }
-  }
+  },
 );

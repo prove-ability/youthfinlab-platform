@@ -1,5 +1,6 @@
 "use server";
 
+import { editGameData, lockEditableGame } from "../lib/market-scenario-guard";
 import { revalidatePath } from "next/cache";
 import {
   db,
@@ -8,10 +9,17 @@ import {
   news as newsSchema,
   classes,
   stocks,
+  classMarketScenarios,
 } from "@repo/db";
 import { eq, and, desc, count, sql, lte, inArray } from "drizzle-orm";
 import { withAuth } from "@/lib/safe-action";
-import { ClassStockPrice, ClassStockPriceInput, News, Stock, ClassWithRelations } from "@/types";
+import {
+  ClassStockPrice,
+  ClassStockPriceInput,
+  News,
+  Stock,
+  ClassWithRelations,
+} from "@/types";
 
 export interface GameData {
   classId: string;
@@ -30,7 +38,7 @@ export interface GameData {
 // 클래스별 주식 가격 조회
 export async function getClassStockPrices(
   classId?: string,
-  day?: number
+  day?: number,
 ): Promise<ClassStockPrice[]> {
   // 현재 사용자 인증 확인
   const { stackServerApp } = await import("@/stack/server");
@@ -78,7 +86,7 @@ export async function getClassStockPrices(
     return data;
   } catch (error) {
     throw new Error(
-      `주식 가격 조회 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+      `주식 가격 조회 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
     );
   }
 }
@@ -87,10 +95,9 @@ export async function getClassStockPrices(
 export const createStockPrice = withAuth(
   async (user, priceData: ClassStockPriceInput): Promise<ClassStockPrice> => {
     try {
-      const [data] = await db
-        .insert(classStockPrices)
-        .values(priceData)
-        .returning();
+      const [data] = await editGameData(priceData.classId, user.id, (tx) =>
+        tx.insert(classStockPrices).values(priceData).returning(),
+      );
       if (!data) {
         throw new Error("주식 가격 생성 후 데이터 반환에 실패했습니다.");
       }
@@ -98,10 +105,10 @@ export const createStockPrice = withAuth(
       return data;
     } catch (error) {
       throw new Error(
-        `주식 가격 생성 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+        `주식 가격 생성 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
       );
     }
-  }
+  },
 );
 
 // 주식 가격 수정
@@ -112,11 +119,18 @@ export const updateStockPrice = withAuth(
       if (!id) {
         throw new Error("주식 가격 ID가 필요합니다.");
       }
-      const [data] = await db
-        .update(classStockPrices)
-        .set({ ...updateData, updatedAt: new Date() })
-        .where(eq(classStockPrices.id, id))
-        .returning();
+      const original = await db.query.classStockPrices.findFirst({
+        where: eq(classStockPrices.id, id),
+      });
+      if (!original || original.classId !== priceData.classId)
+        throw new Error("가격 정보를 확인할 수 없습니다.");
+      const [data] = await editGameData(original.classId, user.id, (tx) =>
+        tx
+          .update(classStockPrices)
+          .set({ ...updateData, updatedAt: new Date() })
+          .where(eq(classStockPrices.id, id))
+          .returning(),
+      );
       if (!data) {
         throw new Error("주식 가격 수정 후 데이터 반환에 실패했습니다.");
       }
@@ -124,24 +138,30 @@ export const updateStockPrice = withAuth(
       return data;
     } catch (error) {
       throw new Error(
-        `주식 가격 수정 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+        `주식 가격 수정 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
       );
     }
-  }
+  },
 );
 
 // 주식 가격 삭제
 export const deleteStockPrice = withAuth(
   async (user, priceId: string): Promise<void> => {
     try {
-      await db.delete(classStockPrices).where(eq(classStockPrices.id, priceId));
+      const original = await db.query.classStockPrices.findFirst({
+        where: eq(classStockPrices.id, priceId),
+      });
+      if (!original) throw new Error("가격 정보를 찾을 수 없습니다.");
+      await editGameData(original.classId, user.id, (tx) =>
+        tx.delete(classStockPrices).where(eq(classStockPrices.id, priceId)),
+      );
       revalidatePath("/game-management");
     } catch (error) {
       throw new Error(
-        `주식 가격 삭제 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+        `주식 가격 삭제 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
       );
     }
-  }
+  },
 );
 
 // 클래스별 게임 데이터 일괄 생성
@@ -150,13 +170,7 @@ export const createGameDay = withAuth(
     const userId = user.id;
     try {
       await dbWithTransaction.transaction(async (tx) => {
-        if (gameData.stocks.length > 0) {
-          // 같은 클래스의 일차별 가격 저장을 직렬화한다.
-          const [ownedClass] = await tx.select({ id: classes.id }).from(classes)
-            .where(and(eq(classes.id, gameData.classId), eq(classes.createdBy, userId)))
-            .for("update");
-          if (!ownedClass) throw new Error("클래스를 찾을 수 없습니다.");
-        }
+        await lockEditableGame(tx, gameData.classId, userId);
 
         // 1. 뉴스 생성
         const newsToInsert = gameData.news.map((news) => ({
@@ -186,26 +200,31 @@ export const createGameDay = withAuth(
         }));
 
         for (const row of pricesToInsert) {
-          const updated = await tx.update(classStockPrices)
+          const updated = await tx
+            .update(classStockPrices)
             .set({ price: row.price })
-            .where(and(
-              eq(classStockPrices.classId, row.classId),
-              eq(classStockPrices.stockId, row.stockId),
-              eq(classStockPrices.day, row.day)
-            ))
+            .where(
+              and(
+                eq(classStockPrices.classId, row.classId),
+                eq(classStockPrices.stockId, row.stockId),
+                eq(classStockPrices.day, row.day),
+              ),
+            )
             .returning({ id: classStockPrices.id });
-          if (updated.length > 1) throw new Error("같은 일차에 중복된 주가가 있습니다.");
-          if (updated.length === 0) await tx.insert(classStockPrices).values(row);
+          if (updated.length > 1)
+            throw new Error("같은 일차에 중복된 주가가 있습니다.");
+          if (updated.length === 0)
+            await tx.insert(classStockPrices).values(row);
         }
       });
 
       revalidatePath("/game-management");
     } catch (error) {
       throw new Error(
-        `게임 데이터 생성 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+        `게임 데이터 생성 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
       );
     }
-  }
+  },
 );
 
 // 특정 클래스의 게임 진행 상황 조회
@@ -258,7 +277,7 @@ export async function getGameProgress(classId: string): Promise<{
     };
   } catch (error) {
     throw new Error(
-      `게임 진행 상황 조회 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+      `게임 진행 상황 조회 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
     );
   }
 }
@@ -266,7 +285,7 @@ export async function getGameProgress(classId: string): Promise<{
 /**
  * 게임 관리 페이지 전체 데이터 일괄 조회
  * - 클래스 목록
- * - 종목 목록  
+ * - 종목 목록
  * - 선택된 클래스의 게임 진행 상황
  * - 선택된 클래스/Day의 가격 데이터
  */
@@ -276,8 +295,13 @@ export async function getGameManagementData(params?: {
 }): Promise<{
   classes: ClassWithRelations[];
   stocks: Stock[];
-  gameProgress: { maxDay: number; totalNews: number; totalPrices: number } | null;
+  gameProgress: {
+    maxDay: number;
+    totalNews: number;
+    totalPrices: number;
+  } | null;
   prices: ClassStockPrice[];
+  eventMode: boolean;
 }> {
   const { stackServerApp } = await import("@/stack/server");
   const user = await stackServerApp.getUser();
@@ -294,7 +318,7 @@ export async function getGameManagementData(params?: {
     const userClasses = await db.query.classes.findMany({
       where: and(
         eq(classes.createdBy, userId),
-        eq(classes.programType, "stock_game")
+        eq(classes.programType, "stock_game"),
       ),
       with: {
         client: {
@@ -316,23 +340,30 @@ export async function getGameManagementData(params?: {
     });
 
     // 3. 선택된 클래스의 게임 진행 상황 (병렬 조회)
-    let gameProgress: { maxDay: number; totalNews: number; totalPrices: number } | null = null;
-    
+    let gameProgress: {
+      maxDay: number;
+      totalNews: number;
+      totalPrices: number;
+    } | null = null;
+
     if (selectedClassId && userClassIds.includes(selectedClassId)) {
-      const [maxDayResult, newsCountResult, priceCountResult] = await Promise.all([
-        db
-          .select({ value: sql`max(${classStockPrices.day})`.mapWith(Number) })
-          .from(classStockPrices)
-          .where(eq(classStockPrices.classId, selectedClassId)),
-        db
-          .select({ value: count() })
-          .from(newsSchema)
-          .where(eq(newsSchema.classId, selectedClassId)),
-        db
-          .select({ value: count() })
-          .from(classStockPrices)
-          .where(eq(classStockPrices.classId, selectedClassId)),
-      ]);
+      const [maxDayResult, newsCountResult, priceCountResult] =
+        await Promise.all([
+          db
+            .select({
+              value: sql`max(${classStockPrices.day})`.mapWith(Number),
+            })
+            .from(classStockPrices)
+            .where(eq(classStockPrices.classId, selectedClassId)),
+          db
+            .select({ value: count() })
+            .from(newsSchema)
+            .where(eq(newsSchema.classId, selectedClassId)),
+          db
+            .select({ value: count() })
+            .from(classStockPrices)
+            .where(eq(classStockPrices.classId, selectedClassId)),
+        ]);
 
       gameProgress = {
         maxDay: maxDayResult[0]?.value || 0,
@@ -343,13 +374,13 @@ export async function getGameManagementData(params?: {
 
     // 4. 선택된 클래스/Day의 가격 데이터
     let pricesData: ClassStockPrice[] = [];
-    
+
     if (selectedClassId && userClassIds.includes(selectedClassId)) {
       const conditions = [eq(classStockPrices.classId, selectedClassId)];
       if (selectedDay !== undefined) {
         conditions.push(eq(classStockPrices.day, selectedDay));
       }
-      
+
       pricesData = await db.query.classStockPrices.findMany({
         where: and(...conditions),
         orderBy: [desc(classStockPrices.day)],
@@ -361,10 +392,17 @@ export async function getGameManagementData(params?: {
       stocks: allStocks,
       gameProgress,
       prices: pricesData,
+      eventMode: !!(
+        selectedClassId &&
+        userClassIds.includes(selectedClassId) &&
+        (await db.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, selectedClassId),
+        }))
+      ),
     };
   } catch (error) {
     throw new Error(
-      `게임 관리 데이터 조회 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+      `게임 관리 데이터 조회 실패: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
     );
   }
 }

@@ -6,7 +6,9 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/schema.ts",
+    "./market-scenario": "./src/market-scenario.ts",
+    "./crisis-engine": "./src/crisis-engine.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.5",

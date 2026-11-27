@@ -1,0 +1,140 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  color: #19391f;
+  background: #f6f8f6;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+select {
+  min-height: 44px;
+  padding: 8px 12px;
+}
+button {
+  cursor: pointer;
+}
+button:focus-visible,
+select:focus-visible {
+  outline: 3px solid #1d6f42;
+  outline-offset: 3px;
+}
+.preview-toolbar {
+  background: #fff;
+  border-bottom: 1px solid #c4cec5;
+  padding: 16px 24px;
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+.preview-toolbar nav {
+  display: flex;
+  gap: 8px;
+}
+.preview-toolbar button {
+  background: white;
+  color: #19391f;
+  border: 1px solid #879789;
+  border-radius: 8px;
+}
+.preview-toolbar [aria-pressed="true"] {
+  background: #19391f;
+  color: white;
+}
+.preview-options {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.preview-options label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.preview-options input {
+  width: 18px;
+  height: 18px;
+  accent-color: #19391f;
+}
+.preview-brand {
+  max-width: 1060px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+}
+.preview-brand strong {
+  font-size: 24px;
+  letter-spacing: -1px;
+}
+.preview-brand img {
+  width: 56px;
+  height: 56px;
+  margin-left: auto;
+  object-fit: contain;
+}
+.preview-main {
+  max-width: 1060px;
+  padding: 20px 24px 80px;
+  margin: auto;
+}
+.preview-main.student {
+  max-width: 840px;
+}
+.preview-eyebrow {
+  font-size: 14px;
+  color: #536158;
+}
+.preview-main h1 {
+  font-size: 32px;
+  letter-spacing: -1px;
+  margin: 8px 0 32px;
+}
+.preview-assets {
+  background: white;
+  border: 1px solid #d9dfda;
+  border-radius: 20px;
+  padding: 24px;
+  display: grid;
+  gap: 12px;
+}
+.preview-assets strong {
+  font-size: 28px;
+}
+.preview-assets p {
+  font-size: 14px;
+  color: #536158;
+}
+@media (max-width: 600px) {
+  .preview-brand,
+  .preview-main {
+    padding-inline: 16px;
+  }
+  .preview-toolbar {
+    padding: 12px;
+  }
+  .preview-brand span {
+    font-size: 13px;
+  }
+  .preview-main h1 {
+    font-size: 28px;
+  }
+  .preview-options {
+    gap: 10px;
+  }
+}

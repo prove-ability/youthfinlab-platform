@@ -17,6 +17,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: [
+      { find: "@repo/db/crisis-engine", replacement: local("packages/db/src/crisis-engine.ts") },
+      { find: "@repo/db/market-scenario", replacement: local("packages/db/src/market-scenario.ts") },
       {
         find: "@repo/utils",
         replacement: local("packages/utils/src/finance-calculations.ts"),

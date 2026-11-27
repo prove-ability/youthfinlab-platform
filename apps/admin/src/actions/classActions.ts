@@ -2,6 +2,7 @@
 
 import {
   db,
+  classMarketScenarios,
   dbWithTransaction,
   classes,
   clients,
@@ -13,7 +14,7 @@ import {
   transactions,
   holdings,
 } from "@repo/db";
-import { eq, inArray, sql } from "drizzle-orm";
+import { eq, and, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { withAuth } from "@/lib/safe-action";
@@ -55,7 +56,7 @@ async function generateUniqueClassCode(): Promise<string> {
   while (!isUnique) {
     // 6자리 랜덤 코드 생성
     code = Array.from({ length: 6 }, () =>
-      characters.charAt(Math.floor(Math.random() * characters.length))
+      characters.charAt(Math.floor(Math.random() * characters.length)),
     ).join("");
 
     // 중복 체크
@@ -135,10 +136,30 @@ export const updateClass = withAuth(
     }
 
     try {
-      await db
-        .update(classes)
-        .set(validation.data)
-        .where(eq(classes.id, classId));
+      await dbWithTransaction.transaction(async (tx) => {
+        const [course] = await tx
+          .select()
+          .from(classes)
+          .where(and(eq(classes.id, classId), eq(classes.createdBy, user.id)))
+          .for("update");
+        if (!course) throw new Error("수업 접근 권한이 없습니다.");
+        const event = await tx.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, classId),
+        });
+        if (
+          event &&
+          (validation.data.totalDays !== 6 ||
+            validation.data.programType !== "stock_game" ||
+            validation.data.difficulty !== course.difficulty ||
+            (validation.data.currentDay !== undefined &&
+              validation.data.currentDay !== course.currentDay))
+        )
+          throw new Error("이벤트의 일수·난이도·진행일은 수정할 수 없습니다.");
+        await tx
+          .update(classes)
+          .set(validation.data)
+          .where(eq(classes.id, classId));
+      });
 
       const data = await db.query.classes.findFirst({
         where: eq(classes.id, classId),
@@ -155,7 +176,7 @@ export const updateClass = withAuth(
         e instanceof Error ? e : new Error("An unknown error occurred");
       return { error: { _form: [error.message] } };
     }
-  }
+  },
 );
 
 // DELETE: 클래스 삭제
@@ -236,7 +257,7 @@ export const getClientsAndManagers = withAuth(async (user) => {
       e instanceof Error ? e : new Error("An unknown error occurred");
     console.error("데이터를 불러오는 중 오류가 발생했습니다:", error);
     throw new Error(
-      `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`
+      `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`,
     );
   }
 });
@@ -276,7 +297,7 @@ export const getClasses = withAuth(async (user) => {
 
     // 맵으로 변환
     const maxDayMap = new Map(
-      maxDaysResult.map((r) => [r.classId, r.maxDay || 0])
+      maxDaysResult.map((r) => [r.classId, r.maxDay || 0]),
     );
 
     // 클래스 데이터에 totalDays 추가 (메모리에서 매칭)
@@ -342,10 +363,23 @@ export const getClassById = withAuth(async (user, classId: string) => {
 export const updateClassCurrentDay = withAuth(
   async (user, classId: string, currentDay: number) => {
     try {
-      await db
-        .update(classes)
-        .set({ currentDay })
-        .where(eq(classes.id, classId));
+      await dbWithTransaction.transaction(async (tx) => {
+        const [course] = await tx
+          .select()
+          .from(classes)
+          .where(and(eq(classes.id, classId), eq(classes.createdBy, user.id)))
+          .for("update");
+        if (!course) throw new Error("수업 접근 권한이 없습니다.");
+        const event = await tx.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, classId),
+        });
+        if (event)
+          throw new Error("이벤트 수업은 Day +1로만 진행할 수 있습니다.");
+        await tx
+          .update(classes)
+          .set({ currentDay })
+          .where(eq(classes.id, classId));
+      });
       revalidatePath("/game-management");
       return { message: `현재 Day가 ${currentDay}로 업데이트되었습니다.` };
     } catch (e) {
@@ -353,7 +387,7 @@ export const updateClassCurrentDay = withAuth(
         e instanceof Error ? e : new Error("An unknown error occurred");
       throw new Error(`현재 Day 업데이트 실패: ${error.message}`);
     }
-  }
+  },
 );
 
 // 클래스 상태 변경 (설정 -> 진행, 진행 -> 종료)
@@ -417,24 +451,39 @@ export const updateClassStatus = withAuth(
         error: error.message,
       };
     }
-  }
+  },
 );
 
 // Day 증가 + 모든 게스트에게 지원금 지급
 export const incrementDayAndPayAllowance = withAuth(
-  async (user, classId: string) => {
+  async (user, classId: string, expectedCurrentDay?: number) => {
     try {
       return await dbWithTransaction.transaction(async (tx) => {
         // 1. 클래스 정보 조회
-        const classInfo = await tx.query.classes.findFirst({
-          where: eq(classes.id, classId),
-          columns: { currentDay: true },
+        const [classInfo] = await tx
+          .select()
+          .from(classes)
+          .where(and(eq(classes.id, classId), eq(classes.createdBy, user.id)))
+          .for("update");
+        const event = await tx.query.classMarketScenarios.findFirst({
+          where: eq(classMarketScenarios.classId, classId),
         });
+        if (
+          event &&
+          (!classInfo ||
+            classInfo.status !== "active" ||
+            classInfo.currentDay >= 6)
+        )
+          throw new Error(
+            "진행 중인 이벤트 수업의 Day 1~5에서만 다음 Day로 이동할 수 있습니다.",
+          );
 
         if (!classInfo) {
           throw new Error("클래스 정보를 찾을 수 없습니다.");
         }
 
+        if (event && expectedCurrentDay !== classInfo.currentDay)
+          throw new Error("수업 Day가 이미 변경되었습니다. 새로고침해 주세요.");
         const newDay = (classInfo.currentDay || 0) + 1;
 
         // 2. 클래스의 currentDay +1
@@ -520,7 +569,7 @@ export const incrementDayAndPayAllowance = withAuth(
     } finally {
       revalidatePath("/game-management");
     }
-  }
+  },
 );
 
 // QR 코드 토큰 생성

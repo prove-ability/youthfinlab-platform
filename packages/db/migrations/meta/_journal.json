@@ -253,6 +253,13 @@
       "when": 1795608272184,
       "tag": "0035_game_data_generation",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795754339331,
+      "tag": "0036_financial_crisis_events",
+      "breakpoints": true
     }
   ]
 }

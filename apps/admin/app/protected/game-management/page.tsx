@@ -13,6 +13,7 @@ import {
 } from "@/actions/classActions";
 import { DaySelectionModal } from "./components/DaySelectionModal";
 import { getGameManagementData } from "@/actions/gameActions";
+import MarketScenarioPanel from "@/components/game/MarketScenarioPanel";
 import GameDayManagement from "@/components/game/GameDayManagement";
 import PriceManagement from "@/components/game/PriceManagement";
 import { Stock, ClassWithRelations } from "@/types";
@@ -31,22 +32,29 @@ export default function GameManagementPage() {
   const isInitialized = useRef(false);
 
   // 단일 쿼리로 모든 데이터 조회
-  const { data, isLoading, isError, isFetching, isPlaceholderData, refetch } = useQuery({
-    queryKey: ["game-management", { classId: selectedClass, day: selectedDay }],
-    queryFn: () =>
-      getGameManagementData({
-        selectedClassId: selectedClass || undefined,
-        selectedDay: selectedDay,
-      }),
-    placeholderData: (previous) => previous,
-    staleTime: 30_000, // 30초 캐시
-  });
+  const { data, isLoading, isError, isFetching, isPlaceholderData, refetch } =
+    useQuery({
+      queryKey: [
+        "game-management",
+        { classId: selectedClass, day: selectedDay },
+      ],
+      queryFn: () =>
+        getGameManagementData({
+          selectedClassId: selectedClass || undefined,
+          selectedDay: selectedDay,
+        }),
+      placeholderData: (previous) => previous,
+      staleTime: 30_000, // 30초 캐시
+    });
 
-  const classes = useMemo(() => data?.classes || ([] as ClassWithRelations[]), [data?.classes]);
+  const classes = useMemo(
+    () => data?.classes || ([] as ClassWithRelations[]),
+    [data?.classes],
+  );
   const stocks = useMemo(() => data?.stocks || [], [data?.stocks]);
   const gameProgress = useMemo(
     () => data?.gameProgress || null,
-    [data?.gameProgress]
+    [data?.gameProgress],
   );
   const prices = useMemo(() => data?.prices || [], [data?.prices]);
 
@@ -58,7 +66,7 @@ export default function GameManagementPage() {
       if (firstClientId) {
         setSelectedClientId(firstClientId);
         const firstClassOfClient = classes.find(
-          (c) => c.client?.id === firstClientId
+          (c) => c.client?.id === firstClientId,
         );
         setSelectedClass(firstClassOfClient?.id || classes[0]?.id || "");
       } else {
@@ -113,12 +121,25 @@ export default function GameManagementPage() {
 
     setIsDayOperationLoading(true);
     try {
-      await incrementDayAndPayAllowance(selectedClass);
+      const result = await incrementDayAndPayAllowance(
+        selectedClass,
+        currentDay,
+      );
+      if (!result.success)
+        throw new Error(
+          ("error" in result && typeof result.error === "string"
+            ? result.error
+            : "message" in result
+              ? result.message
+              : undefined) || "Day 변경에 실패했습니다.",
+        );
       await queryClient.invalidateQueries({ queryKey: ["game-management"] });
       alert(`Day ${newDay}로 진행되었으며, 용돈이 지급되었습니다.`);
     } catch (error) {
       console.error("Day 증가 실패:", error);
-      alert("Day 증가에 실패했습니다.");
+      alert(
+        error instanceof Error ? error.message : "Day 증가에 실패했습니다.",
+      );
     } finally {
       setIsDayOperationLoading(false);
     }
@@ -147,18 +168,25 @@ export default function GameManagementPage() {
     setDayAdjustmentModal({ ...dayAdjustmentModal, isOpen: false });
   };
 
-  if (isLoading) return <LoadingState label="게임 관리 데이터를 불러오는 중…" />;
-  if (isError && !data) return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
+  if (isLoading)
+    return <LoadingState label="게임 관리 데이터를 불러오는 중…" />;
+  if (isError && !data)
+    return <LoadError onRetry={() => refetch()} retrying={isFetching} />;
 
   const uniqueClients = Array.from(
-    new Set(classes.map((c) => c.client?.id).filter(Boolean))
-  ).map((clientId) => {
-    const classWithClient = classes.find((c) => c.client?.id === clientId);
-    return classWithClient?.client;
-  }).filter((client): client is NonNullable<ClassWithRelations["client"]> => client != null);
+    new Set(classes.map((c) => c.client?.id).filter(Boolean)),
+  )
+    .map((clientId) => {
+      const classWithClient = classes.find((c) => c.client?.id === clientId);
+      return classWithClient?.client;
+    })
+    .filter(
+      (client): client is NonNullable<ClassWithRelations["client"]> =>
+        client != null,
+    );
 
   const classesOfSelectedClient = classes.filter(
-    (c) => c.client?.id === selectedClientId
+    (c) => c.client?.id === selectedClientId,
   );
 
   return (
@@ -167,11 +195,15 @@ export default function GameManagementPage() {
         <h1>게임 관리</h1>
         <p>수업 진행을 조정하고, 종목·뉴스·가격을 관리하세요.</p>
       </header>
-      {!isFetching && classes.length === 0 && <p>등록된 클래스가 없습니다. 클래스 관리에서 수업을 추가해 주세요.</p>}
+      {!isFetching && classes.length === 0 && (
+        <p>등록된 클래스가 없습니다. 클래스 관리에서 수업을 추가해 주세요.</p>
+      )}
       {/* 클래스 선택 */}
       <div className="yfl-game-filters">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="game-client" className="text-sm font-medium">고객사</label>
+          <label htmlFor="game-client" className="text-sm font-medium">
+            고객사
+          </label>
           <select
             id="game-client"
             disabled={isDayOperationLoading || isFetching || isError}
@@ -181,7 +213,7 @@ export default function GameManagementPage() {
               setSelectedClientId(newClientId);
               if (newClientId) {
                 const classesOfClient = classes.filter(
-                  (c) => c.client?.id === newClientId
+                  (c) => c.client?.id === newClientId,
                 );
                 const firstClass = classesOfClient[0];
                 if (firstClass) {
@@ -206,7 +238,9 @@ export default function GameManagementPage() {
 
         {selectedClientId && (
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="game-class" className="text-sm font-medium">클래스</label>
+            <label htmlFor="game-class" className="text-sm font-medium">
+              클래스
+            </label>
             <div className="relative">
               <select
                 id="game-class"
@@ -239,41 +273,124 @@ export default function GameManagementPage() {
       </div>
 
       {selectedClass && !isPlaceholderData && (
-        <section className="yfl-game-operation" aria-labelledby="game-progress-title" aria-busy={isDayOperationLoading}>
+        <section
+          className="yfl-game-operation"
+          aria-labelledby="game-progress-title"
+          aria-busy={isDayOperationLoading}
+        >
           <div className="yfl-game-operation-main">
             <div className="yfl-game-current">
               <h2 id="game-progress-title">현재 수업 진행</h2>
-              <p className="yfl-game-day"><strong>Day {getCurrentDay()}</strong><span>/ {classes.find((c) => c.id === selectedClass)?.totalDays ?? "—"}</span></p>
-              <p className="yfl-game-class-name">{classes.find((c) => c.id === selectedClass)?.name}</p>
+              <p className="yfl-game-day">
+                <strong>Day {getCurrentDay()}</strong>
+                <span>
+                  /{" "}
+                  {classes.find((c) => c.id === selectedClass)?.totalDays ??
+                    "—"}
+                </span>
+              </p>
+              <p className="yfl-game-class-name">
+                {classes.find((c) => c.id === selectedClass)?.name}
+              </p>
             </div>
             <div className="yfl-game-run">
               <div className="yfl-game-run-buttons">
-                <Button onClick={handleDayDecrease} variant="outline" size="sm" isLoading={isDayOperationLoading} disabled={isDayOperationLoading || isFetching || isError}>Day −1</Button>
-                <Button onClick={handleDayIncrease} size="sm" isLoading={isDayOperationLoading} disabled={isDayOperationLoading || isFetching || isError}>Day +1 · 용돈 지급</Button>
+                <Button
+                  onClick={handleDayDecrease}
+                  variant="outline"
+                  size="sm"
+                  isLoading={isDayOperationLoading}
+                  disabled={
+                    isDayOperationLoading ||
+                    isFetching ||
+                    isError ||
+                    data?.eventMode
+                  }
+                >
+                  Day −1
+                </Button>
+                <Button
+                  onClick={handleDayIncrease}
+                  size="sm"
+                  isLoading={isDayOperationLoading}
+                  disabled={
+                    isDayOperationLoading ||
+                    isFetching ||
+                    isError ||
+                    (data?.eventMode &&
+                      (getCurrentDay() >= 6 ||
+                        classes.find((c) => c.id === selectedClass)?.status !==
+                          "active"))
+                  }
+                >
+                  Day +1 · 용돈 지급
+                </Button>
               </div>
               <p>Day +1 실행 시 수업이 진행되고 용돈이 지급됩니다.</p>
-              {isDayOperationLoading && <p role="status">진행 상태 업데이트 중…</p>}
+              {isDayOperationLoading && (
+                <p role="status">진행 상태 업데이트 중…</p>
+              )}
             </div>
           </div>
           {gameProgress && (
             <dl className="yfl-game-data-summary" aria-label="등록 데이터 요약">
-              <div><dt>최대 Day</dt><dd>{gameProgress.maxDay}</dd></div>
-              <div><dt>총 뉴스</dt><dd>{gameProgress.totalNews}<span>개</span></dd></div>
-              <div><dt>가격 데이터</dt><dd>{gameProgress.totalPrices}<span>개</span></dd></div>
+              <div>
+                <dt>최대 Day</dt>
+                <dd>{gameProgress.maxDay}</dd>
+              </div>
+              <div>
+                <dt>총 뉴스</dt>
+                <dd>
+                  {gameProgress.totalNews}
+                  <span>개</span>
+                </dd>
+              </div>
+              <div>
+                <dt>가격 데이터</dt>
+                <dd>
+                  {gameProgress.totalPrices}
+                  <span>개</span>
+                </dd>
+              </div>
             </dl>
           )}
         </section>
       )}
 
-      {isPlaceholderData ? <LoadingState label="선택한 수업 정보를 불러오는 중…" /> : isError ? <LoadError onRetry={() => refetch()} retrying={isFetching} hasData /> : <RefreshStatus active={isFetching} />}
+      {isPlaceholderData ? (
+        <LoadingState label="선택한 수업 정보를 불러오는 중…" />
+      ) : isError ? (
+        <LoadError onRetry={() => refetch()} retrying={isFetching} hasData />
+      ) : (
+        <RefreshStatus active={isFetching} />
+      )}
+      {selectedClass && !isPlaceholderData && !isError && (
+        <MarketScenarioPanel
+          key={selectedClass}
+          classId={selectedClass}
+          stocks={stocks}
+          onConfigured={() =>
+            queryClient.invalidateQueries({ queryKey: ["game-management"] })
+          }
+        />
+      )}
       {/* 탭 */}
       {selectedClass && !isPlaceholderData && (
         <Tabs defaultValue="stock-management" className="yfl-game-data w-full">
           <div className="yfl-game-data-heading">
             <h2>게임 데이터</h2>
             <div className="yfl-game-view-day">
-              <span>조회 기준 <strong>Day {selectedDay}</strong></span>
-              <Button onClick={handleDaySelection} variant="outline" size="sm" disabled={isDayOperationLoading || isFetching || isError}>조회 Day 변경</Button>
+              <span>
+                조회 기준 <strong>Day {selectedDay}</strong>
+              </span>
+              <Button
+                onClick={handleDaySelection}
+                variant="outline"
+                size="sm"
+                disabled={isDayOperationLoading || isFetching || isError}
+              >
+                조회 Day 변경
+              </Button>
             </div>
           </div>
           <TabsList className="yfl-game-tabs" aria-label="게임 데이터 종류">
@@ -283,9 +400,14 @@ export default function GameManagementPage() {
           </TabsList>
 
           <TabsContent value="stock-management">
-            <section className="yfl-game-stocks" aria-labelledby="game-stocks-title">
+            <section
+              className="yfl-game-stocks"
+              aria-labelledby="game-stocks-title"
+            >
               <div className="yfl-game-stocks-heading">
-                <h3 id="game-stocks-title">사용 중인 종목 <span>{stocks.length}</span></h3>
+                <h3 id="game-stocks-title">
+                  사용 중인 종목 <span>{stocks.length}</span>
+                </h3>
                 <p>종목 추가·수정은 주식 관리 메뉴에서 할 수 있습니다.</p>
               </div>
               {stocks.length === 0 ? (
@@ -295,8 +417,13 @@ export default function GameManagementPage() {
                   {stocks.map((stock: Stock) => (
                     <li key={stock.id}>
                       <span className="yfl-game-stock-name">{stock.name}</span>
-                      <span className="yfl-game-stock-sector">{stock.industrySector || "업종 미등록"}</span>
-                      <span className="yfl-game-stock-market">{MARKET_FLAGS[stock.marketCountryCode] ?? "🌐"} {stock.marketCountryCode}</span>
+                      <span className="yfl-game-stock-sector">
+                        {stock.industrySector || "업종 미등록"}
+                      </span>
+                      <span className="yfl-game-stock-market">
+                        {MARKET_FLAGS[stock.marketCountryCode] ?? "🌐"}{" "}
+                        {stock.marketCountryCode}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -305,32 +432,46 @@ export default function GameManagementPage() {
           </TabsContent>
 
           <TabsContent value="game-day-management">
-            <GameDayManagement
-              selectedClass={selectedClass}
-              selectedDay={selectedDay}
-              stocks={stocks}
-              totalDays={gameProgress?.maxDay || 100}
-              onRefresh={() =>
-                queryClient.invalidateQueries({
-                  queryKey: ["game-management"],
-                })
-              }
-            />
+            {data?.eventMode ? (
+              <p className="p-4">
+                이벤트 속보는 위의 교사용 시나리오에서 확인하세요. 확정된 속보는
+                수정할 수 없습니다.
+              </p>
+            ) : (
+              <GameDayManagement
+                selectedClass={selectedClass}
+                selectedDay={selectedDay}
+                stocks={stocks}
+                totalDays={gameProgress?.maxDay || 100}
+                onRefresh={() =>
+                  queryClient.invalidateQueries({
+                    queryKey: ["game-management"],
+                  })
+                }
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="price-management">
-            <PriceManagement
-              selectedClass={selectedClass}
-              selectedDay={selectedDay}
-              stocks={stocks}
-              prices={prices}
-              maxDay={gameProgress?.maxDay || 0}
-              onRefresh={() =>
-                queryClient.invalidateQueries({
-                  queryKey: ["game-management"],
-                })
-              }
-            />
+            {data?.eventMode ? (
+              <p className="p-4">
+                이벤트 가격은 위의 교사용 시나리오에서 확인하세요. 확정된 가격은
+                수정할 수 없습니다.
+              </p>
+            ) : (
+              <PriceManagement
+                selectedClass={selectedClass}
+                selectedDay={selectedDay}
+                stocks={stocks}
+                prices={prices}
+                maxDay={gameProgress?.maxDay || 0}
+                onRefresh={() =>
+                  queryClient.invalidateQueries({
+                    queryKey: ["game-management"],
+                  })
+                }
+              />
+            )}
           </TabsContent>
         </Tabs>
       )}
