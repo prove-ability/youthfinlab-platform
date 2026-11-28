@@ -72,7 +72,7 @@ const Blog = () => {
                       <Typography.H3 className="group-hover:text-primary transition-colors">
                         {post.title}
                       </Typography.H3>
-                      <Typography.P className="text-muted-foreground line-clamp-2">
+                      <Typography.P className="text-muted-foreground line-clamp-2 [&:not(:first-child)]:mt-0">
                         {post.description}
                       </Typography.P>
                       <Typography.Muted>

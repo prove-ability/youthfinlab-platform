@@ -110,7 +110,7 @@ export default function EducationInquiry() {
             <Typography.P className="text-lg font-medium">
               금융역량을 강화하는 최고의 파트너
             </Typography.P>
-            <Typography.P className="text-foreground/80">
+            <Typography.P className="text-foreground/80 [&:not(:first-child)]:mt-0">
               세심한 사전 협의를 통해 꼭 맞는 프로그램을 제공합니다.
               <br />
               체계적이고 실질적인 금융 역량을 통해 지속 가능한 성장을
