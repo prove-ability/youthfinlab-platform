@@ -1,0 +1,67 @@
+{
+  "name": "youthfinlab-homepage",
+  "version": "1.0.0",
+  "private": true,
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "scripts": {
+    "dev": "next dev --turbopack --port 3300",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "check:brand": "node --test tests/*.test.mjs",
+    "check": "npm run lint && npm run typecheck && npm run check:brand",
+    "sync:blog": "node scripts/sync-blog.mjs",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@radix-ui/react-accordion": "1.2.20",
+    "@radix-ui/react-slot": "1.3.3",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "0.469.0",
+    "next": "16.0.8",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "tailwind-merge": "3.3.1",
+    "tailwindcss-animate": "1.0.7",
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "@channel.io/channel-web-sdk-loader": "2.0.2",
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
+    "@eslint/eslintrc": "3.3.6",
+    "@hookform/error-message": "2.0.1",
+    "@hookform/resolvers": "3.10.0",
+    "@notionhq/client": "2.3.0",
+    "@types/node": "20.19.43",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@types/three": "0.185.3",
+    "@types/xml2js": "0.4.14",
+    "eslint": "9.39.5",
+    "eslint-config-next": "15.1.3",
+    "eslint-config-prettier": "9.1.2",
+    "eslint-plugin-prettier": "5.5.6",
+    "husky": "9.1.7",
+    "next-themes": "0.4.6",
+    "postcss": "8.5.25",
+    "prettier": "3.9.6",
+    "react-hook-form": "7.60.0",
+    "tailwindcss": "4.1.11",
+    "typescript": "5.9.3",
+    "xml2js": "0.6.2",
+    "zod": "3.25.64",
+    "@tailwindcss/postcss": "4.1.11"
+  },
+  "trustedDependencies": [
+    "unrs-resolver"
+  ]
+}

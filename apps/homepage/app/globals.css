@@ -1,0 +1,311 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+/* Preserve pre-migration form defaults in the base layer. */
+@layer base {
+  input::placeholder, textarea::placeholder { color: #9ca3af; opacity: 1; }
+  button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+}
+
+@font-face {
+  font-family: "RixYeoljeongdo_Regular";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2102-01@1.0/RixYeoljeongdo_Regular.woff")
+    format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  /* 한글은 어절 단위로 끊어야 한다. 기본값은 영어 기준이라
+     "함께하/세요"처럼 단어 중간에서 잘린다. */
+  word-break: keep-all;
+  font-family:
+    "Pretendard",
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    sans-serif;
+}
+
+@layer base {
+  :root {
+    /* ------------------------------------------------------------------
+     * Brand scale — 유스핀랩 그린
+     * 600(#3F624A)이 기준색. 500(#5A8A6F), 800(#2D4A38)은 기존 사용값과 동일.
+     * 라이트/다크 공통. 브랜드 패널 위 텍스트는 --on-brand 사용.
+     * ------------------------------------------------------------------ */
+    --brand-50: 150 60% 97%;
+    --brand-100: 150 55% 92%;
+    --brand-200: 151 48% 82%;
+    --brand-300: 152 42% 70%;
+    --brand-400: 152 45% 56%;
+    --brand-500: 153 55% 42%;
+    --brand-600: 154 64% 31%;
+    --brand-700: 155 66% 25%;
+    --brand-800: 156 66% 20%;
+    --brand-900: 157 62% 13%;
+    --on-brand: 0 0% 100%;
+    /* 브랜드 패널 위 하이라이트 텍스트 (밝은 민트) */
+    --brand-accent: 152 45% 56%;
+
+    /*
+     * 브랜드 패널. 히어로 오브제와 같은 밝은 민트 계열로 통일한다.
+     * 라이트/다크 공통으로 동일한 색을 유지해 브랜드 인상이 흔들리지 않게 한다.
+     */
+    --panel: 152 45% 56%;
+    /* 패널은 테마와 무관하므로 그 위 강조색도 고정이어야 한다.
+       primary를 쓰면 다크에서 밝아져 민트 위에서 사라진다. */
+    --panel-accent: 156 66% 20%;
+    --panel-strong: 152 42% 70%;
+    --on-panel: 157 62% 13%;
+
+    /* 라이트/다크와 무관하게 항상 어두운 표면 (푸터 등) */
+    --surface-inverse: 220 15% 12%;
+    --on-surface-inverse: 0 0% 100%;
+
+    /* 배경보다 한 단계 가라앉은 면. 히어로처럼 오브제를 얹는 구간에 쓴다. */
+    --surface-sunken: 220 13% 93%;
+
+    /* ------------------------------------------------------------------
+     * Semantic tokens — 라이트
+     * ------------------------------------------------------------------ */
+    --background: 140 18% 97%;
+    --foreground: 220 15% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 221 39.3% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39.3% 11%;
+
+    --primary: 154 64% 31%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 155 66% 25%;
+
+    --secondary: 150 60% 97%;
+    --secondary-foreground: 155 66% 25%;
+    --accent: 150 55% 92%;
+    --accent-foreground: 155 66% 25%;
+
+    /* 본문 아래 단계의 텍스트 3단 — 기존 gray-600/500/400에 대응 */
+    --muted: 210 20% 98%;
+    --muted-foreground: 215 13.8% 34.1%;
+    --subtle-foreground: 220 8.9% 46.1%;
+    --faint-foreground: 218 10.6% 64.9%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --danger: 0 72% 51%;
+
+    --border: 140 12% 88%;
+    --border-strong: 140 12% 83%;
+    --input: 220 13% 91%;
+    --ring: 154 64% 31%;
+
+    --chart-1: 154 64% 31%;
+    --chart-2: 153 55% 42%;
+    --chart-3: 152 42% 70%;
+    --chart-4: 94 27% 45%;
+    --chart-5: 154 27% 45%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* ------------------------------------------------------------------
+     * Semantic tokens — 다크
+     * brand-* 는 그대로 두고 시맨틱 토큰만 반전한다.
+     * primary는 어두운 배경 위 대비 확보를 위해 400단계로 올리고
+     * 그 위 텍스트는 900단계를 쓴다.
+     * ------------------------------------------------------------------ */
+    --background: 220 18% 9%;
+    --foreground: 210 20% 98%;
+
+    --card: 220 16% 13%;
+    --card-foreground: 210 20% 98%;
+    --popover: 220 16% 13%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 152 45% 56%;
+    --primary-foreground: 157 62% 10%;
+    --primary-hover: 152 42% 70%;
+
+    --secondary: 220 14% 16%;
+    --secondary-foreground: 152 42% 70%;
+    --accent: 220 14% 18%;
+    --accent-foreground: 152 42% 70%;
+
+    --muted: 220 14% 15%;
+    --muted-foreground: 218 11% 74%;
+    --subtle-foreground: 218 11% 64%;
+    --faint-foreground: 218 10% 52%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 61% 55%;
+    --danger: 0 72% 62%;
+
+    --border: 220 12% 20%;
+    --border-strong: 220 12% 27%;
+    --input: 220 12% 27%;
+    --ring: 152 45% 56%;
+
+    --surface-sunken: 220 16% 12%;
+
+    --chart-1: 152 42% 70%;
+    --chart-2: 152 45% 56%;
+    --chart-3: 153 55% 42%;
+    --chart-4: 94 27% 60%;
+    --chart-5: 154 27% 60%;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /*
+   * 브랜드 그린 패널. 라이트/다크 모두 동일하게 진한 그린을 유지하고
+   * 내부 텍스트는 항상 --on-brand(흰색)를 쓴다.
+   */
+  .brand-panel {
+    @apply bg-linear-to-br/srgb from-panel to-panel-strong text-on-panel;
+  }
+
+  /*
+   * 기기 목업처럼 "제품 스크린샷" 역할이라 테마와 무관하게
+   * 항상 라이트로 고정되어야 하는 영역.
+   */
+  .device-mockup {
+    color-scheme: light;
+  }
+
+  /*
+   * 3D 블롭이 뜨기 전까지 자리를 지키는 CSS 폴백.
+   * WebGL 미지원 환경에서는 이 상태로 남는다.
+   */
+  .blob-fallback {
+    border-radius: 58% 42% 46% 54% / 52% 46% 54% 48%;
+    background:
+      radial-gradient(
+        46% 40% at 26% 74%,
+        hsl(var(--brand-accent)) 0%,
+        transparent 60%
+      ),
+      linear-gradient(150deg, hsl(var(--brand-500)), hsl(var(--brand-600)) 70%);
+    animation: blob-morph 20s ease-in-out infinite;
+  }
+
+  @keyframes blob-morph {
+    0%,
+    100% {
+      border-radius: 58% 42% 46% 54% / 52% 46% 54% 48%;
+      transform: rotate(0deg) scale(1);
+    }
+    33% {
+      border-radius: 44% 56% 62% 38% / 42% 62% 38% 58%;
+      transform: rotate(4deg) scale(1.03);
+    }
+    66% {
+      border-radius: 55% 45% 36% 64% / 62% 38% 62% 38%;
+      transform: rotate(-3deg) scale(0.98);
+    }
+  }
+
+  /*
+   * 히어로 좌하단 보조 블롭. 순수 장식이라 WebGL을 하나 더 띄우지 않고
+   * CSS로 처리한다. 주 오브제와 반대 방향으로 돌아 화면에 리듬을 준다.
+   */
+  .blob-soft {
+    border-radius: 54% 46% 62% 38% / 46% 58% 42% 54%;
+    background: linear-gradient(
+      140deg,
+      hsl(var(--brand-accent)),
+      hsl(var(--brand-400))
+    );
+    animation:
+      blob-morph 26s ease-in-out infinite reverse,
+      blob-drift 16s ease-in-out infinite;
+  }
+
+  @keyframes blob-drift {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 3% -4%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob-fallback,
+    .blob-soft {
+      animation: none;
+    }
+  }
+}
+
+/* 인스타그램 A 새싹 · 민트 · 차콜과 공유하는 브랜드 표면 */
+.brand-hero {
+  background-image: radial-gradient(
+    ellipse at 90% 10%,
+    #5cc19214,
+    transparent 65%
+  );
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  transform: translateY(-160%);
+  padding: 12px 20px;
+  background: #1a1d23;
+  color: white;
+  border: 2px solid #5cc192;
+  border-radius: 12px;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 4px;
+}
+.program-card {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.75rem, 4vw, 3rem);
+}
+.program-card > ul {
+  margin-top: auto;
+  padding-top: 2rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,44 @@
+name: Archive new blog posts for review
+on:
+  schedule:
+    - cron: '17 23 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: blog-archive
+  cancel-in-progress: false
+jobs:
+  archive:
+    if: vars.HOMEPAGE_ARCHIVE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm --filter youthfinlab-homepage sync:blog
+      - run: pnpm --filter youthfinlab-homepage check
+      - name: Open review PR (never merge or publish automatically)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- apps/homepage/data/blog-posts.json; then exit 0; fi
+          branch="automation/blog-archive-${GITHUB_RUN_ID}"
+          if [ "$(gh pr list --state open --json headRefName --jq '[.[] | select(.headRefName | startswith("automation/blog-archive-"))] | length')" != "0" ]; then
+            echo "Existing archive PR requires review; leaving it unchanged."
+            exit 0
+          fi
+          git switch -c "$branch"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/homepage/data/blog-posts.json
+          git -c core.hooksPath=/dev/null commit -m 'content: archive new YouthFinLab blog posts'
+          git push origin "$branch"
+          gh pr create --head "$branch" --title '새 블로그 글 보관 및 노출 검토' --body '네이버 RSS의 새 글을 추가했습니다. 기존 주소·본문은 유지합니다. 원고와 링크 검토 후 별도 승인으로 병합·배포해주세요.'
