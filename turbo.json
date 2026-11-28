@@ -11,9 +11,17 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ],
       "env": [
         "DATABASE_URL",
         "OPENAI_API_KEY",
@@ -24,10 +32,14 @@
       ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": [
+        "^check-types"
+      ]
     },
     "dev": {
       "cache": false,
@@ -39,6 +51,26 @@
         "NEXT_PUBLIC_STACK_PROJECT_ID",
         "NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY",
         "STACK_SECRET_SERVER_KEY"
+      ]
+    },
+    "youthfinlab-homepage#build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "env": [
+        "NOTION_API_KEY",
+        "NOTION_DATABASE_ID",
+        "SLACK_WEBHOOK_URL",
+        "NEXT_PUBLIC_CHANNEL_PLUGIN_KEY",
+        "VERCEL_ENV"
       ]
     }
   }

@@ -9,7 +9,8 @@ crowed-rank/
 ├── apps/
 │   ├── admin/          # 관리자 대시보드 (포트 3100)
 │   ├── stock-sim/      # 주식 투자 게임 - 학생용 (포트 3000)
-│   └── finance-sim/    # 재무 시뮬레이션 - 학생용 (포트 3200)
+│   ├── finance-sim/    # 재무 시뮬레이션 - 학생용 (포트 3200)
+│   └── homepage/       # 공식 홈페이지 (포트 3300, 독립 배포)
 ├── packages/
 │   ├── db/             # @repo/db — Drizzle ORM + Neon PostgreSQL
 │   ├── ui/             # @repo/ui — 공유 UI 컴포넌트
@@ -28,10 +29,11 @@ crowed-rank/
 | `admin` | — | 관리자 전용 대시보드. 클래스·고객사·학생 관리, 결과 분석 |
 | `stock-sim` | https://invest-game.youthfinlab.com | 주식 투자 게임. 학생이 가상 주식을 매수·매도하며 투자를 체험 |
 | `finance-sim` | https://finance-sim.youthfinlab.com | 재무 시뮬레이션. 재무 상태 진단, 저축·투자 계획, 연금 설계, 투자 성향 분석 |
+| `homepage` | https://www.youthfinlab.com | 공식 홈페이지·교육 문의·블로그. 운영 연결 전환은 별도 승인 후 진행 |
 
 ## 기술 스택
 
-- **프레임워크**: Next.js 15 (App Router), React 19
+- **프레임워크**: Next.js 16 (App Router), React 19
 - **모노레포**: Turborepo + pnpm workspaces
 - **데이터베이스**: Neon PostgreSQL + Drizzle ORM
 - **인증**: Stack Auth (`apps/admin`), 수업 코드 기반 세션 (`apps/stock-sim`, `apps/finance-sim`)
